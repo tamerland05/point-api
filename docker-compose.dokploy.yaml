@@ -1,0 +1,12 @@
+---
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    command: python -m uvicorn point.app:app --host 0.0.0.0 --port 8000
+    restart: always
+    env_file:
+      - ./.env
+    expose:
+      - 8000
