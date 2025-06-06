@@ -72,7 +72,7 @@ async def get_places_near(
             position=PointOut(
                 latitude=latitude,
                 longitude=longitude,
-                address=fake.wallet(),
+                address=fake.address(),
             ),
         ))
 
@@ -105,7 +105,7 @@ async def get_place(place_id: UUID) -> PlaceOut:
         position=PointOut(
             latitude=fake.latitude(),
             longitude=fake.longitude(),
-            address=fake.wallet(),
+            address=fake.address(),
         ),
     )
 

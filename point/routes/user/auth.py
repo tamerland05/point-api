@@ -52,7 +52,7 @@ async def post_auth(auth_data: AuthIn, user_type: UserType = UserType.consumer) 
             job_place=JobPlaceOut(
                 id=uuid4(),
                 name=fake.name(),
-                address=fake.wallet(),
+                address=fake.address(),
             ),
             purpose=PurposeOut(
                 id=uuid4(),

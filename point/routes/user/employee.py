@@ -33,7 +33,7 @@ async def get(employee_id: UUID, _: AuthUser = Depends(get_user)) -> UserPublicO
             job_place=fake.random_element([JobPlaceOut(
                 id=uuid4(),
                 name=fake.name(),
-                address=fake.wallet(),
+                address=fake.address(),
             ), None]),
             purpose=fake.random_element([PurposeOut(
                 id=uuid4(),
@@ -60,7 +60,7 @@ async def update(update_in: EmployeeUpdateIn, user: AuthUser = Depends(get_user)
             job_place=JobPlaceOut(
                 id=uuid4(),
                 name=fake.name(),
-                address=fake.wallet(),
+                address=fake.address(),
             ),
             purpose=PurposeOut(
                 id=uuid4(),

@@ -43,6 +43,6 @@ async def get_selection(selection_id: UUID) -> SelectionOut:
             name=fake.name(),
             description=fake.text(),
             icon=fake.image_url(1280, 720),
-            address=fake.wallet(),
+            address=fake.address(),
         ) for _ in range(fake.random_int(1, 10))],
     )
