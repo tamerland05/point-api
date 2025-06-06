@@ -36,7 +36,7 @@ async def get_places(diagonal: PointPair, location: PointOut) -> list[PlacePrevi
             position=PointOut(
                 latitude=latitude,
                 longitude=longitude,
-                address=fake.wallet(),
+                address=fake.address(),
             ),
         ))
 

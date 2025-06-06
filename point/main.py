@@ -2,7 +2,6 @@ import logging
 
 import uvicorn
 
-from point.types import TonAddress
 
 log_config = uvicorn.config.LOGGING_CONFIG
 log_config["formatters"]["access"]["fmt"] = "%(asctime)s - %(levelname)s - %(message)s"
