@@ -1,50 +1,48 @@
-from typing import Self
+from pydantic import Field
 
-from pydantic import Field, model_validator
-
-from point.types import UserType, ImageUrl
+from point.entity_types import Image, TonAddress
 from point.view import PointBase
 
-from . import EmployeeOut, ConsumerOut, EmployeePublicOut, ConsumerPublicOut
+from . import EmployeeOut, EmployeePublicOut
+
+
+class UserMeta(PointBase):
+    show_tips_left: bool = False
 
 
 class AuthUserIn(PointBase):
-    id: int = Field(default=None)
-    first_name: str | None = Field(default=None)
-    last_name: str | None = Field(default=None)
-    username: str | None = Field(default=None)
-    language_code: str | None = Field(default=None)
-    photo_url: ImageUrl | None = Field(default=None)
-    is_bot: bool | None = Field(default=None)
-    is_premium: bool | None = Field(default=None)
-    allows_write_to_pm: bool | None = Field(default=None)
+    id: int
+    first_name: str = Field(default="")
+    last_name: str = Field(default="")
+    username: str = Field(default="")
+    language_code: str | None = None
+    photo_url: Image | None = None
+    is_bot: bool = False
+    is_premium: bool = False
+    allows_write_to_pm: bool = False
 
 
 class AuthUserOut(AuthUserIn):
+    wallet: TonAddress | None = None
     rank: int
     bonus_balance: int = 0
-    user_type: UserType
-    account: EmployeeOut | ConsumerOut
-
-    @model_validator(mode="after")
-    def validate_model(self) -> Self:
-        if (
-                self.user_type == UserType.consumer and not isinstance(self.account, ConsumerOut) or
-                self.user_type == UserType.employee and not isinstance(self.account, EmployeeOut)
-        ):
-            raise ValueError("Mismatch user type and account model")
-        return self
+    typs_left: int = Field(ge=0)
+    account: EmployeeOut | None = None
 
 
 class AuthUser(PointBase):
     id: int
-    username: str | None = Field(default=None)
-    sessionId: str | None = Field(default=None)
+    sessionId: str | None = None
 
 
 class UserPublicOut(PointBase):
     name: str
     username: str
     rank: int
-    user_type: UserType
-    account: EmployeePublicOut | ConsumerPublicOut
+    typs_left: int | None = Field(ge=0, default=None)
+    account: EmployeePublicOut | None = None
+
+
+class UserUpdateIn(PointBase):
+    wallet: TonAddress | None = None
+    meta: UserMeta | None = None

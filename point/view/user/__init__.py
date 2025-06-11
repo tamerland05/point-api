@@ -1,4 +1,3 @@
-from .emploee import JobPlaceOut, PurposeOut, EmployeeMeta, EmployeePublicOut, EmployeeOut, EmployeeUpdateIn
-from .consumer import ConsumerMeta, ConsumerPublicOut, ConsumerOut, ConsumerUpdateIn
-from .user import AuthUser, AuthUserIn, AuthUserOut, UserPublicOut
+from .emploee import JobPlaceOut, Purpose, EmployeeMeta, EmployeePublicOut, EmployeeOut, EmployeeUpdateIn
+from .user import UserMeta, AuthUser, AuthUserIn, AuthUserOut, UserPublicOut, UserUpdateIn
 from .auth import AuthIn, AuthOut

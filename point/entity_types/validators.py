@@ -4,7 +4,7 @@ from pydantic import UrlConstraints, AnyUrl, RootModel, Field, model_validator
 from pytoniq import Address, AddressError
 
 
-class ImageUrl(AnyUrl):
+class Image(AnyUrl):
     _constraints = UrlConstraints(max_length=1024, allowed_schemes=["http", "https"])
 
 
@@ -24,6 +24,10 @@ class PointName(PointRoot[str]):
 
 class PointDescription(PointRoot[str]):
     root: str = Field(max_length=256, kw_only=True)
+
+
+class PointHash(PointRoot[str]):
+    root: str = Field(min_length=32, max_length=32 + 8, kw_only=True)
 
 
 class TonAddress(PointRoot[str]):

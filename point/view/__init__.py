@@ -1,13 +1,14 @@
 import faker
 
 from .base import PointBase
-from .common import PointIn, PointOut, PointPair
+from .common import PointRequestIn, PointUploadIn, PointOut, PointWithScale, Cost
 from .earn import *
 from .map import *
 from .selection import *
 from .task import *
 from .user import *
 from .tip import *
+from .admin import *
 
 from .utils import random_address
 

@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import Base64Str
 
-from point.types import TonAddress
+from point.entity_types import TonAddress
 from point.view import PointBase
 
 

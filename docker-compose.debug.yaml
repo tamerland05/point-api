@@ -1,0 +1,16 @@
+---
+services:
+  postgres:
+    restart: always
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    env_file:
+      - .env
+    volumes:
+      - ./db:/var/lib/postgresql/data

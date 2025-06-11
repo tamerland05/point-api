@@ -1,12 +1,13 @@
 import logging
 
+from starlette.responses import JSONResponse
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
-from starlette.responses import JSONResponse
+from tortoise.contrib.fastapi import register_tortoise
 
-from point.config import settings, AppEnv
+from point.config import settings
 from point.errors import APIException
 from point.routes import router
 
@@ -92,5 +93,5 @@ Instrumentator().instrument(app).expose(
     app=app,
     endpoint=APP_BASE + "/metrics",
     tags=["Aux endpoints"],
-    include_in_schema=settings.app_env != AppEnv.PROD
 )
+register_tortoise(app, add_exception_handlers=True, config=settings.tortoise_orm, generate_schemas=False)

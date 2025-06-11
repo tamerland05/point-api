@@ -3,17 +3,14 @@ from uuid import uuid4
 from fastapi import APIRouter
 
 from point.errors import APIException
-from point.types import UserType
 from point.view import (
     AuthIn,
     AuthOut,
     AuthUserOut,
-    ConsumerOut,
     JobPlaceOut,
-    PurposeOut,
+    Purpose,
     EmployeeMeta,
     EmployeeOut,
-    ConsumerMeta,
     random_address,
     fake,
 )
@@ -24,7 +21,7 @@ router = APIRouter(tags=["Auth"])
 
 
 @router.post("")
-async def post_auth(auth_data: AuthIn, user_type: UserType = UserType.consumer) -> AuthOut:
+async def post_auth(auth_data: AuthIn, is_employee: bool = True) -> AuthOut:
     if not validate_telegram_init_data(auth_data):
         raise APIException("Wrong credentials", 401)
 
@@ -38,24 +35,17 @@ async def post_auth(auth_data: AuthIn, user_type: UserType = UserType.consumer) 
 
     user_out = AuthUserOut(
         **auth_data.model_dump(),
+        wallet=random_address(),
         rank=fake.random_int(1, 10 ** 10),
         bonus_balance=fake.random_int(1, 10 ** 10),
-        user_type=user_type,
-        account=ConsumerOut(
+        account=EmployeeOut(
             id=uuid4(),
-            typs_left=fake.random_int(1, 10 ** 10),
-            wallet=random_address(),
-            meta=ConsumerMeta(show_tips_left=fake.boolean())
-        ) if user_type == UserType.consumer else EmployeeOut(
-            id=uuid4(),
-            wallet=random_address(),
             job_place=JobPlaceOut(
                 id=uuid4(),
                 name=fake.name(),
                 address=fake.address(),
             ),
-            purpose=PurposeOut(
-                id=uuid4(),
+            purpose=Purpose(
                 title=fake.name(),
                 description=fake.text(),
                 icon=fake.image_url(1280, 720)
@@ -64,7 +54,7 @@ async def post_auth(auth_data: AuthIn, user_type: UserType = UserType.consumer) 
                 show_job=fake.boolean(),
                 show_purpose=fake.boolean(),
             )
-        )
+        ) if is_employee else None
     )
 
     return AuthOut(access_token=access_token, user=user_out)

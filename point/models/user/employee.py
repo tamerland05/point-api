@@ -1,0 +1,18 @@
+from tortoise import Model, fields
+from tortoise.fields import OnDelete
+
+
+class Employee(Model):
+
+    class Meta:
+        table = "employers"
+        unique_together = ()
+
+    job_place_id = fields.ForeignKeyField("models.Establishment", on_delete=OnDelete.RESTRICT, index=True)
+
+    id = fields.UUIDField(pk=True, unique=True, index=True)
+    purpose = fields.JSONField(null=True)
+    meta = fields.JSONField()
+
+    created_at = fields.DatetimeField(auto_now_add=True)
+    updated_at = fields.DatetimeField(auto_now=True)

@@ -1,0 +1,35 @@
+from uuid import uuid4
+
+from tortoise import Model, fields
+from tortoise.fields import OnDelete
+
+from point.models.utils import hash_to_link
+
+
+class MenuItem(Model):
+
+    class Meta:
+        table = "menu_items"
+
+    establishment = fields.ForeignKeyField("models.Establishment", on_delete=OnDelete.RESTRICT, index=True)
+
+    id = fields.UUIDField(pk=True, default=uuid4, unique=True)
+
+    title = fields.CharField(max_length=128, unique=True)
+    description = fields.CharField(max_length=128, unique=True)
+    photo_hash = fields.TextField()
+
+    amount = fields.DecimalField(decimal_places=18, max_digits=64)
+    currency = fields.CharField(max_length=8)
+
+    enabled = fields.BooleanField(default=True, index=True)
+    created_at = fields.DatetimeField(auto_now_add=True)
+    updated_at = fields.DatetimeField(auto_now=True)
+
+    @property
+    def photo(self) -> str:
+        return hash_to_link(self.photo_hash)
+
+    @property
+    def cost(self) -> dict:
+        return {"amount": self.amount, "currency": self.currency}

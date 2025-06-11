@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import Field
 
-from point.types import ImageUrl, TonAddress
+from point.entity_types import Image, TonAddress
 from point.view import PointBase
 
 
@@ -13,4 +13,4 @@ class AssetOut(PointBase):
     ticker: str = Field(max_length=16)
     price: Decimal = Field(default=0)
     address: TonAddress
-    icon: ImageUrl
+    icon: Image

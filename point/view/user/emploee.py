@@ -2,7 +2,7 @@ from uuid import UUID
 
 from pydantic import Field
 
-from point.types import TonAddress, ImageUrl
+from point.entity_types import Image
 from point.view import PointBase
 
 
@@ -12,14 +12,10 @@ class JobPlaceOut(PointBase):
     address: str = Field(max_length=64)
 
 
-class PurposeIn(PointBase):
-    icon: ImageUrl
+class Purpose(PointBase):
+    icon: Image
     title: str = Field(max_length=32)
     description: str = Field(max_length=512)
-
-
-class PurposeOut(PurposeIn):
-    id: UUID
 
 
 class EmployeeMeta(PointBase):
@@ -29,9 +25,8 @@ class EmployeeMeta(PointBase):
 
 class EmployeePublicOut(PointBase):
     id: UUID
-    wallet: TonAddress
     job_place: JobPlaceOut | None = None
-    purpose: PurposeOut | None = None
+    purpose: Purpose | None = None
 
 
 class EmployeeOut(EmployeePublicOut):
@@ -39,6 +34,5 @@ class EmployeeOut(EmployeePublicOut):
 
 
 class EmployeeUpdateIn(PointBase):
-    wallet: TonAddress | None = None
-    purpose: PurposeIn | None = None
+    purpose: Purpose | None = None
     meta: EmployeeMeta | None = None
