@@ -11,7 +11,7 @@ services:
       timeout: 3s
       retries: 3
     env_file:
-      - .env
+      - ./.env
     volumes:
       - ./db:/var/lib/postgresql/data
 
@@ -22,7 +22,7 @@ services:
         condition: service_healthy
     command: aerich upgrade
     env_file:
-      - .env
+      - ./.env
 
   api:
     image: ${IMAGE_REF}
