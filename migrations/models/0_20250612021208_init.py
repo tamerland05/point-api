@@ -41,15 +41,16 @@ CREATE TABLE IF NOT EXISTS "employers" (
 CREATE INDEX IF NOT EXISTS "idx_employers_job_pla_6113ba" ON "employers" ("job_place_id_id");
 CREATE TABLE IF NOT EXISTS "menu_items" (
     "id" UUID NOT NULL PRIMARY KEY,
-    "title" VARCHAR(128) NOT NULL UNIQUE,
-    "description" VARCHAR(128) NOT NULL UNIQUE,
+    "title" VARCHAR(128) NOT NULL,
+    "description" VARCHAR(128) NOT NULL,
     "photo_hash" TEXT NOT NULL,
     "amount" DECIMAL(64,18) NOT NULL,
     "currency" VARCHAR(8) NOT NULL,
     "enabled" BOOL NOT NULL DEFAULT True,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "establishment_id" UUID NOT NULL REFERENCES "establishments" ("id") ON DELETE RESTRICT
+    "establishment_id" UUID NOT NULL REFERENCES "establishments" ("id") ON DELETE RESTRICT,
+    CONSTRAINT "uid_menu_items_title_9a00bf" UNIQUE ("title", "establishment_id")
 );
 CREATE INDEX IF NOT EXISTS "idx_menu_items_enabled_2c09a4" ON "menu_items" ("enabled");
 CREATE INDEX IF NOT EXISTS "idx_menu_items_establi_1ef563" ON "menu_items" ("establishment_id");

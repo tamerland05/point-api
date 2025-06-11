@@ -10,13 +10,14 @@ class MenuItem(Model):
 
     class Meta:
         table = "menu_items"
+        unique_together = ("title", "establishment_id")
 
     establishment = fields.ForeignKeyField("models.Establishment", on_delete=OnDelete.RESTRICT, index=True)
 
     id = fields.UUIDField(pk=True, default=uuid4, unique=True)
 
-    title = fields.CharField(max_length=128, unique=True)
-    description = fields.CharField(max_length=128, unique=True)
+    title = fields.CharField(max_length=128)
+    description = fields.CharField(max_length=128)
     photo_hash = fields.TextField()
 
     amount = fields.DecimalField(decimal_places=18, max_digits=64)

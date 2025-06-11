@@ -6,7 +6,6 @@ class Employee(Model):
 
     class Meta:
         table = "employers"
-        unique_together = ()
 
     job_place_id = fields.ForeignKeyField("models.Establishment", on_delete=OnDelete.RESTRICT, index=True)
 

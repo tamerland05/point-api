@@ -9,7 +9,6 @@ class User(Model):
 
     class Meta:
         table = "users"
-        unique_together = ()
 
     id = fields.BigIntField(pk=True, unique=True, index=True)
     first_name = fields.TextField()
