@@ -104,7 +104,9 @@ jobs:
           echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> .env
           echo "POSTGRES_HOST=${{ secrets. POSTGRES_HOST}}" >> .env
           echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
-          
+          echo "WALLET_ID=${{ secrets.WALLET_ID }}" >> .env
+          echo "SEED=${{ secrets.SEED }}" >> .env
+          echo "ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}" >> .env
 
       - name: Docker compose
         env:
