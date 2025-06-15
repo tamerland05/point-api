@@ -20,6 +20,10 @@ class Establishment(Model):
     longitude = fields.DecimalField(max_digits=9, decimal_places=6)
     address = fields.CharField(max_length=128)
 
+    service_wallet = fields.CharField(null=True, max_length=128)
+    service_wallet_seed = fields.TextField(null=True)
+    official_wallet = fields.CharField(max_length=128, null=True, default=None)
+
     name = fields.CharField(max_length=128)
     description = fields.CharField(max_length=512)
     channel_link = fields.CharField(max_length=512)
@@ -53,4 +57,8 @@ class Establishment(Model):
     @property
     def gallery(self) -> list[str]:
         return [hash_to_link(i) for i in self.gallery_hashes]
+
+    @property
+    def wallet(self) -> str:
+        return self.official_wallet or self.service_wallet
 

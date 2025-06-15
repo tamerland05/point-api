@@ -1,10 +1,11 @@
+from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
 
 from pydantic import Field, AnyUrl
 
 from point.entity_types import PointHash
-from point.view import PointBase, PointUploadIn
+from point.view import PointBase, PointUploadIn, EstablishmentOut
 
 
 class EstablishmentCreateIn(PointBase):
@@ -39,3 +40,15 @@ class EstablishmentUpdateIn(PointBase):
     icon_hash: PointHash | None = None
     photo_hash: PointHash | None = None
     gallery: list[PointHash] | None = None
+
+    enabled: bool | None = None
+
+
+class EstablishmentAdminOut(EstablishmentOut):
+    service_wallet: str | None = Field(default=None, max_length=128)
+    service_wallet_seed: str | None = None
+    official_wallet: str | None = Field(default=None, max_length=128)
+
+    enabled: bool
+    created_at: datetime | None = None
+    updated_at: datetime | None = None

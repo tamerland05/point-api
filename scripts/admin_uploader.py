@@ -8,10 +8,8 @@ import aiohttp
 from point.entity_types import PointHash
 from point.view import (
     PointBase,
-    EstablishmentTypeOut,
     EstablishmentTypeCreateIn,
     EstablishmentTypeUpdateIn,
-    EstablishmentOut,
     EstablishmentCreateIn,
     EstablishmentUpdateIn,
     PointUploadIn,
@@ -19,6 +17,8 @@ from point.view import (
     Cost,
     MenuItemCreateIn,
     MenuItemUpdateIn,
+    EstablishmentTypeAdminOut,
+    EstablishmentAdminOut,
 )
 
 
@@ -77,17 +77,17 @@ class PointApiService:
     async def upload_files(self, filepaths: list[str]) -> list[PointHash] | None:
         return await asyncio.gather(*[asyncio.create_task(self.upload_file(filepath)) for filepath in filepaths])
 
-    async def get_establishment_type(self, establishment_type_id: str) -> EstablishmentTypeOut:
+    async def get_establishment_type(self, establishment_type_id: str) -> EstablishmentTypeAdminOut:
         resp = await self._get(url="/map/establishment-type/" + establishment_type_id)
-        return EstablishmentTypeOut.model_validate(resp)
+        return EstablishmentTypeAdminOut.model_validate(resp)
 
-    async def create_establishment_type(self, name: str, path_to_icon: str) -> EstablishmentTypeOut:
+    async def create_establishment_type(self, name: str, path_to_icon: str) -> EstablishmentTypeAdminOut:
         icon_hash = await self.upload_file(path_to_icon)
         resp = await self._post(
             url="/map/establishment-type",
             data=EstablishmentTypeCreateIn(name=name, icon_hash=icon_hash),
         )
-        return EstablishmentTypeOut.model_validate(resp)
+        return EstablishmentTypeAdminOut.model_validate(resp)
 
     async def update_establishment_type(
             self,
@@ -95,7 +95,7 @@ class PointApiService:
             name: str | None = None,
             icon_hash: PointHash | None = None,
             path_to_icon: str | None = None,
-    ) -> EstablishmentTypeOut:
+    ) -> EstablishmentTypeAdminOut:
         if icon_hash is None and path_to_icon is not None:
             icon_hash = await self.upload_file(path_to_icon)
 
@@ -103,14 +103,14 @@ class PointApiService:
             url="/map/establishment-type/" + establishment_type_id,
             data=EstablishmentTypeUpdateIn(name=name, icon_hash=icon_hash),
         )
-        return EstablishmentTypeOut.model_validate(resp)
+        return EstablishmentTypeAdminOut.model_validate(resp)
 
     async def delete_establishment_type(self, establishment_type_id: str) -> None:
         await self._delete(url="/map/establishment-type/" + establishment_type_id)
 
-    async def get_establishment(self, establishment_id: str) -> EstablishmentOut:
+    async def get_establishment(self, establishment_id: str) -> EstablishmentAdminOut:
         resp = await self._get(url="/map/establishment/" + establishment_id)
-        return EstablishmentOut.model_validate(resp)
+        return EstablishmentAdminOut.model_validate(resp)
 
     async def create_establishment(
             self,
@@ -122,7 +122,7 @@ class PointApiService:
             path_to_photo: str,
             paths_to_gallery: list[str],
             channel_link: str | None = None,
-    ) -> EstablishmentOut:
+    ) -> EstablishmentAdminOut:
         icon_hash, photo_hash = await self.upload_files([path_to_icon, path_to_photo])
         gallery_hashes = await self.upload_files(paths_to_gallery)  # можно сделать, чтобы указывалась директория
         resp = await self._post(
@@ -138,7 +138,7 @@ class PointApiService:
                 channel_link=channel_link,
             ),
         )
-        return EstablishmentOut.model_validate(resp)
+        return EstablishmentAdminOut.model_validate(resp)
 
     async def update_establishment(
             self,
@@ -156,7 +156,7 @@ class PointApiService:
             paths_to_gallery: list[str] | None = None,
             gallery: list[PointHash] | None = None,
             channel_link: str | None = None,
-    ) -> EstablishmentTypeOut:
+    ) -> EstablishmentAdminOut:
         if icon_hash is None and path_to_icon is not None:
             icon_hash = await self.upload_file(path_to_icon)
         if photo_hash is None and path_to_photo is not None:
@@ -179,7 +179,7 @@ class PointApiService:
                 channel_link=channel_link,
             ),
         )
-        return EstablishmentTypeOut.model_validate(resp)
+        return EstablishmentAdminOut.model_validate(resp)
 
     async def delete_establishment(self, establishment_id: str) -> None:
         await self._delete(url="/map/establishment/" + establishment_id)

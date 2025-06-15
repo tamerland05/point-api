@@ -1,6 +1,7 @@
 from enum import StrEnum
 from typing import Any
 
+from cryptography.fernet import Fernet
 from pydantic_settings import BaseSettings
 
 
@@ -29,6 +30,11 @@ class Settings(BaseSettings, extra="allow"):
     postgres_host: str
     postgres_db: str
 
+    wallet_id: int
+    seed: str
+
+    encryption_key: str
+
     @property
     def tortoise_orm(self) -> dict[str, Any]:
         database_url = (
@@ -51,6 +57,10 @@ class Settings(BaseSettings, extra="allow"):
             "use_tz": True,
             "timezone": "UTC",
         }
+
+    @property
+    def merchant_cipher(self) -> Fernet:
+        return Fernet(self.encryption_key.encode())
 
     def __init__(self, **kwargs: Any):
         super().__init__(**kwargs)

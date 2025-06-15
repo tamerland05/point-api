@@ -4,10 +4,10 @@ from fastapi import APIRouter
 
 from point.controllers import EstablishmentController, EstablishmentTypeController
 from point.view import (
-    EstablishmentOut,
     EstablishmentCreateIn,
     EstablishmentUpdateIn,
-    EstablishmentDbCreateIn
+    EstablishmentDbCreateIn,
+    EstablishmentAdminOut,
 )
 
 router = APIRouter()
@@ -16,32 +16,30 @@ router = APIRouter()
 @router.get("/{establishment_id}")
 async def get_establishment(
         establishment_id: UUID,
-) -> EstablishmentOut:
+) -> EstablishmentAdminOut:
     establishment = await EstablishmentController.get_establishment(establishment_id=establishment_id)
-    return EstablishmentOut.model_validate(establishment)
+    return EstablishmentAdminOut.model_validate(establishment)
 
 
 @router.post("")
 async def create_establishment(
         establishment_in: EstablishmentCreateIn,
-) -> EstablishmentOut:
+) -> EstablishmentAdminOut:
     await EstablishmentTypeController.get(id=establishment_in.establishment_type_id)
 
     establishment_in = EstablishmentDbCreateIn(
         **establishment_in.model_dump(),
         **establishment_in.position.model_dump(),
     )
-    establishment = await EstablishmentController.create(establishment_in)
-    await establishment.fetch_related("menu")
-
-    return EstablishmentOut.model_validate(establishment)
+    establishment = await EstablishmentController.admin_create(establishment_in)
+    return EstablishmentAdminOut.model_validate(establishment)
 
 
 @router.put("/{establishment_id}")
 async def update_establishment(
         establishment_id: UUID,
         establishment_update_in: EstablishmentUpdateIn,
-) -> EstablishmentOut:
+) -> EstablishmentAdminOut:
     if establishment_update_in.establishment_type_id is not None:
         await EstablishmentTypeController.get(id=establishment_update_in.establishment_type_id)
 
@@ -50,7 +48,7 @@ async def update_establishment(
         model_update_in=establishment_update_in,
         id=establishment_id
     )
-    return EstablishmentOut.model_validate(establishment)
+    return EstablishmentAdminOut.model_validate(establishment)
 
 
 @router.delete("/{establishment_id}")

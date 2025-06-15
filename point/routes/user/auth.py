@@ -17,7 +17,7 @@ from point.view import (
 
 from point.auth import create_token, validate_telegram_init_data
 
-router = APIRouter(tags=["Auth"])
+router = APIRouter()
 
 
 @router.post("")
@@ -34,10 +34,11 @@ async def post_auth(auth_data: AuthIn, is_employee: bool = True) -> AuthOut:
     access_token = create_token(payload)
 
     user_out = AuthUserOut(
-        **auth_data.model_dump(),
+        **auth_data.user.model_dump(),
         wallet=random_address(),
         rank=fake.random_int(1, 10 ** 10),
         bonus_balance=fake.random_int(1, 10 ** 10),
+        typs_left=fake.random_int(1, 10 ** 10),
         account=EmployeeOut(
             id=uuid4(),
             job_place=JobPlaceOut(
