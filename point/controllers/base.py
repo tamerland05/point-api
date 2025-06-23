@@ -14,11 +14,6 @@ class BaseController(Generic[Model]):
     error_code: ErrorCode = ErrorCode.ENTITY_NOT_FOUND
 
     @classmethod
-    async def get_by_uuid(cls, uuid: str) -> Model | None:
-        res: Model | None = await cls.model.get_or_none(uuid=uuid)
-        return res
-
-    @classmethod
     async def get_or_none(cls, *prefetch, **filters) -> Model | None:
         return await cls.model.get_or_none(**filters).prefetch_related(*prefetch)
 

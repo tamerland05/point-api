@@ -1,18 +1,17 @@
-import base64
-
 from fastapi import APIRouter
 from fastapi.params import Depends
 
 from point.auth import get_user
-from point.view import AuthUser, CheckoutTransferIn, CheckoutTransferOut, random_address, fake
+from point.controllers import TipController
+from point.view import AuthUser, CheckoutTipIn, TransactionOut
 
 router = APIRouter()
 
 
 @router.post("/checkout")
-async def checkout_transfer(checkout_in: CheckoutTransferIn, user: AuthUser = Depends(get_user)) -> CheckoutTransferOut:
-    return CheckoutTransferOut(
-        to=random_address(),
-        value=fake.random_int(1, 10 ** 10),
-        body=base64.urlsafe_b64encode(fake.text().encode("utf8")).decode("utf8"),
+async def checkout_tip(checkout_in: CheckoutTipIn, user: AuthUser = Depends(get_user)) -> list[TransactionOut]:
+    tip = await TipController.create_tip(
+        checkout_in=checkout_in,
+        sender_id=user.id,
     )
+    return [TransactionOut.model_validate(t) for t in tip.transactions]

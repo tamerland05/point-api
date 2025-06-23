@@ -19,7 +19,7 @@ class EstablishmentPreview(PointBase):
 
 
 class NearEstablishmentCriteria(PointBase):
-    name: str | None = Field(max_length=128)
+    name: str | None = Field(default=None, max_length=128)
     location: PointRequestIn
 
 

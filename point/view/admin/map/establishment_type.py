@@ -13,11 +13,11 @@ class EstablishmentTypeCreateIn(PointBase):
 
 class EstablishmentTypeUpdateIn(PointBase):
     name: str | None = Field(max_length=128, default=None)
-    icon_hash: PointHash | None = None
-    enabled: bool | None = None
+    icon_hash: PointHash | None = Field(default=None)
+    enabled: bool | None = Field(default=None)
 
 
 class EstablishmentTypeAdminOut(EstablishmentTypeOut):
     enabled: bool
-    created_at: datetime | None = None
-    updated_at: datetime | None = None
+    created_at: datetime | None = Field(default=None)
+    updated_at: datetime | None = Field(default=None)

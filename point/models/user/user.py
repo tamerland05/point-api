@@ -11,21 +11,27 @@ class User(Model):
         table = "users"
 
     id = fields.BigIntField(pk=True, unique=True, index=True)
-    first_name = fields.TextField()
-    last_name = fields.TextField()
-    username = fields.TextField()
+    first_name = fields.TextField(null=True)
+    last_name = fields.TextField(null=True)
+    username = fields.TextField(null=True)
     language_code = fields.TextField(null=True)
     photo_url = fields.TextField(null=True)
-    is_bot = fields.BooleanField()
-    is_premium = fields.BooleanField()
-    allows_write_to_pm = fields.BooleanField()
+    is_bot = fields.BooleanField(null=True)
+    is_premium = fields.BooleanField(null=True)
+    allows_write_to_pm = fields.BooleanField(null=True)
 
     wallet: TonAddress = fields.TextField(null=True)
-    bonus_balance = fields.BigIntField(null=True)
-    tips_left = fields.BigIntField(null=True)
-    meta: UserMeta = fields.JSONField()
+    bonus_balance = fields.BigIntField(default=0)
+    tips_left = fields.BigIntField(default=0)
+    meta: UserMeta = fields.JSONField(default={})
 
-    account_id = fields.ForeignKeyField("models.Employee", null=True, on_delete=OnDelete.SET_NULL)
+    employee = fields.ForeignKeyField(
+        model_name="models.Employee",
+        null=True,
+        on_delete=OnDelete.SET_NULL,
+        unique=True,
+        index=True,
+    )
 
     enabled = fields.BooleanField(default=True, index=True)
     created_at = fields.DatetimeField(auto_now_add=True)

@@ -21,9 +21,9 @@ class MenuItemDbCreateIn(MenuItemCreateIn):
 
 
 class MenuItemUpdateIn(PointBase):
-    establishment_id: UUID | None = None
+    establishment_id: UUID | None = Field(default=None)
     title: str | None = Field(default=None, max_length=128)
     description: str | None = Field(default=None, max_length=512)
-    photo_hash: PointHash | None = None
+    photo_hash: PointHash | None = Field(default=None)
     amount: Decimal | None = Field(default=None, ge=0)
     currency: str | None = Field(default=None, max_length=8)

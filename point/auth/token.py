@@ -6,7 +6,7 @@ from point.config import settings
 from point.errors import APIException
 
 
-def create_token(data):
+def create_token(data: dict):
     to_encode = data
 
     # todo: make it more difficultly

@@ -3,7 +3,21 @@ from tortoise import BaseDBAsyncClient
 
 async def upgrade(db: BaseDBAsyncClient) -> str:
     return """
-        CREATE TABLE IF NOT EXISTS "establishment_types" (
+        CREATE TABLE IF NOT EXISTS "assets" (
+    "id" UUID NOT NULL PRIMARY KEY,
+    "symbol" VARCHAR(16) NOT NULL UNIQUE,
+    "name" VARCHAR(128) NOT NULL,
+    "decimals" SMALLINT NOT NULL DEFAULT 9,
+    "address" VARCHAR(128) NOT NULL,
+    "image_url" VARCHAR(1024) NOT NULL,
+    "ton_price" BIGINT NOT NULL DEFAULT 0,
+    "enabled" BOOL NOT NULL DEFAULT True,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS "idx_assets_symbol_b74a33" ON "assets" ("symbol");
+CREATE INDEX IF NOT EXISTS "idx_assets_enabled_28a156" ON "assets" ("enabled");
+CREATE TABLE IF NOT EXISTS "establishment_types" (
     "id" UUID NOT NULL PRIMARY KEY,
     "name" VARCHAR(128) NOT NULL UNIQUE,
     "icon_hash" TEXT NOT NULL,
@@ -17,8 +31,8 @@ CREATE TABLE IF NOT EXISTS "establishments" (
     "latitude" DECIMAL(9,6) NOT NULL,
     "longitude" DECIMAL(9,6) NOT NULL,
     "address" VARCHAR(128) NOT NULL,
-    "service_wallet" VARCHAR(128) NOT NULL,
-    "service_wallet_seed" TEXT NOT NULL,
+    "service_wallet" VARCHAR(128),
+    "service_wallet_seed" TEXT,
     "official_wallet" VARCHAR(128),
     "name" VARCHAR(128) NOT NULL,
     "description" VARCHAR(512) NOT NULL,
@@ -35,13 +49,14 @@ CREATE TABLE IF NOT EXISTS "establishments" (
 CREATE INDEX IF NOT EXISTS "idx_establishme_enabled_90ab06" ON "establishments" ("enabled");
 CREATE TABLE IF NOT EXISTS "employers" (
     "id" UUID NOT NULL PRIMARY KEY,
+    "profession" VARCHAR(32) NOT NULL,
     "purpose" JSONB,
     "meta" JSONB NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "job_place_id_id" UUID NOT NULL REFERENCES "establishments" ("id") ON DELETE RESTRICT
+    "job_place_id" UUID NOT NULL REFERENCES "establishments" ("id") ON DELETE RESTRICT
 );
-CREATE INDEX IF NOT EXISTS "idx_employers_job_pla_6113ba" ON "employers" ("job_place_id_id");
+CREATE INDEX IF NOT EXISTS "idx_employers_job_pla_bb0716" ON "employers" ("job_place_id");
 CREATE TABLE IF NOT EXISTS "menu_items" (
     "id" UUID NOT NULL PRIMARY KEY,
     "title" VARCHAR(128) NOT NULL,
@@ -59,24 +74,25 @@ CREATE INDEX IF NOT EXISTS "idx_menu_items_enabled_2c09a4" ON "menu_items" ("ena
 CREATE INDEX IF NOT EXISTS "idx_menu_items_establi_1ef563" ON "menu_items" ("establishment_id");
 CREATE TABLE IF NOT EXISTS "users" (
     "id" BIGSERIAL NOT NULL PRIMARY KEY,
-    "first_name" TEXT NOT NULL,
-    "last_name" TEXT NOT NULL,
-    "username" TEXT NOT NULL,
+    "first_name" TEXT,
+    "last_name" TEXT,
+    "username" TEXT,
     "language_code" TEXT,
     "photo_url" TEXT,
-    "is_bot" BOOL NOT NULL,
-    "is_premium" BOOL NOT NULL,
-    "allows_write_to_pm" BOOL NOT NULL,
+    "is_bot" BOOL,
+    "is_premium" BOOL,
+    "allows_write_to_pm" BOOL,
     "wallet" TEXT,
-    "bonus_balance" BIGINT,
-    "tips_left" BIGINT,
+    "bonus_balance" BIGINT NOT NULL DEFAULT 0,
+    "tips_left" BIGINT NOT NULL DEFAULT 0,
     "meta" JSONB NOT NULL,
     "enabled" BOOL NOT NULL DEFAULT True,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "account_id_id" UUID REFERENCES "employers" ("id") ON DELETE SET NULL
+    "employee_id" UUID REFERENCES "employers" ("id") ON DELETE SET NULL
 );
 CREATE INDEX IF NOT EXISTS "idx_users_enabled_e41084" ON "users" ("enabled");
+CREATE INDEX IF NOT EXISTS "idx_users_employe_b299e5" ON "users" ("employee_id");
 CREATE TABLE IF NOT EXISTS "place_ratings" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "mark" SMALLINT NOT NULL,
@@ -86,6 +102,24 @@ CREATE TABLE IF NOT EXISTS "place_ratings" (
 );
 CREATE INDEX IF NOT EXISTS "idx_place_ratin_place_i_11df0a" ON "place_ratings" ("place_id");
 CREATE INDEX IF NOT EXISTS "idx_place_ratin_user_id_c90f7b" ON "place_ratings" ("user_id");
+CREATE TABLE IF NOT EXISTS "tips" (
+    "id" UUID NOT NULL PRIMARY KEY,
+    "fee_transaction" JSONB NOT NULL,
+    "tip_transaction" JSONB NOT NULL,
+    "expired_at" TIMESTAMPTZ NOT NULL,
+    "status" VARCHAR(8) NOT NULL DEFAULT 'created',
+    "amount" BIGINT NOT NULL,
+    "tips_left_amount" BIGINT NOT NULL,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "asset_id" UUID NOT NULL REFERENCES "assets" ("id") ON DELETE RESTRICT,
+    "employee_id" UUID REFERENCES "employers" ("id") ON DELETE CASCADE,
+    "establishment_id" UUID REFERENCES "establishments" ("id") ON DELETE CASCADE,
+    "sender_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE
+    CHECK (employee_id is null AND establishment_id is not null OR employee_id is not null AND establishment_id is null)
+);
+CREATE INDEX IF NOT EXISTS "idx_tips_status_b521b6" ON "tips" ("status");
+COMMENT ON COLUMN "tips"."status" IS 'created: created\naccepted: accepted\nfailed: failed';
 CREATE TABLE IF NOT EXISTS "aerich" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "version" VARCHAR(255) NOT NULL,

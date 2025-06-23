@@ -28,7 +28,7 @@ async def get_establishments_near(
     establishments = await EstablishmentController.filter("menu", enabled=True)
     establishments = [
         EstablishmentPreview.model_validate(e) for e in establishments
-        if criteria.name in e.name
+        if e.name is None or criteria.name in e.name
     ]
 
     establishments.sort(key=lambda establishment: point_distance(criteria.location, establishment.position))

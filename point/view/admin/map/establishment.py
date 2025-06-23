@@ -28,7 +28,7 @@ class EstablishmentDbCreateIn(EstablishmentCreateIn):
 
 
 class EstablishmentUpdateIn(PointBase):
-    establishment_type_id: UUID | None = None
+    establishment_type_id: UUID | None = Field(default=None)
 
     latitude: Decimal | None = Field(default=None, ge=-90, le=90)
     longitude: Decimal | None = Field(default=None, ge=-180, le=180)
@@ -37,18 +37,18 @@ class EstablishmentUpdateIn(PointBase):
     name: str | None = Field(default=None, max_length=128)
     description: str | None = Field(default=None, max_length=512)
     channel_link: AnyUrl | None = Field(default=None, max_length=512)
-    icon_hash: PointHash | None = None
-    photo_hash: PointHash | None = None
-    gallery: list[PointHash] | None = None
+    icon_hash: PointHash | None = Field(default=None)
+    photo_hash: PointHash | None = Field(default=None)
+    gallery: list[PointHash] | None = Field(default=None)
 
-    enabled: bool | None = None
+    enabled: bool | None = Field(default=None)
 
 
 class EstablishmentAdminOut(EstablishmentOut):
     service_wallet: str | None = Field(default=None, max_length=128)
-    service_wallet_seed: str | None = None
+    service_wallet_seed: str | None = Field(default=None)
     official_wallet: str | None = Field(default=None, max_length=128)
 
     enabled: bool
-    created_at: datetime | None = None
-    updated_at: datetime | None = None
+    created_at: datetime | None = Field(default=None)
+    updated_at: datetime | None = Field(default=None)

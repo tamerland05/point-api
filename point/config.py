@@ -2,6 +2,7 @@ from enum import StrEnum
 from typing import Any
 
 from cryptography.fernet import Fernet
+from pydantic import AnyUrl
 from pydantic_settings import BaseSettings
 
 
@@ -11,13 +12,6 @@ class AppEnv(StrEnum):
 
 
 class Settings(BaseSettings, extra="allow"):
-    admin_auth_key: str
-
-    app_env: AppEnv
-
-    public_key: str
-    jwt_algorithm: str
-
     aws_service_name: str
     aws_endpoint_url: str
     aws_access_key_id: str
@@ -30,10 +24,24 @@ class Settings(BaseSettings, extra="allow"):
     postgres_host: str
     postgres_db: str
 
+    ton_indexer_url: AnyUrl
+    ton_indexer_api_key: str
+    ton_indexer_rps: int
+
     wallet_id: int
     seed: str
-
     encryption_key: str
+
+    fix_fee: int
+    jetton_transfer_amount: int
+
+    point_wallet: str
+    admin_auth_key: str
+    bot_token: str
+    jwt_algorithm: str
+    public_key: str
+
+    app_env: AppEnv
 
     @property
     def tortoise_orm(self) -> dict[str, Any]:

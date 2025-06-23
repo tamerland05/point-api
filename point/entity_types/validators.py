@@ -1,7 +1,7 @@
 from typing import Self
 
 from pydantic import UrlConstraints, AnyUrl, RootModel, Field, model_validator
-from pytoniq import Address, AddressError
+from pytoniq_core import Address, AddressError
 
 
 class Image(AnyUrl):
@@ -30,6 +30,10 @@ class PointHash(PointRoot[str]):
     root: str = Field(min_length=32, max_length=32 + 8, kw_only=True)
 
 
+class PointBlockchainHash(PointRoot[str]):
+    root: str = Field(min_length=44, max_length=44, kw_only=True)
+
+
 class TonAddress(PointRoot[str]):
     root: str = Field(max_length=256, kw_only=True)
 
@@ -40,5 +44,9 @@ class TonAddress(PointRoot[str]):
         except AddressError:
             raise ValueError("Address is not a valid address")
 
-        self.root = addr.to_str(True, True)
+        self.root = addr.to_str(
+            is_user_friendly=True,
+            is_url_safe=True,
+            is_bounceable=False
+        )
         return self

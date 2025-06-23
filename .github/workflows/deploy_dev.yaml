@@ -90,23 +90,36 @@ jobs:
 
       - name: Creating .env for docker-compose.dev.yaml
         run: |
-          echo "APP_ENV=dev" >> .env
-          echo "ADMIN_AUTH_KEY=${{ secrets.ADMIN_AUTH_KEY }}" >> .env
-          echo "JWT_ALGORITHM=${{ secrets.JWT_ALGORITHM }}" >> .env
-          echo "PUBLIC_KEY=${{ secrets.PUBLIC_KEY }}" >> .env
           echo "AWS_SERVICE_NAME=${{ vars.AWS_SERVICE_NAME }}" >> .env
           echo "AWS_ENDPOINT_URL=${{ vars.AWS_ENDPOINT_URL }}" >> .env
           echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
           echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
           echo "AWS_BUCKET_NAME=${{ vars.AWS_BUCKET_NAME }}" >> .env
+          
           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
           echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> .env
           echo "POSTGRES_HOST=${{ secrets. POSTGRES_HOST}}" >> .env
           echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
+          
+          echo "TON_INDEXER_URL=${{ secrets.TON_INDEXER_URL }}" >> .env
+          echo "TON_INDEXER_API_KEY=${{ secrets.TON_INDEXER_API_KEY }}" >> .env
+          echo "TON_INDEXER_RPS=${{ secrets.TON_INDEXER_RPS }}" >> .env
+
           echo "WALLET_ID=${{ secrets.WALLET_ID }}" >> .env
           echo "SEED=${{ secrets.SEED }}" >> .env
           echo "ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}" >> .env
+          
+          echo "FIX_FEE=${{ secrets.FIX_FEE }}" >> .env
+          echo "JETTON_TRANSFER_AMOUNT=${{ secrets.JETTON_TRANSFER_AMOUNT }}" >> .env
+
+          echo "POINT_WALLET=${{ secrets.POINT_WALLET }}" >> .env
+          echo "ADMIN_AUTH_KEY=${{ secrets.ADMIN_AUTH_KEY }}" >> .env
+          echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" >> .env
+          echo "JWT_ALGORITHM=${{ secrets.JWT_ALGORITHM }}" >> .env
+          echo "PUBLIC_KEY=${{ secrets.PUBLIC_KEY }}" >> .env
+          
+          echo "APP_ENV=dev" >> .env
 
       - name: Docker compose
         env:

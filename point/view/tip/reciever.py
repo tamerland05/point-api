@@ -14,5 +14,4 @@ class EmployeeReceiver(PointBase):
 
 
 class ReceiversOut(PointBase):
-    place_wallet: TonAddress | None = None
     employees: list[EmployeeReceiver] = Field(default_factory=list)

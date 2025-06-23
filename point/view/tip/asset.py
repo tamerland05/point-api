@@ -9,8 +9,13 @@ from point.view import PointBase
 
 class AssetOut(PointBase):
     id: UUID
+    symbol: str = Field(max_length=16)
     name: str = Field(max_length=32)
-    ticker: str = Field(max_length=16)
-    price: Decimal = Field(default=0)
     address: TonAddress
-    icon: Image
+    ton_price: Decimal
+    image_url: Image
+
+
+class JettonWalletOut(PointBase):
+    address: TonAddress
+    balance: int = Field(ge=0)

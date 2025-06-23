@@ -25,8 +25,9 @@ class EmployeeMeta(PointBase):
 
 class EmployeePublicOut(PointBase):
     id: UUID
-    job_place: JobPlaceOut | None = None
-    purpose: Purpose | None = None
+    profession: str = Field(max_length=32)
+    job_place: JobPlaceOut | None = Field(default=None)
+    purpose: Purpose | None = Field(default=None)
 
 
 class EmployeeOut(EmployeePublicOut):
@@ -34,5 +35,5 @@ class EmployeeOut(EmployeePublicOut):
 
 
 class EmployeeUpdateIn(PointBase):
-    purpose: Purpose | None = None
-    meta: EmployeeMeta | None = None
+    purpose: Purpose | None = Field(default=None)
+    meta: EmployeeMeta | None = Field(default=None)

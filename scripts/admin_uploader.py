@@ -5,7 +5,7 @@ from uuid import UUID
 
 import aiohttp
 
-from point.entity_types import PointHash
+from point.entity_types import PointHash, RecipientType
 from point.view import (
     PointBase,
     EstablishmentTypeCreateIn,
@@ -19,12 +19,29 @@ from point.view import (
     MenuItemUpdateIn,
     EstablishmentTypeAdminOut,
     EstablishmentAdminOut,
+    AssetAdminOut,
+    AssetCreateIn,
+    AssetUpdateIn,
+    AuthUserIn,
+    AuthIn,
+    AuthOut,
+    AuthUserOut,
+    PointWithScale,
+    EstablishmentPreview,
+    NearEstablishmentCriteria,
+    PointRequestIn,
+    EstablishmentOut,
+    EstablishmentTypeOut,
+    ReceiversOut,
+    AssetOut,
+    TransactionOut,
+    CheckoutTipIn,
 )
 
 
-class PointApiService:
-    def __init__(self, admin_auth_api_key: str, origin: str) -> None:
-        self.headers = {"AdminApiKey": admin_auth_api_key}
+class BaseApiService:
+    def __init__(self, headers: dict, origin: str) -> None:
+        self.headers = headers
         self.base_url = origin
 
     @staticmethod
@@ -65,6 +82,12 @@ class PointApiService:
 
         async with aiohttp.ClientSession(headers=self.headers) as session, session.delete(url=url, data=data) as resp:
             return await self.log_or_return(resp)
+
+
+class AdminPointApiService(BaseApiService):
+    def __init__(self, admin_auth_api_key: str, origin: str) -> None:
+        headers = {"AdminApiKey": admin_auth_api_key}
+        super().__init__(headers, origin + "/admin")
 
     async def upload_file(self, filepath: str) -> PointHash | None:
         with open(filepath, 'rb') as f:
@@ -239,14 +262,163 @@ class PointApiService:
     async def delete_menu_item(self, menu_item_id: str) -> None:
         await self._delete(url="/map/menu-item/" + menu_item_id)
 
+    async def get_asset(self, asset_id: str) -> AssetAdminOut:
+        resp = await self._get(url="/tip/asset/" + asset_id)
+        return AssetAdminOut.model_validate(resp)
+
+    async def create_asset(
+            self,
+            symbol: str,
+            name: str,
+            decimals: int,
+            address: str,
+            image_url: str,
+    ) -> AssetAdminOut:
+        resp = await self._post(
+            url="/tip/asset",
+            data=AssetCreateIn(
+                symbol=symbol,
+                name=name,
+                decimals=decimals,
+                address=address,
+                image_url=image_url,
+            ),
+        )
+        return AssetAdminOut.model_validate(resp)
+
+    async def update_asset(
+            self,
+            asset_id: str | None = None,
+            symbol: str | None = None,
+            name: str | None = None,
+            decimals: int | None = None,
+            address: str | None = None,
+            image_url: str | None = None,
+    ) -> AssetAdminOut:
+        resp = await self._put(
+            url="/tip/asset/" + asset_id,
+            data=AssetUpdateIn(
+                symbol=symbol,
+                name=name,
+                decimals=decimals,
+                address=address,
+                image_url=image_url,
+            ),
+        )
+        return AssetAdminOut.model_validate(resp)
+
+    async def delete_asset(self, establishment_type_id: str) -> None:
+        await self._delete(url="/tip/asset/" + establishment_type_id)
+
+
+class PublicPointApiService(BaseApiService):
+    current_user: AuthUserOut
+
+    def __init__(self, origin: str) -> None:
+        super().__init__({}, origin)
+
+    async def auth(
+            self,
+            user: AuthUserIn,
+            hash: str,
+            referrer_data: str | None = None,
+    ) -> None:
+        resp = await self._post(
+            url="/user/auth",
+            data=AuthIn(
+                hash=hash,
+                referrer_data=referrer_data,
+                user=user,
+            )
+        )
+        auth_out = AuthOut.model_validate(resp)
+        self.headers["Authorization"] = "Bearer " + auth_out.access_token
+        self.current_user = auth_out.user
+
+    async def get_establishment_types(self) -> dict[UUID, EstablishmentTypeOut]:
+        resp = await self._get(url="/map/establishment-types")
+        return {k: EstablishmentTypeOut.model_validate(v) for k, v in resp.items()}
+
+    async def get_establishments(
+            self,
+            latitude: str,
+            longitude: str,
+            scale: str,
+    ) -> list[EstablishmentPreview]:
+        resp = await self._post(
+            url="/map/establishments",
+            data=PointWithScale(
+                latitude=Decimal(latitude),
+                longitude=Decimal(longitude),
+                scale=Decimal(scale),
+            )
+        )
+
+        return [EstablishmentPreview.model_validate(e) for e in resp]
+
+    async def get_establishments_near(
+            self,
+            latitude: str,
+            longitude: str,
+            name: str | None = None,
+    ) -> list[EstablishmentPreview]:
+        resp = await self._post(
+            url="/map/establishments/near",
+            data=NearEstablishmentCriteria(
+                location=PointRequestIn(
+                    latitude=Decimal(latitude),
+                    longitude=Decimal(longitude),
+                ),
+                name=name,
+            ),
+        )
+
+        return [EstablishmentPreview.model_validate(e) for e in resp]
+
+    async def get_establishment(self, establishment_id: str) -> EstablishmentOut:
+        resp = await self._get(url="/map/establishment/" + establishment_id)
+        return EstablishmentOut.model_validate(resp)
+
+    async def get_menu_item(self, menu_item_id: str) -> MenuItemOut:
+        resp = await self._get(url="/map/menu-item/" + menu_item_id)
+        return MenuItemOut.model_validate(resp)
+
+    async def get_receivers(self, establishment_id: str) -> ReceiversOut:
+        resp = await self._get(url="/tip/receivers/" + establishment_id)
+        return ReceiversOut.model_validate(resp)
+
+    async def get_assets(self) -> list[AssetOut]:
+        resp = await self._get(url="/tip/assets")
+        return [AssetOut.model_validate(a) for a in resp]
+
+    async def checkout_tip(
+            self,
+            recipient_id: UUID,
+            recipient_type: RecipientType,
+            asset_id: UUID,
+            amount: str,
+    ) -> list[TransactionOut]:
+        resp = await self._post(
+            url="/tip/send/checkout",
+            data=CheckoutTipIn(
+                recipient_id=recipient_id,
+                recipient_type=recipient_type,
+                asset_id=asset_id,
+                amount=Decimal(amount),
+            )
+        )
+        return [TransactionOut.model_validate(t) for t in resp]
+
 
 async def main():
-    admin_auth_api_key = "<ADMIN_AUTH_KEY>"
-    origin = "<ORIGIN_URL/admin>"
+    admin_auth_api_key = "admin"
+    origin = "http://localhost:8000/api/v1/point"
 
-    pas = PointApiService(admin_auth_api_key=admin_auth_api_key, origin=origin)
+    apas = AdminPointApiService(admin_auth_api_key=admin_auth_api_key, origin=origin)
+    ppas = PublicPointApiService(origin=origin)
 
-    # res = pas.any_method(...)
+    # res = apas.any_method(...)
+    # res = ppas.any_method(...)
     # print(res)
 
 

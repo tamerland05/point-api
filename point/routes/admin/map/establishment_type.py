@@ -12,16 +12,16 @@ router = APIRouter()
 async def get_establishment_type(
         establishment_type_id: UUID,
 ) -> EstablishmentTypeAdminOut:
-    establishment = await EstablishmentTypeController.get(id=establishment_type_id)
-    return EstablishmentTypeAdminOut.model_validate(establishment)
+    establishment_type = await EstablishmentTypeController.get(id=establishment_type_id)
+    return EstablishmentTypeAdminOut.model_validate(establishment_type)
 
 
 @router.post("")
 async def create_establishment_type(
         establishment_type_in: EstablishmentTypeCreateIn,
 ) -> EstablishmentTypeAdminOut:
-    establishment = await EstablishmentTypeController.create(establishment_type_in)
-    return EstablishmentTypeAdminOut.model_validate(establishment)
+    establishment_type = await EstablishmentTypeController.create(establishment_type_in)
+    return EstablishmentTypeAdminOut.model_validate(establishment_type)
 
 
 @router.put("/{establishment_type_id}")
@@ -29,11 +29,11 @@ async def update_establishment_type(
         establishment_type_id: UUID,
         establishment_type_update_in: EstablishmentTypeUpdateIn,
 ) -> EstablishmentTypeAdminOut:
-    establishment = await EstablishmentTypeController.update(
+    establishment_type = await EstablishmentTypeController.update(
         model_update_in=establishment_type_update_in,
         id=establishment_type_id
     )
-    return EstablishmentTypeAdminOut.model_validate(establishment)
+    return EstablishmentTypeAdminOut.model_validate(establishment_type)
 
 
 @router.delete("/{establishment_type_id}")

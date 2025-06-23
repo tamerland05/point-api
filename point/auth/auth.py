@@ -49,8 +49,7 @@ class JWTBearer(HTTPBearer):
 def get_user(token_data=Depends(JWTBearer())) -> AuthUser:
     user = AuthUser.model_validate(
         {
-            "id": int(token_data["id"]) if "id" in token_data else None,
-            "username": token_data["username"] if "username" in token_data else None,
+            "id": int(token_data["id"]),
             "sessionId": token_data["iss"],
         }
     )
@@ -58,19 +57,16 @@ def get_user(token_data=Depends(JWTBearer())) -> AuthUser:
 
 
 def validate_telegram_init_data(init_data: AuthIn) -> bool:
-    init_data_dict = init_data.model_dump(mode='json')
-    init_data_hash = init_data_dict.pop('hash', None)
-    if not isinstance(init_data_hash, str):
-        return False
-
-    bot_token = None
-    if bot_token:
-        data_check_array = [f"{key}={value}" for key, value in init_data_dict.items()]
+    if settings.bot_token != "":
+        data_check_array = [
+            f"{key}={value}" for key, value in init_data.model_dump(mode="json", exclude_unset=True).items()
+            if key != "hash"
+        ]
         data_check_array.sort()
-        secret_key = hmac.new(b'WebAppData', bot_token.encode('utf-8'), hashlib.sha256).digest()
+        secret_key = hmac.new(b'WebAppData', settings.bot_token.encode('utf-8'), hashlib.sha256).digest()
         data_string = '\n'.join(data_check_array).encode('utf-8')
         calculated_hash = hmac.new(secret_key, data_string, hashlib.sha256).hexdigest()
-        is_valid = hmac.compare_digest(calculated_hash, init_data_hash)
+        is_valid = hmac.compare_digest(calculated_hash, init_data.hash)
     else:
         is_valid = True
 

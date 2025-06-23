@@ -1,4 +1,6 @@
+import asyncio
 import logging
+from contextlib import asynccontextmanager
 
 from starlette.responses import JSONResponse
 from fastapi import FastAPI, HTTPException, Request, status
@@ -8,6 +10,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from tortoise.contrib.fastapi import register_tortoise
 
 from point.config import settings
+from point.controllers.pooling import start_pooling, stop_pooling
 from point.errors import APIException
 from point.routes import router
 
@@ -20,6 +23,15 @@ logging.basicConfig(
 APP_BASE = "/api/v1/point"
 
 
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    asyncio.ensure_future(start_pooling())
+
+    yield
+
+    stop_pooling()
+
+
 app = FastAPI(
     title="Pont service API",
     debug=True,
@@ -27,6 +39,7 @@ app = FastAPI(
     redoc_url=None,
     version="0.0.1",
     openapi_url=f"{APP_BASE}/point.json",
+    lifespan=lifespan,
 )
 
 

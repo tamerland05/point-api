@@ -4,6 +4,7 @@ from uuid import uuid4
 from tortoise import Model, fields
 from tortoise.fields import OnDelete
 
+from point.entity_types import TonAddress
 from point.models.utils import hash_to_link
 
 
@@ -59,6 +60,6 @@ class Establishment(Model):
         return [hash_to_link(i) for i in self.gallery_hashes]
 
     @property
-    def wallet(self) -> str:
+    def wallet(self) -> TonAddress | None:
         return self.official_wallet or self.service_wallet
 

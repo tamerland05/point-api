@@ -11,6 +11,7 @@ from point.view import (
     EmployeePublicOut,
     Purpose,
     fake,
+    random_address
 )
 
 router = APIRouter(tags=["Employee"])
@@ -19,12 +20,14 @@ router = APIRouter(tags=["Employee"])
 @router.get("/{employee_id}")
 async def get(employee_id: UUID, _: AuthUser = Depends(get_user)) -> UserPublicOut:
     return UserPublicOut(
+        wallet=random_address(),
+        photo_url=fake.image_url(1280, 720),
         name=fake.name(),
         username=fake.user_name(),
         rank=fake.random_int(1, 10 ** 10),
-        typs_left=fake.random_int(1, 10 ** 10),
         account=EmployeePublicOut(
             id=employee_id,
+            profession="waiter",
             job_place=fake.random_element([JobPlaceOut(
                 id=uuid4(),
                 name=fake.name(),

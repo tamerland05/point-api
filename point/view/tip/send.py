@@ -1,19 +1,19 @@
 from decimal import Decimal
 from uuid import UUID
 
-from pydantic import Base64Str
-
-from point.entity_types import TonAddress
+from point.entity_types import RecipientType
 from point.view import PointBase
 
+from .transaction import TransactionOut
 
-class CheckoutTransferIn(PointBase):
+
+class CheckoutTipIn(PointBase):
     recipient_id: UUID
+    recipient_type: RecipientType
     asset_id: UUID
     amount: Decimal
 
 
-class CheckoutTransferOut(PointBase):
-    to: TonAddress
-    value: int
-    body: Base64Str
+class CheckoutTipOut(PointBase):
+    transactions: list[TransactionOut]
+
