@@ -1,13 +1,9 @@
-from decimal import Decimal
-from uuid import uuid4
+from fastapi import APIRouter
 
-from fastapi import APIRouter, Depends
-
-from point.auth import get_user
 from point.controllers import AssetController
-from point.view import AuthUser, AssetOut, fake, random_address
+from point.view import AssetOut
 
-router = APIRouter(tags=["Asset"])
+router = APIRouter()
 
 
 @router.get("s")

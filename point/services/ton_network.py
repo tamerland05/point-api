@@ -163,15 +163,3 @@ class TonNetworkService(Client):
 
 
 tns = TonNetworkService()
-
-if __name__ == "__main__":
-    import asyncio
-    # print(asyncio.run(tns.get_jetton(
-    #     jetton_master="kQApoN_JyPCYZhiw7Tm0cr7FPmOFTfpRykG5EeIitQRpvMIo",
-    #     owner_address="0QCj0zI66mVKC_kkRZ-63e7uR9tcpHWxS-C-W-P_Xeroso3_"
-    # )))
-
-    print(asyncio.run(tns.get_transaction(
-        body_hash="gi66viDu5gbAgGRiDB7Tf/Uw43OCgUto6CzHoCr2Z9Y=",
-        opcode=0x0f8a7ea5,
-    )))

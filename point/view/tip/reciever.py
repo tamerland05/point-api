@@ -2,7 +2,6 @@ from uuid import UUID
 
 from pydantic import Field
 
-from point.entity_types import TonAddress
 from point.view import PointBase
 
 

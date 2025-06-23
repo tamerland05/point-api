@@ -5,7 +5,7 @@ from fastapi import APIRouter
 from point.controllers import AssetController
 from point.view import AssetCreateIn, AssetUpdateIn, AssetAdminOut
 
-router = APIRouter(tags=["Asset"])
+router = APIRouter()
 
 
 @router.get("/{asset_id}")
