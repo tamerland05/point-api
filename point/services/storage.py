@@ -1,3 +1,4 @@
+import mimetypes
 from contextlib import asynccontextmanager
 import hashlib
 import logging
@@ -33,7 +34,15 @@ class StorageService:
             async with self.get_client() as client:
                 key = hashlib.md5(data).hexdigest() + extension
 
-                response = await client.put_object(Bucket=self.bucket, Key=key, Body=data)
+                content_type, _ = mimetypes.guess_type("file" + extension)
+                content_type = content_type or "application/octet-stream"
+
+                response = await client.put_object(
+                    Bucket=self.bucket,
+                    Key=key,
+                    Body=data,
+                    ContentType=content_type
+                )
                 if response["ResponseMetadata"]["HTTPStatusCode"] != 200:
                     logging.error(f"Unexpected response while putting file in storage: {response}")
                     return None
