@@ -19,6 +19,14 @@ class TransactionDbOut(TransactionOut):
     now: int = Field(default_factory=lambda: int(time.time()))
 
 
+class GetTrxByMsgCriteria(PointBase):
+    msg_hash: PointBlockchainHash | None = None
+    body_hash: PointBlockchainHash | None = None
+    opcode: int | None = None
+    direction: str = "in"
+    limit: int = 1000
+
+
 class BlockchainTransactionDescriptionAction(PointBase):
     success: bool
     valid: bool

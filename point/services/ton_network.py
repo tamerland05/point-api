@@ -1,5 +1,4 @@
 from pytoniq_core import Address, Cell, begin_cell
-from pytoniq_core.boc.utils import make_url_safe
 from tonutils.client import Client
 from tonutils.jetton import JettonWalletStandard
 from tonutils.jetton.contract.standard.op_codes import JETTON_TRANSFER_OPCODE
@@ -8,7 +7,7 @@ from tonutils.wallet.op_codes import TEXT_COMMENT_OPCODE
 
 from point.config import settings
 from point.entity_types import TonAddress, PointBlockchainHash
-from point.view import JettonWalletOut, TransactionDbOut, BlockchainTransactionOut
+from point.view import JettonWalletOut, TransactionDbOut, BlockchainTransactionOut, GetTrxByMsgCriteria
 
 
 def create_text_cell(payload: str) -> Cell:
@@ -60,20 +59,10 @@ class TonNetworkService(Client):
 
     async def _get_transactions_by_message(
             self,
-            msg_hash: PointBlockchainHash | None = None,
-            body_hash: PointBlockchainHash | None = None,
-            opcode: int | None = None,
-            direction: str = "in",
-            limit: int = 1000,
+            criteria: GetTrxByMsgCriteria,
     ) -> list[BlockchainTransactionOut]:
         method = "/transactionsByMessage"
-        resp = await self._get(method=method, params={
-            "msg_hash": make_url_safe(msg_hash) if msg_hash else None,
-            "body_hash": make_url_safe(body_hash) if body_hash else None,
-            "opcode": opcode,
-            "direction": direction,
-            "limit": limit,
-        })
+        resp = await self._get(method=method, params=criteria.model_dump(mode="json", exclude_none=True))
         return [BlockchainTransactionOut.model_validate(t) for t in resp["transactions"]]
 
     @staticmethod
@@ -133,7 +122,7 @@ class TonNetworkService(Client):
             return False
 
         supposed_internal_transactions = await self._get_transactions_by_message(
-            msg_hash=transaction.out_msgs[0].hash,
+            criteria=GetTrxByMsgCriteria(msg_hash=transaction.out_msgs[0].hash),
         )
         for t in supposed_internal_transactions:
             if t.in_msg.source == transaction.account and t.description.action.success:
@@ -143,8 +132,10 @@ class TonNetworkService(Client):
 
     async def is_transaction_completed(self, transaction: TransactionDbOut) -> bool:
         supposed_transactions = await self._get_transactions_by_message(
-            body_hash=transaction.body_hash,
-            opcode=transaction.out_message_opcode,
+            criteria=GetTrxByMsgCriteria(
+                body_hash=transaction.body_hash,
+                opcode=transaction.out_message_opcode,
+            )
         )
 
         blockchain_transaction = self._find_transaction(

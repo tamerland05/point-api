@@ -148,14 +148,14 @@ class TipController(BaseController[Tip]):
 
     @classmethod
     async def _check_tip_completion(cls, tip: Tip) -> None:
-        is_completed = (
+        is_completed = all(await asyncio.gather(
                 tns.is_transaction_completed(
                     transaction=TransactionDbOut.model_validate(tip.fee_transaction),
-                ) and
+                ),
                 tns.is_transaction_completed(
                     transaction=TransactionDbOut.model_validate(tip.tip_transaction),
                 )
-        )
+        ))
 
         if is_completed:
             tip.status = TipStatus.accepted
