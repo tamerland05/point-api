@@ -1,4 +1,3 @@
-from decimal import Decimal
 from uuid import uuid4
 
 from tortoise import Model, fields
@@ -15,10 +14,10 @@ class Establishment(Model):
 
     establishment_type = fields.ForeignKeyField("models.EstablishmentType", on_delete=OnDelete.RESTRICT)
 
-    id = fields.UUIDField(pk=True, default=uuid4, unique=True, index=True)
+    id = fields.UUIDField(pk=True, default=uuid4)
 
-    latitude = fields.DecimalField(max_digits=9, decimal_places=6)
-    longitude = fields.DecimalField(max_digits=9, decimal_places=6)
+    latitude = fields.DecimalField(max_digits=9, decimal_places=6, index=True)
+    longitude = fields.DecimalField(max_digits=9, decimal_places=6, index=True)
     address = fields.CharField(max_length=128)
 
     service_wallet = fields.CharField(null=True, max_length=128)
@@ -33,7 +32,7 @@ class Establishment(Model):
     gallery_hashes = fields.JSONField(default=[])
     menu = fields.ManyToManyField("models.MenuItem")
 
-    rating = fields.DecimalField(max_digits=3, decimal_places=2, default=Decimal("0"))
+    rating = fields.DecimalField(max_digits=3, decimal_places=2, default=0)
 
     enabled = fields.BooleanField(default=True, index=True)
     created_at = fields.DatetimeField(auto_now_add=True)

@@ -2,7 +2,7 @@ from uuid import uuid4
 
 from fastapi import APIRouter, BackgroundTasks
 
-from point.controllers import UserController
+from point.controllers import UserController, EmployeeController
 from point.errors import APIException, ErrorCode
 from point.view import AuthIn, AuthOut, AuthUserOut
 
@@ -16,17 +16,22 @@ async def post_auth(auth_data: AuthIn, background_tasks: BackgroundTasks) -> Aut
     if not validate_telegram_init_data(auth_data):
         raise APIException(ErrorCode.WRONG_CREDENTIALS)
 
-    payload = {
-        "iss": uuid4().hex,
-        "id": str(auth_data.user.id),
-    }
-
-    access_token = create_token(payload)
-
     user, created = await UserController.get_or_create_user(user_in=auth_data.user)
     if not created:
         async def background_update():
             await user.update_from_dict(auth_data.user.model_dump(mode="json")).save()
         background_tasks.add_task(background_update)
+
+    if user.employee_id is None:
+        user.employee = None
+    else:
+        user.employee = await EmployeeController.get_employee(employee_id=user.employee_id)
+
+    payload = {
+        "iss": uuid4().hex,
+        "id": str(user.id),
+    }
+
+    access_token = create_token(payload)
 
     return AuthOut(access_token=access_token, user=AuthUserOut.model_validate(user))

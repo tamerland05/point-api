@@ -3,6 +3,7 @@ from uuid import UUID
 
 from pydantic import Field
 
+from point.entity_types import Image
 from point.view import PointBase
 
 
@@ -11,7 +12,7 @@ class AssetCreateIn(PointBase):
     name: str = Field(max_length=128)
     decimals: int
     address: str = Field(max_length=128)
-    image_url: str = Field(max_length=1024)
+    image_url: Image
 
 
 class AssetUpdateIn(PointBase):
@@ -19,7 +20,8 @@ class AssetUpdateIn(PointBase):
     name: str | None = Field(default=None, max_length=128)
     decimals: int | None = Field(default=None)
     address: str | None = Field(default=None, max_length=128)
-    image_url: str | None = Field(default=None, max_length=1024)
+    image_url: Image | None = Field(default=None)
+    enabled: bool | None = Field(default=None)
 
 
 class AssetAdminOut(AssetCreateIn):

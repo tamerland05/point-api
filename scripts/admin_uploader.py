@@ -5,7 +5,7 @@ from uuid import UUID
 
 import aiohttp
 
-from point.entity_types import PointHash, RecipientType
+from point.entity_types import PointHash, RecipientType, Image
 from point.view import (
     PointBase,
     EstablishmentTypeCreateIn,
@@ -36,6 +36,16 @@ from point.view import (
     AssetOut,
     TransactionOut,
     CheckoutTipIn,
+    UserMeta,
+    UserUpdateIn,
+    UserPublicOut,
+    PurposeIconAdminOut,
+    PurposeIconCreateIn,
+    PurposeIconUpdateIn,
+    PurposeIconOut,
+    PurposeUpdateIn,
+    EmployeeMeta,
+    EmployeeUpdateIn,
 )
 
 
@@ -118,13 +128,14 @@ class AdminPointApiService(BaseApiService):
             name: str | None = None,
             icon_hash: PointHash | None = None,
             path_to_icon: str | None = None,
+            enabled: bool | None = None,
     ) -> EstablishmentTypeAdminOut:
         if icon_hash is None and path_to_icon is not None:
             icon_hash = await self.upload_file(path_to_icon)
 
         resp = await self._put(
             url="/map/establishment-type/" + establishment_type_id,
-            data=EstablishmentTypeUpdateIn(name=name, icon_hash=icon_hash),
+            data=EstablishmentTypeUpdateIn(name=name, icon_hash=icon_hash, enabled=enabled),
         )
         return EstablishmentTypeAdminOut.model_validate(resp)
 
@@ -179,6 +190,7 @@ class AdminPointApiService(BaseApiService):
             paths_to_gallery: list[str] | None = None,
             gallery: list[PointHash] | None = None,
             channel_link: str | None = None,
+            enabled: bool | None = None,
     ) -> EstablishmentAdminOut:
         if icon_hash is None and path_to_icon is not None:
             icon_hash = await self.upload_file(path_to_icon)
@@ -200,6 +212,7 @@ class AdminPointApiService(BaseApiService):
                 photo_hash=photo_hash,
                 gallery=gallery,
                 channel_link=channel_link,
+                enabled=enabled,
             ),
         )
         return EstablishmentAdminOut.model_validate(resp)
@@ -242,6 +255,7 @@ class AdminPointApiService(BaseApiService):
             photo_hash: str | None = None,
             amount: Decimal | None = None,
             currency: str | None = None,
+            enabled: bool | None = None,
     ) -> MenuItemOut:
         if photo_hash is None and path_to_photo is not None:
             photo_hash = await self.upload_file(path_to_photo)
@@ -255,12 +269,53 @@ class AdminPointApiService(BaseApiService):
                 photo_hash=photo_hash,
                 amount=amount,
                 currency=currency,
+                enabled=enabled,
             ),
         )
         return MenuItemOut.model_validate(resp)
 
     async def delete_menu_item(self, menu_item_id: str) -> None:
         await self._delete(url="/map/menu-item/" + menu_item_id)
+
+    async def get_purpose_icon(self, purpose_icon_id: str) -> PurposeIconAdminOut:
+        resp = await self._get(url="/account/purpose-icon/" + purpose_icon_id)
+        return PurposeIconAdminOut.model_validate(resp)
+
+    async def create_purpose_icon(
+            self,
+            path_to_icon: str,
+            path_to_preview: str
+    ) -> PurposeIconAdminOut:
+        icon_hash, preview_hash = await self.upload_files([path_to_icon, path_to_preview])
+        resp = await self._post(
+            url="/account/purpose-icon/",
+            data=PurposeIconCreateIn(icon_hash=icon_hash, preview_hash=preview_hash),
+        )
+        return PurposeIconAdminOut.model_validate(resp)
+
+    async def update_purpose_icon(
+            self,
+            purpose_icon_id: str,
+            icon_hash: str | None = None,
+            path_to_icon: str | None = None,
+            preview_hash: str | None = None,
+            path_to_preview: str | None = None,
+            enabled: bool | None = None,
+    ) -> PurposeIconAdminOut:
+        if icon_hash is None and path_to_icon is not None:
+            icon_hash = await self.upload_file(path_to_icon)
+
+        if preview_hash is None and path_to_preview is not None:
+            preview_hash = await self.upload_file(path_to_preview)
+
+        resp = await self._put(
+            url="/account/purpose-icon/" + purpose_icon_id,
+            data=PurposeIconUpdateIn(icon_hash=icon_hash, preview_hash=preview_hash, enabled=enabled),
+        )
+        return PurposeIconAdminOut.model_validate(resp)
+
+    async def delete_purpose_icon(self, purpose_icon_id: str) -> None:
+        await self._delete(url="/account/purpose-icon/" + purpose_icon_id)
 
     async def get_asset(self, asset_id: str) -> AssetAdminOut:
         resp = await self._get(url="/tip/asset/" + asset_id)
@@ -281,7 +336,7 @@ class AdminPointApiService(BaseApiService):
                 name=name,
                 decimals=decimals,
                 address=address,
-                image_url=image_url,
+                image_url=Image(image_url),
             ),
         )
         return AssetAdminOut.model_validate(resp)
@@ -294,6 +349,7 @@ class AdminPointApiService(BaseApiService):
             decimals: int | None = None,
             address: str | None = None,
             image_url: str | None = None,
+            enabled: bool | None = None,
     ) -> AssetAdminOut:
         resp = await self._put(
             url="/tip/asset/" + asset_id,
@@ -303,6 +359,7 @@ class AdminPointApiService(BaseApiService):
                 decimals=decimals,
                 address=address,
                 image_url=image_url,
+                enabled=enabled
             ),
         )
         return AssetAdminOut.model_validate(resp)
@@ -324,7 +381,7 @@ class PublicPointApiService(BaseApiService):
             referrer_data: str | None = None,
     ) -> None:
         resp = await self._post(
-            url="/user/auth",
+            url="/account/auth",
             data=AuthIn(
                 hash=hash,
                 referrer_data=referrer_data,
@@ -334,6 +391,54 @@ class PublicPointApiService(BaseApiService):
         auth_out = AuthOut.model_validate(resp)
         self.headers["Authorization"] = "Bearer " + auth_out.access_token
         self.current_user = auth_out.user
+
+    async def get_user(self, user_id: int) -> UserPublicOut:
+        resp = await self._get(url="/account/user/" + str(user_id))
+        return UserPublicOut.model_validate(resp)
+
+    async def update_user(
+            self,
+            wallet: str | None = None,
+            meta: UserMeta | None = None,
+    ) -> None:
+        await self._put(
+            url="/account/user",
+            data=UserUpdateIn(wallet=wallet, meta=meta,)
+        )
+
+    async def get_purpose_icons(self) -> list[PurposeIconOut]:
+        resp = await self._get(url="/account/purpose-icons")
+        return [PurposeIconOut.model_validate(a) for a in resp]
+
+    async def update_employee(
+            self,
+            purpose: PurposeUpdateIn | None = None,
+            meta: EmployeeMeta | None = None,
+            first_name: str | None = None,
+            last_name: str | None = None,
+            photo_path: str | None = None,
+    ) -> None:
+        update_in = EmployeeUpdateIn(
+            purpose=purpose,
+            first_name=first_name,
+            last_name=last_name,
+            meta=meta,
+        )
+        form = aiohttp.FormData()
+        form.add_field('update_in', update_in.model_dump_json(exclude_none=True), content_type='application/json')
+
+        if photo_path:
+            form.add_field(
+                'file',
+                open(photo_path, 'rb'),
+                filename=photo_path,
+                content_type='image/svg+xml'
+            )
+
+        url = f"{self.base_url}/account/employee"
+
+        async with aiohttp.ClientSession(headers=self.headers) as session, session.put(url=url, data=form) as resp:
+            return await self.log_or_return(resp)
 
     async def get_establishment_types(self) -> dict[UUID, EstablishmentTypeOut]:
         resp = await self._get(url="/map/establishment-types")
@@ -411,8 +516,8 @@ class PublicPointApiService(BaseApiService):
 
 
 async def main():
-    admin_auth_api_key = "admin"
-    origin = "http://localhost:8000/api/v1/point"
+    admin_auth_api_key = ""
+    origin = ""
 
     apas = AdminPointApiService(admin_auth_api_key=admin_auth_api_key, origin=origin)
     ppas = PublicPointApiService(origin=origin)

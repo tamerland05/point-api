@@ -20,6 +20,7 @@ class ErrorCode(ErrorCodeBase):
     ASSET_NOT_FOUND = "Asset not found", status.HTTP_404_NOT_FOUND
     TIP_NOT_FOUND = "Tip not found", status.HTTP_404_NOT_FOUND
 
+    PURPOSE_ICON_NOT_FOUND = "Purpose icon not found", status.HTTP_404_NOT_FOUND
     EMPLOYEE_NOT_FOUND = "Employee not found", status.HTTP_404_NOT_FOUND
     USER_NOT_FOUND = "User not found", status.HTTP_404_NOT_FOUND
     USER_HAVE_NOT_WALLET = "User have not wallet", status.HTTP_404_NOT_FOUND

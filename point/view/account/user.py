@@ -17,9 +17,6 @@ class AuthUserIn(PointBase):
     username: str | None = Field(default=None)
     language_code: str | None = Field(default=None)
     photo_url: Image | None = Field(default=None)
-    is_bot: bool | None = Field(default=None)
-    is_premium: bool | None = Field(default=None)
-    allows_write_to_pm: bool | None = Field(default=None)
 
 
 class AuthUserOut(AuthUserIn):
@@ -42,7 +39,7 @@ class UserPublicOut(PointBase):
     username: str
     rank: int | None = Field(default=None)  # todo: calculate rank
     tips_left: int | None = Field(ge=0, default=None)
-    account: EmployeePublicOut | None = Field(default=None)
+    employee: EmployeePublicOut | None = Field(default=None)
 
 
 class UserUpdateIn(PointBase):

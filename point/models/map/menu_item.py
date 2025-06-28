@@ -12,9 +12,9 @@ class MenuItem(Model):
         table = "menu_items"
         unique_together = ("title", "establishment_id")
 
-    establishment = fields.ForeignKeyField("models.Establishment", on_delete=OnDelete.RESTRICT, index=True)
+    establishment = fields.ForeignKeyField("models.Establishment", on_delete=OnDelete.RESTRICT)
 
-    id = fields.UUIDField(pk=True, default=uuid4, unique=True)
+    id = fields.UUIDField(pk=True, default=uuid4)
 
     title = fields.CharField(max_length=128)
     description = fields.CharField(max_length=128)

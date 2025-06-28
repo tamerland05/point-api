@@ -5,14 +5,14 @@ from tortoise import Model, fields
 from point.models.utils import hash_to_link
 
 
-class EstablishmentType(Model):
+class PurposeIcon(Model):
 
     class Meta:
-        table = "establishment_types"
+        table = "purpose_icons"
 
     id = fields.UUIDField(pk=True, default=uuid4)
 
-    name = fields.CharField(max_length=128, unique=True)
+    preview_hash = fields.TextField()
     icon_hash = fields.TextField()
 
     enabled = fields.BooleanField(default=True, index=True)
@@ -22,3 +22,7 @@ class EstablishmentType(Model):
     @property
     def icon(self) -> str:
         return hash_to_link(self.icon_hash)
+
+    @property
+    def preview(self) -> str:
+        return hash_to_link(self.preview_hash)

@@ -53,7 +53,6 @@ class TonNetworkService(Client):
             "owner_address": owner_address,
         })
 
-        print(resp)
         jetton_wallet = resp["jetton_wallets"][0]
         return JettonWalletOut.model_validate(jetton_wallet)
 

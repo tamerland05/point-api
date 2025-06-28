@@ -8,7 +8,7 @@ class EstablishmentRating(Model):
         table = "place_ratings"
         unique_together = ("user_id", "place_id")
 
-    user = fields.ForeignKeyField("models.User", on_delete=OnDelete.RESTRICT, index=True)
-    place = fields.ForeignKeyField("models.Establishment", on_delete=OnDelete.RESTRICT, index=True)
+    user = fields.ForeignKeyField("models.User", on_delete=OnDelete.RESTRICT)
+    place = fields.ForeignKeyField("models.Establishment", on_delete=OnDelete.RESTRICT)
 
     mark = fields.SmallIntField()

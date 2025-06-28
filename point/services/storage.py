@@ -29,7 +29,7 @@ class StorageService:
         async with self.session.create_client(service_name=self.service_name, **self.config) as client:
             yield client
 
-    async def put_file(self, extension: str, data: bytes) -> str | None:
+    async def put_raw_file(self, data: bytes, extension: str = "") -> str | None:
         try:
             async with self.get_client() as client:
                 key = hashlib.md5(data).hexdigest() + extension
@@ -51,6 +51,10 @@ class StorageService:
         except Exception as e:
             logging.exception(f"Exception while putting file in storage: {e}")
             return None
+
+    async def put_file(self, filename: str, data: bytes) -> str | None:
+        extension = "." + filename.split(".")[-1]
+        return await self.put_raw_file(data, extension=extension)
 
     async def delete_file(self, key: UUID) -> bool:
         try:

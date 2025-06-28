@@ -10,19 +10,16 @@ class User(Model):
     class Meta:
         table = "users"
 
-    id = fields.BigIntField(pk=True, unique=True, index=True)
+    id = fields.BigIntField(pk=True)
     first_name = fields.TextField(null=True)
     last_name = fields.TextField(null=True)
     username = fields.TextField(null=True)
     language_code = fields.TextField(null=True)
     photo_url = fields.TextField(null=True)
-    is_bot = fields.BooleanField(null=True)
-    is_premium = fields.BooleanField(null=True)
-    allows_write_to_pm = fields.BooleanField(null=True)
 
     wallet: TonAddress = fields.TextField(null=True)
-    bonus_balance = fields.BigIntField(default=0)
-    tips_left = fields.BigIntField(default=0)
+    bonus_balance = fields.BigIntField(default=0, index=True)
+    tips_left = fields.BigIntField(default=0, index=True)
     meta: UserMeta = fields.JSONField(default={})
 
     employee = fields.ForeignKeyField(
@@ -30,7 +27,6 @@ class User(Model):
         null=True,
         on_delete=OnDelete.SET_NULL,
         unique=True,
-        index=True,
     )
 
     enabled = fields.BooleanField(default=True, index=True)

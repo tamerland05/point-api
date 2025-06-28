@@ -6,7 +6,7 @@ from .earn import *
 from .map import *
 from .selection import *
 from .task import *
-from .user import *
+from .account import *
 from .tip import *
 from .admin import *
 

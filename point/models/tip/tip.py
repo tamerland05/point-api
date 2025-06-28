@@ -9,7 +9,7 @@ class Tip(Model):
     class Meta:
         table = "tips"
 
-    id = fields.UUIDField(pk=True, unique=True)
+    id = fields.UUIDField(pk=True)
 
     sender = fields.ForeignKeyField("models.User")
     asset = fields.ForeignKeyField("models.Asset", on_delete=OnDelete.RESTRICT)

@@ -12,24 +12,29 @@ class UserController(BaseController[User]):
 
     @classmethod
     async def get_or_create_user(cls, user_in: AuthUserIn) -> (model, bool):
-        user = await cls.get_or_none("employee", id=user_in.id, enabled=True)
+        user = await cls.get_or_none(id=user_in.id, enabled=True)
         created = False
 
         if user is None:
             user = await UserController.create(model_create_in=user_in)
             created = True
 
-        if user.employee_id is not None:
-            await user.employee.fetch_related("job_place")
-        else:
-            user.employee = None
-
         return user, created
 
     @classmethod
     async def get_user(cls, user_id: int) -> model:
-        return await cls.get(id=user_id, enabled=True)
+        user = await cls.get("employee", id=user_id, enabled=True)
+
+        if user.employee_id is None:
+            user.employee = None
+
+        return user
 
     @classmethod
     async def get_by_employee(cls, employee_id: UUID) -> model:
         return await cls.get(employee_id=employee_id, enabled=True)
+
+    @classmethod
+    def validate_meta(cls, employee: model) -> None:
+        if not employee.meta["show_tips_left"]:
+            employee.tips_left = None

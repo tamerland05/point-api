@@ -15,6 +15,6 @@ class AssetController(BaseController[Asset]):
 
     @classmethod
     async def get_all_assets(cls) -> list[model]:
-        return await cls.get_all(enabled=True)
+        return await cls.filter(enabled=True)
 
     # todo: asset price updating

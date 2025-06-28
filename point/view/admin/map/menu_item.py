@@ -27,3 +27,4 @@ class MenuItemUpdateIn(PointBase):
     photo_hash: PointHash | None = Field(default=None)
     amount: Decimal | None = Field(default=None, ge=0)
     currency: str | None = Field(default=None, max_length=8)
+    enabled: bool | None = Field(default=None)
