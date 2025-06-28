@@ -16,6 +16,12 @@ async def get_asset(
     return AssetAdminOut.model_validate(asset)
 
 
+@router.get("s")
+async def get_all_assets() -> list[AssetAdminOut]:
+    assets = await AssetController.filter()
+    return [AssetAdminOut.model_validate(a) for a in assets]
+
+
 @router.post("")
 async def create_asset(
         asset_in: AssetCreateIn,

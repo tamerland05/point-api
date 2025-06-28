@@ -36,7 +36,7 @@ async def get_establishments_near(
     return establishments
 
 
-@router.post("/{establishment_id}")
+@router.get("/{establishment_id}")
 async def get_establishment(establishment_id: UUID) -> EstablishmentOut:
     establishment = await EstablishmentController.get("menu", id=establishment_id)
     return EstablishmentOut.model_validate(establishment)

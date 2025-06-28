@@ -16,6 +16,12 @@ async def get_purpose_icon(
     return PurposeIconAdminOut.model_validate(purpose_icon)
 
 
+@router.get("-icons")
+async def get_all_purpose_icons() -> list[PurposeIconAdminOut]:
+    purpose_icons = await PurposeIconController.filter()
+    return [PurposeIconAdminOut.model_validate(p) for p in purpose_icons]
+
+
 @router.post("-icon")
 async def create_purpose_icon(
         purpose_icon_in: PurposeIconCreateIn,

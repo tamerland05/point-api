@@ -21,6 +21,12 @@ async def get_establishment(
     return EstablishmentAdminOut.model_validate(establishment)
 
 
+@router.get("s")
+async def get_all_establishments() -> list[EstablishmentAdminOut]:
+    establishments = await EstablishmentController.filter()
+    return [EstablishmentAdminOut.model_validate(e) for e in establishments]
+
+
 @router.post("")
 async def create_establishment(
         establishment_in: EstablishmentCreateIn,

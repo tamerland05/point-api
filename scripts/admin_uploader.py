@@ -114,6 +114,10 @@ class AdminPointApiService(BaseApiService):
         resp = await self._get(url="/map/establishment-type/" + establishment_type_id)
         return EstablishmentTypeAdminOut.model_validate(resp)
 
+    async def get_all_establishment_types(self) -> list[EstablishmentTypeAdminOut]:
+        resp = await self._get(url="/map/establishment-types")
+        return [EstablishmentTypeAdminOut.model_validate(e) for e in resp]
+
     async def create_establishment_type(self, name: str, path_to_icon: str) -> EstablishmentTypeAdminOut:
         icon_hash = await self.upload_file(path_to_icon)
         resp = await self._post(
@@ -145,6 +149,10 @@ class AdminPointApiService(BaseApiService):
     async def get_establishment(self, establishment_id: str) -> EstablishmentAdminOut:
         resp = await self._get(url="/map/establishment/" + establishment_id)
         return EstablishmentAdminOut.model_validate(resp)
+
+    async def get_all_establishments(self) -> list[EstablishmentAdminOut]:
+        resp = await self._get(url="/map/establishments")
+        return [EstablishmentAdminOut.model_validate(e) for e in resp]
 
     async def create_establishment(
             self,
@@ -224,6 +232,10 @@ class AdminPointApiService(BaseApiService):
         resp = await self._get(url="/map/menu-item/" + menu_item_id)
         return MenuItemOut.model_validate(resp)
 
+    async def get_all_menu_items(self) -> list[MenuItemOut]:
+        resp = await self._get(url="/map/menu-items")
+        return [MenuItemOut.model_validate(m) for m in resp]
+
     async def create_menu_item(
             self,
             establishment_id: str,
@@ -281,6 +293,10 @@ class AdminPointApiService(BaseApiService):
         resp = await self._get(url="/account/purpose-icon/" + purpose_icon_id)
         return PurposeIconAdminOut.model_validate(resp)
 
+    async def get_all_purpose_icons(self) -> list[PurposeIconAdminOut]:
+        resp = await self._get(url="/account/purpose-icons")
+        return [PurposeIconAdminOut.model_validate(p) for p in resp]
+
     async def create_purpose_icon(
             self,
             path_to_icon: str,
@@ -320,6 +336,10 @@ class AdminPointApiService(BaseApiService):
     async def get_asset(self, asset_id: str) -> AssetAdminOut:
         resp = await self._get(url="/tip/asset/" + asset_id)
         return AssetAdminOut.model_validate(resp)
+
+    async def get_all_assets(self) -> list[AssetAdminOut]:
+        resp = await self._get(url="/tip/assets")
+        return [AssetAdminOut.model_validate(a) for a in resp]
 
     async def create_asset(
             self,
