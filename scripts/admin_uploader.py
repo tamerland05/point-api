@@ -257,6 +257,28 @@ class AdminPointApiService(BaseApiService):
         )
         return MenuItemOut.model_validate(resp)
 
+    async def create_menu_items(
+            self,
+            establishment_ids: list[str],
+            title: str,
+            description: str,
+            path_to_photo: str,
+            cost: Cost,
+    ) -> None:
+        photo_hash = await self.upload_file(path_to_photo)
+
+        for establishment_id in establishment_ids:
+            await self._post(
+                url="/map/menu-item",
+                data=MenuItemCreateIn(
+                    establishment_id=UUID(establishment_id),
+                    title=title,
+                    description=description,
+                    photo_hash=photo_hash,
+                    cost=cost,
+                ),
+            )
+
     async def update_menu_item(
             self,
             menu_item_id: str,
