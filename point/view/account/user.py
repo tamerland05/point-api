@@ -24,6 +24,7 @@ class AuthUserOut(AuthUserIn):
     rank: int | None = Field(default=None)
     bonus_balance: int = 0
     tips_left: int = Field(ge=0)
+    meta: UserMeta
     employee: EmployeeOut | None = Field(default=None)
 
 
