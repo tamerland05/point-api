@@ -39,6 +39,6 @@ class UserController(BaseController[User]):
         return await cls.model.filter(employee_id__in=employee_ids).values_list("employee_id", "id")
 
     @classmethod
-    def validate_meta(cls, employee: model) -> None:
-        if not employee.meta["show_tips_left"]:
-            employee.tips_left = None
+    def validate_meta(cls, user: model) -> None:
+        if "show_tips_left" not in user.meta or not user.meta["show_tips_left"]:
+            user.tips_left = None
