@@ -46,4 +46,4 @@ async def update_establishment_type(
 async def delete_establishment_type(
         establishment_type_id: UUID,
 ) -> None:
-    await EstablishmentTypeController.delete_by_uuid(model_id=establishment_type_id)
+    await EstablishmentTypeController.delete(id=establishment_type_id)

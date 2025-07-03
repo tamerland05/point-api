@@ -70,9 +70,9 @@ class Settings(BaseSettings, extra="allow"):
     def merchant_cipher(self) -> Fernet:
         return Fernet(self.encryption_key.encode())
 
-    def __init__(self, **kwargs: Any):
-        super().__init__(**kwargs)
+    def __init__(self):
+        super().__init__(_env_file=".env", _env_file_encoding="utf-8")
 
 
-settings = Settings(_env_file=".env", _env_file_encoding="utf-8")
+settings = Settings()
 TORTOISE_ORM = settings.tortoise_orm

@@ -58,4 +58,4 @@ async def update_menu_item(
 async def delete_menu_item(
         menu_item_id: UUID,
 ) -> None:
-    await MenuItemController.delete_by_uuid(model_id=menu_item_id)
+    await MenuItemController.delete(id=menu_item_id)

@@ -11,7 +11,7 @@ dependencies = [
     "faker>=37.4.0",
     "fastapi>=0.115.14",
     "fastapi-pagination>=0.13.3",
-    "notebook>=7.4.3",
+    "notebook>=7.4.4",
     "prometheus-fastapi-instrumentator>=7.1.0",
     "pydantic-settings>=2.10.1",
     "python-jose>=3.5.0",
@@ -19,7 +19,7 @@ dependencies = [
     "tomlkit>=0.13.3",
     "tonutils>=0.4.8",
     "tortoise-orm>=0.25.1",
-    "uvicorn>=0.34.3",
+    "uvicorn>=0.35.0",
 ]
 
 [tool.aerich]

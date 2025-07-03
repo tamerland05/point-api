@@ -43,9 +43,14 @@ from point.view import (
     PurposeIconCreateIn,
     PurposeIconUpdateIn,
     PurposeIconOut,
-    PurposeUpdateIn,
+    PurposeIn,
     EmployeeMeta,
     EmployeeUpdateIn,
+    InvitationAdminOut,
+    InvitationCreateIn,
+    InvitationDeleteIn,
+    InvitationOut,
+    EmployeeCreateIn,
 )
 
 
@@ -88,7 +93,7 @@ class BaseApiService:
 
     async def _delete(self, url: str, data: PointBase = None) -> Any | None:
         url = f"{self.base_url}{url}"
-        data = {} if data is None else data.model_dump_json()
+        data = {} if data is None else data.model_dump(mode="json", exclude_none=True)
 
         async with aiohttp.ClientSession(headers=self.headers) as session, session.delete(url=url, data=data) as resp:
             return await self.log_or_return(resp)
@@ -311,6 +316,31 @@ class AdminPointApiService(BaseApiService):
     async def delete_menu_item(self, menu_item_id: str) -> None:
         await self._delete(url="/map/menu-item/" + menu_item_id)
 
+    async def get_all_invitations(self) -> list[InvitationAdminOut]:
+        resp = await self._get(url="/account/invitations")
+        return [InvitationAdminOut.model_validate(p) for p in resp]
+
+    async def create_invitation(
+            self,
+            user_id: int,
+            establishment_id: str,
+    ) -> InvitationAdminOut:
+        resp = await self._post(
+            url="/account/invitation/",
+            data=InvitationCreateIn(user_id=user_id, establishment_id=UUID(establishment_id)),
+        )
+        return InvitationAdminOut.model_validate(resp)
+
+    async def delete_invitation(
+            self,
+            user_id: int,
+            establishment_id: str,
+    ) -> None:
+        await self._post(
+            url="/account/invitation-delete",
+            data=InvitationDeleteIn(user_id=user_id, establishment_id=UUID(establishment_id)),
+        )
+
     async def get_purpose_icon(self, purpose_icon_id: str) -> PurposeIconAdminOut:
         resp = await self._get(url="/account/purpose-icon/" + purpose_icon_id)
         return PurposeIconAdminOut.model_validate(resp)
@@ -448,13 +478,45 @@ class PublicPointApiService(BaseApiService):
             data=UserUpdateIn(wallet=wallet, meta=meta,)
         )
 
+    async def get_invitation(self) -> InvitationOut:
+        resp = await self._get(url="/account/invitation")
+        return InvitationOut.model_validate(resp)
+
     async def get_purpose_icons(self) -> list[PurposeIconOut]:
         resp = await self._get(url="/account/purpose-icons")
         return [PurposeIconOut.model_validate(a) for a in resp]
 
+    async def create_employee(
+            self,
+            purpose: PurposeIn,
+            meta: EmployeeMeta,
+            first_name: str,
+            last_name: str,
+            photo_path: str,
+    ):
+        create_in = EmployeeCreateIn(
+            purpose=purpose,
+            first_name=first_name,
+            last_name=last_name,
+            meta=meta,
+        )
+        form = aiohttp.FormData()
+        form.add_field('update_in', create_in.model_dump_json(), content_type='application/json')
+        form.add_field(
+            'file',
+            open(photo_path, 'rb'),
+            filename=photo_path,
+            content_type='image/svg+xml'
+        )
+
+        url = f"{self.base_url}/account/employee"
+
+        async with aiohttp.ClientSession(headers=self.headers) as session, session.post(url=url, data=form) as resp:
+            return await self.log_or_return(resp)
+
     async def update_employee(
             self,
-            purpose: PurposeUpdateIn | None = None,
+            purpose: PurposeIn | None = None,
             meta: EmployeeMeta | None = None,
             first_name: str | None = None,
             last_name: str | None = None,
@@ -481,6 +543,9 @@ class PublicPointApiService(BaseApiService):
 
         async with aiohttp.ClientSession(headers=self.headers) as session, session.put(url=url, data=form) as resp:
             return await self.log_or_return(resp)
+
+    async def delete_employee(self) -> None:
+        await self._delete(url="/account/employee")
 
     async def get_establishment_types(self) -> dict[UUID, EstablishmentTypeOut]:
         resp = await self._get(url="/map/establishment-types")

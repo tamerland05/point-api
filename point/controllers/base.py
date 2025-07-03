@@ -1,5 +1,4 @@
 from typing import Generic, TypeVar
-from uuid import UUID
 
 from tortoise.models import Model as TortoiseModel
 
@@ -41,11 +40,16 @@ class BaseController(Generic[Model]):
     @classmethod
     async def update(cls, *prefetch, model_update_in: PointBase, **filters) -> Model:
         entity: Model = await cls.get(*prefetch, **filters)
-        await entity.update_from_dict(model_update_in.model_dump(exclude_unset=True)).save()
+
+        model_update_in = model_update_in.model_dump(exclude_unset=True)
+        await (
+            entity
+            .update_from_dict(model_update_in)
+            .save(update_fields=list(model_update_in.keys()))
+        )
 
         return entity
 
     @classmethod
-    async def delete_by_uuid(cls, model_id: UUID) -> None:
-        entity: Model = await cls.get(id=model_id)
-        await entity.delete()
+    async def delete(cls, **filters) -> None:
+        await cls.model.filter(**filters).delete()

@@ -17,7 +17,7 @@ class Purpose(PointBase):
     description: str = Field(max_length=512)
 
 
-class PurposeUpdateIn(PointBase):
+class PurposeIn(PointBase):
     icon: str
     title: str = Field(max_length=32)
     description: str = Field(max_length=512)

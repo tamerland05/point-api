@@ -46,4 +46,4 @@ async def update_purpose_icon(
 async def delete_purpose_icon(
         purpose_icon_id: UUID,
 ) -> None:
-    await PurposeIconController.delete_by_uuid(model_id=purpose_icon_id)
+    await PurposeIconController.delete(id=purpose_icon_id)

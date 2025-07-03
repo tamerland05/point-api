@@ -9,7 +9,7 @@ async def upgrade(db: BaseDBAsyncClient) -> str:
     "name" VARCHAR(128) NOT NULL,
     "decimals" SMALLINT NOT NULL DEFAULT 9,
     "address" VARCHAR(128) NOT NULL,
-    "image_url" VARCHAR(1024) NOT NULL,
+    "image_url" TEXT NOT NULL,
     "ton_price" BIGINT NOT NULL DEFAULT 0,
     "enabled" BOOL NOT NULL DEFAULT True,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS "employers" (
     "first_name" VARCHAR(32) NOT NULL,
     "last_name" VARCHAR(32) NOT NULL,
     "photo_hash" TEXT NOT NULL,
-    "purpose" JSONB,
+    "purpose" JSONB NOT NULL,
     "meta" JSONB NOT NULL,
     "enabled" BOOL NOT NULL DEFAULT True,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -62,6 +62,16 @@ CREATE TABLE IF NOT EXISTS "employers" (
     "job_place_id" UUID NOT NULL REFERENCES "establishments" ("id") ON DELETE RESTRICT
 );
 CREATE INDEX IF NOT EXISTS "idx_employers_enabled_ac4be2" ON "employers" ("enabled");
+CREATE TABLE IF NOT EXISTS "invitations" (
+    "id" SERIAL NOT NULL PRIMARY KEY,
+    "user_id" BIGINT NOT NULL,
+    "profession" VARCHAR(32) NOT NULL,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "establishment_id" UUID NOT NULL REFERENCES "establishments" ("id") ON DELETE CASCADE,
+    CONSTRAINT "uid_invitations_user_id_10cff6" UNIQUE ("user_id", "establishment_id")
+);
+CREATE INDEX IF NOT EXISTS "idx_invitations_user_id_ebf60a" ON "invitations" ("user_id");
 CREATE TABLE IF NOT EXISTS "menu_items" (
     "id" UUID NOT NULL PRIMARY KEY,
     "title" VARCHAR(128) NOT NULL,

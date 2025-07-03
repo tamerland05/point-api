@@ -35,6 +35,10 @@ class UserController(BaseController[User]):
         return await cls.get(employee_id=employee_id, enabled=True)
 
     @classmethod
+    async def find_by_employee_ids(cls, employee_ids: list[UUID]) -> list:
+        return await cls.model.filter(employee_id__in=employee_ids).values_list("employee_id", "id")
+
+    @classmethod
     def validate_meta(cls, employee: model) -> None:
         if not employee.meta["show_tips_left"]:
             employee.tips_left = None

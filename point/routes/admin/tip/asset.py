@@ -46,4 +46,4 @@ async def update_asset(
 async def delete_asset(
         asset_id: UUID,
 ) -> None:
-    await AssetController.delete_by_uuid(model_id=asset_id)
+    await AssetController.delete(id=asset_id)
