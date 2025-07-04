@@ -33,4 +33,4 @@ class MenuItem(Model):
 
     @property
     def cost(self) -> dict:
-        return {"value": self.amount.normalize(), "currency": self.currency}
+        return {"value": self.amount.normalize().to_eng_string(), "currency": self.currency}
