@@ -17,6 +17,7 @@ from point.view import (
     Cost,
     MenuItemCreateIn,
     MenuItemUpdateIn,
+    MenuItemAdminOut,
     EstablishmentTypeAdminOut,
     EstablishmentAdminOut,
     AssetAdminOut,
@@ -233,13 +234,13 @@ class AdminPointApiService(BaseApiService):
     async def delete_establishment(self, establishment_id: str) -> None:
         await self._delete(url="/map/establishment/" + establishment_id)
 
-    async def get_menu_item(self, menu_item_id: str) -> MenuItemOut:
+    async def get_menu_item(self, menu_item_id: str) -> MenuItemAdminOut:
         resp = await self._get(url="/map/menu-item/" + menu_item_id)
-        return MenuItemOut.model_validate(resp)
+        return MenuItemAdminOut.model_validate(resp)
 
-    async def get_all_menu_items(self) -> list[MenuItemOut]:
+    async def get_all_menu_items(self) -> list[MenuItemAdminOut]:
         resp = await self._get(url="/map/menu-items")
-        return [MenuItemOut.model_validate(m) for m in resp]
+        return [MenuItemAdminOut.model_validate(m) for m in resp]
 
     async def create_menu_item(
             self,
@@ -248,7 +249,7 @@ class AdminPointApiService(BaseApiService):
             description: str,
             path_to_photo: str,
             cost: Cost,
-    ) -> MenuItemOut:
+    ) -> MenuItemAdminOut:
         photo_hash = await self.upload_file(path_to_photo)
         resp = await self._post(
             url="/map/menu-item",
@@ -260,7 +261,7 @@ class AdminPointApiService(BaseApiService):
                 cost=cost,
             ),
         )
-        return MenuItemOut.model_validate(resp)
+        return MenuItemAdminOut.model_validate(resp)
 
     async def create_menu_items(
             self,
@@ -295,7 +296,7 @@ class AdminPointApiService(BaseApiService):
             amount: Decimal | None = None,
             currency: str | None = None,
             enabled: bool | None = None,
-    ) -> MenuItemOut:
+    ) -> MenuItemAdminOut:
         if photo_hash is None and path_to_photo is not None:
             photo_hash = await self.upload_file(path_to_photo)
 
@@ -311,7 +312,7 @@ class AdminPointApiService(BaseApiService):
                 enabled=enabled,
             ),
         )
-        return MenuItemOut.model_validate(resp)
+        return MenuItemAdminOut.model_validate(resp)
 
     async def delete_menu_item(self, menu_item_id: str) -> None:
         await self._delete(url="/map/menu-item/" + menu_item_id)

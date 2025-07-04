@@ -23,5 +23,5 @@ class PointWithScale(PointRequestIn):
 
 
 class Cost(PointBase):
-    amount: Decimal = Field(ge=0)
+    value: Decimal = Field(ge=0)
     currency: str = Field(max_length=8)

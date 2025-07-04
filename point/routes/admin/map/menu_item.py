@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter
 
 from point.controllers import EstablishmentController, MenuItemController
-from point.view import MenuItemCreateIn, MenuItemOut, MenuItemDbCreateIn, MenuItemUpdateIn
+from point.view import MenuItemCreateIn, MenuItemAdminOut, MenuItemDbCreateIn, MenuItemUpdateIn
 
 router = APIRouter()
 
@@ -11,21 +11,21 @@ router = APIRouter()
 @router.get("/{menu_item_id}")
 async def get_menu_item(
         menu_item_id: UUID,
-) -> MenuItemOut:
+) -> MenuItemAdminOut:
     menu_item = await MenuItemController.get(id=menu_item_id)
-    return MenuItemOut.model_validate(menu_item)
+    return MenuItemAdminOut.model_validate(menu_item)
 
 
 @router.get("s")
-async def get_all_menu_items() -> list[MenuItemOut]:
+async def get_all_menu_items() -> list[MenuItemAdminOut]:
     menu_items = await MenuItemController.filter()
-    return [MenuItemOut.model_validate(m) for m in menu_items]
+    return [MenuItemAdminOut.model_validate(m) for m in menu_items]
 
 
 @router.post("")
 async def create_menu_item(
         menu_item_in: MenuItemCreateIn,
-) -> MenuItemOut:
+) -> MenuItemAdminOut:
     establishment = await EstablishmentController.get(id=menu_item_in.establishment_id)
 
     menu_item_in = MenuItemDbCreateIn(
@@ -36,14 +36,14 @@ async def create_menu_item(
 
     await establishment.menu.add(menu_item)
 
-    return MenuItemOut.model_validate(menu_item)
+    return MenuItemAdminOut.model_validate(menu_item)
 
 
 @router.put("/{menu_item_id}")
 async def update_menu_item(
         menu_item_id: UUID,
         menu_item_update_in: MenuItemUpdateIn,
-) -> MenuItemOut:
+) -> MenuItemAdminOut:
     if menu_item_update_in.establishment_id is not None:
         await EstablishmentController.get(id=menu_item_update_in.establishment_id)
 
@@ -51,7 +51,7 @@ async def update_menu_item(
         model_update_in=menu_item_update_in,
         id=menu_item_id
     )
-    return MenuItemOut.model_validate(menu_item)
+    return MenuItemAdminOut.model_validate(menu_item)
 
 
 @router.delete("/{menu_item_id}")

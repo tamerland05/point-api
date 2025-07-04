@@ -9,4 +9,4 @@ from .establishment_type import (
     EstablishmentTypeUpdateIn,
     EstablishmentTypeAdminOut,
 )
-from .menu_item import MenuItemCreateIn, MenuItemUpdateIn, MenuItemDbCreateIn
+from .menu_item import MenuItemCreateIn, MenuItemUpdateIn, MenuItemDbCreateIn, MenuItemAdminOut
