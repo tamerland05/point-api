@@ -112,12 +112,16 @@ jobs:
           
           echo "FIX_FEE=${{ secrets.FIX_FEE }}" >> .env
           echo "JETTON_TRANSFER_AMOUNT=${{ secrets.JETTON_TRANSFER_AMOUNT }}" >> .env
-
           echo "POINT_WALLET=${{ secrets.POINT_WALLET }}" >> .env
-          echo "ADMIN_AUTH_KEY=${{ secrets.ADMIN_AUTH_KEY }}" >> .env
+
+          echo "BONUS_REWARD_FOR_PREMIUM=${{ secrets.BONUS_REWARD_FOR_PREMIUM }}" >> .env
+          echo "BONUS_REWARD_FOR_SIMPLE=${{ secrets.BONUS_REWARD_FOR_SIMPLE }}" >> .env
+
           echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" >> .env
           echo "JWT_ALGORITHM=${{ secrets.JWT_ALGORITHM }}" >> .env
           echo "PUBLIC_KEY=${{ secrets.PUBLIC_KEY }}" >> .env
+          
+          echo "ADMIN_AUTH_KEY=${{ secrets.ADMIN_AUTH_KEY }}" >> .env
           
           echo "APP_ENV=dev" >> .env
 
