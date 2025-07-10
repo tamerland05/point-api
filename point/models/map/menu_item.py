@@ -18,7 +18,7 @@ class MenuItem(Model):
 
     title = fields.CharField(max_length=128)
     description = fields.CharField(max_length=128)
-    photo_hash = fields.TextField()
+    photo_hash = fields.TextField(null=True)
 
     amount = fields.DecimalField(decimal_places=18, max_digits=64)
     currency = fields.CharField(max_length=8)
@@ -28,9 +28,12 @@ class MenuItem(Model):
     updated_at = fields.DatetimeField(auto_now=True)
 
     @property
-    def photo(self) -> str:
-        return hash_to_link(self.photo_hash)
+    def photo(self) -> str | None:
+        return None if self.photo_hash is None else hash_to_link(self.photo_hash)
 
     @property
     def cost(self) -> dict:
-        return {"value": self.amount.normalize().to_eng_string(), "currency": self.currency}
+        return {
+            "amount": self.amount.normalize().to_eng_string(),
+            "currency": self.currency
+        }

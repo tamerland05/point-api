@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS "menu_items" (
     "id" UUID NOT NULL PRIMARY KEY,
     "title" VARCHAR(128) NOT NULL,
     "description" VARCHAR(128) NOT NULL,
-    "photo_hash" TEXT NOT NULL,
+    "photo_hash" TEXT,
     "amount" DECIMAL(64,18) NOT NULL,
     "currency" VARCHAR(8) NOT NULL,
     "enabled" BOOL NOT NULL DEFAULT True,

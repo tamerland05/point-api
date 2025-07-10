@@ -247,10 +247,10 @@ class AdminPointApiService(BaseApiService):
             establishment_id: str,
             title: str,
             description: str,
-            path_to_photo: str,
             cost: Cost,
+            path_to_photo: str | None = None,
     ) -> MenuItemAdminOut:
-        photo_hash = await self.upload_file(path_to_photo)
+        photo_hash = None if path_to_photo is None else await self.upload_file(path_to_photo)
         resp = await self._post(
             url="/map/menu-item",
             data=MenuItemCreateIn(
