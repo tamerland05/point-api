@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS "employers" (
     "first_name" VARCHAR(32) NOT NULL,
     "last_name" VARCHAR(32) NOT NULL,
     "photo_hash" TEXT NOT NULL,
-    "purpose" JSONB NOT NULL,
+    "purpose" JSONB,
     "meta" JSONB NOT NULL,
     "enabled" BOOL NOT NULL DEFAULT True,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -114,6 +114,34 @@ CREATE TABLE IF NOT EXISTS "users" (
 CREATE INDEX IF NOT EXISTS "idx_users_bonus_b_7e88f8" ON "users" ("bonus_balance");
 CREATE INDEX IF NOT EXISTS "idx_users_tips_le_b640c2" ON "users" ("tips_left");
 CREATE INDEX IF NOT EXISTS "idx_users_enabled_e41084" ON "users" ("enabled");
+CREATE TABLE IF NOT EXISTS "referrals" (
+    "id" SERIAL NOT NULL PRIMARY KEY,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "referral_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE,
+    "referrer_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE,
+    CONSTRAINT "uid_referrals_referre_ec3a4e" UNIQUE ("referrer_id", "referral_id")
+);
+CREATE TABLE IF NOT EXISTS "tasks" (
+    "id" UUID NOT NULL PRIMARY KEY,
+    "title" VARCHAR(128) NOT NULL,
+    "description" VARCHAR(512) NOT NULL,
+    "profit" BIGINT NOT NULL,
+    "icon_hash" VARCHAR(128) NOT NULL,
+    "link" VARCHAR(1024) NOT NULL,
+    "integration_type" VARCHAR(7) NOT NULL,
+    "enabled" BOOL NOT NULL DEFAULT True,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS "idx_task_enabled_f0ab0d" ON "tasks" ("enabled");
+COMMENT ON COLUMN "tasks"."integration_type" IS 'created: link\naccepted: channel';
+CREATE TABLE IF NOT EXISTS "completed_tasks" (
+    "id" SERIAL NOT NULL PRIMARY KEY,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "executor_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE,
+    "task_id" UUID NOT NULL REFERENCES "tasks" ("id") ON DELETE CASCADE,
+    CONSTRAINT "uid_completed_t_task_id_e2f118" UNIQUE ("task_id", "executor_id")
+);
 CREATE TABLE IF NOT EXISTS "place_ratings" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "mark" SMALLINT NOT NULL,

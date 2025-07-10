@@ -11,7 +11,7 @@ router = APIRouter()
 @router.get("s")
 async def get_all_invitations() -> list[InvitationAdminOut]:
     invitations = await InvitationController.filter()
-    return [InvitationAdminOut.model_validate(p) for p in invitations]
+    return InvitationAdminOut.list_validate(invitations)
 
 
 @router.post("")

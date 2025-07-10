@@ -19,7 +19,7 @@ async def get_establishment_type(
 @router.get("s")
 async def get_all_establishment_types() -> list[EstablishmentTypeAdminOut]:
     establishment_types = await EstablishmentTypeController.filter()
-    return [EstablishmentTypeAdminOut.model_validate(e) for e in establishment_types]
+    return EstablishmentTypeAdminOut.list_validate(establishment_types)
 
 
 @router.post("")

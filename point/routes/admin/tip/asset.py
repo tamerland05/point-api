@@ -19,7 +19,7 @@ async def get_asset(
 @router.get("s")
 async def get_all_assets() -> list[AssetAdminOut]:
     assets = await AssetController.filter()
-    return [AssetAdminOut.model_validate(a) for a in assets]
+    return AssetAdminOut.list_validate(assets)
 
 
 @router.post("")

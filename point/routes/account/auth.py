@@ -18,9 +18,16 @@ async def post_auth(auth_data: AuthIn, background_tasks: BackgroundTasks) -> Aut
 
     user, created = await UserController.get_or_create_user(user_in=auth_data.user)
     if not created:
-        async def background_update():
-            await user.update_from_dict(auth_data.user.model_dump(mode="json")).save()
-        background_tasks.add_task(background_update)
+        background_tasks.add_task(
+            func=user.update_from_dict(auth_data.user.model_dump(mode="json")).save
+        )
+    elif auth_data.referrer_id is not None:
+        background_tasks.add_task(
+            func=UserController.create_referral,
+            referrer_id=auth_data.referrer_id,
+            user_id=user.id,
+            is_premium=auth_data.user.is_premium,
+        )
 
     if user.employee_id is None:
         user.employee = None
@@ -32,6 +39,6 @@ async def post_auth(auth_data: AuthIn, background_tasks: BackgroundTasks) -> Aut
         "id": str(user.id),
     }
 
-    access_token = create_token(payload)
+    access_token = create_token(data=payload)
 
     return AuthOut(access_token=access_token, user=AuthUserOut.model_validate(user))

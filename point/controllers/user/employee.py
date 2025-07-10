@@ -14,10 +14,11 @@ class EmployeeController(BaseController[Employee]):
         return await cls.get("job_place", id=employee_id, enabled=True)
 
     @classmethod
-    async def validate_meta(cls, employee: model) -> None:
+    def validate_meta(cls, employee: model | None) -> None:
+        if employee is None:
+            return
+
         if employee.meta["show_job"]:
-            await employee.fetch_related("job_place")
-        else:
             employee.job_place = None
 
         if not employee.meta["show_purpose"]:

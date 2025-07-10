@@ -17,4 +17,4 @@ async def get_receivers(establishment_id: UUID) -> ReceiversOut:
     for employee in employees:
         employee.id = related_users[employee.id]
 
-    return ReceiversOut(employees=[EmployeeReceiver.model_validate(e) for e in employees])
+    return ReceiversOut(employees=EmployeeReceiver.list_validate(employees))

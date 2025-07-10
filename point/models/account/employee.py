@@ -18,7 +18,7 @@ class Employee(Model):
     first_name = fields.CharField(max_length=32)
     last_name = fields.CharField(max_length=32)
     photo_hash = fields.TextField()
-    purpose = fields.JSONField()
+    purpose = fields.JSONField(null=True)
     meta = fields.JSONField()
 
     enabled = fields.BooleanField(default=True, index=True)

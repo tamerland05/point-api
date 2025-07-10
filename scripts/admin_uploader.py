@@ -4,8 +4,10 @@ from typing import Any
 from uuid import UUID
 
 import aiohttp
+from fastapi_pagination import Page
+from pydantic import AnyUrl
 
-from point.entity_types import PointHash, RecipientType, Image
+from point.entity_types import PointHash, RecipientType, Image, TaskIntegrationType
 from point.view import (
     PointBase,
     EstablishmentTypeCreateIn,
@@ -52,6 +54,11 @@ from point.view import (
     InvitationDeleteIn,
     InvitationOut,
     EmployeeCreateIn,
+    TaskAdminOut,
+    TaskCreateIn,
+    TaskUpdateIn,
+    ReferralOut,
+    TaskOut,
 )
 
 
@@ -114,7 +121,65 @@ class AdminPointApiService(BaseApiService):
                 return await self.log_or_return(resp)
 
     async def upload_files(self, filepaths: list[str]) -> list[PointHash] | None:
-        return await asyncio.gather(*[asyncio.create_task(self.upload_file(filepath)) for filepath in filepaths])
+        return await asyncio.gather(*[self.upload_file(filepath) for filepath in filepaths])
+
+    async def get_task(self, task_id: str) -> TaskAdminOut:
+        resp = await self._get(url="/earn/task/" + task_id)
+        return TaskAdminOut.model_validate(resp)
+
+    async def get_all_tasks(self) -> list[TaskAdminOut]:
+        resp = await self._get(url="/earn/tasks")
+        return TaskAdminOut.list_validate(resp)
+
+    async def create_task(
+            self,
+            title: str,
+            description: str,
+            profit: int,
+            icon_hash: PointHash,
+            link: str,
+            integration_type: TaskIntegrationType,
+    ) -> TaskAdminOut:
+        resp = await self._post(
+            url="/earn/task",
+            data=TaskCreateIn(
+                title=title,
+                description=description,
+                profit=profit,
+                icon_hash=icon_hash,
+                link=AnyUrl(link),
+                integration_type=integration_type,
+            )
+        )
+        return TaskAdminOut.model_validate(resp)
+
+    async def update_task(
+            self,
+            task_id: str,
+            title: str | None = None,
+            description: str | None = None,
+            profit: int | None = None,
+            icon_hash: PointHash | None = None,
+            link: str | None = None,
+            integration_type: TaskIntegrationType | None = None,
+            enabled: bool | None = None,
+    ) -> TaskAdminOut:
+        resp = await self._put(
+            url="/earn/task/" + task_id,
+            data=TaskUpdateIn(
+                title=title,
+                description=description,
+                profit=profit,
+                icon_hash=icon_hash,
+                link=AnyUrl(link),
+                integration_type=integration_type,
+                enabled=enabled,
+            ),
+        )
+        return TaskAdminOut.model_validate(resp)
+
+    async def delete_task(self, task_id: str) -> None:
+        await self._delete(url="/earn/task/" + task_id)
 
     async def get_establishment_type(self, establishment_type_id: str) -> EstablishmentTypeAdminOut:
         resp = await self._get(url="/map/establishment-type/" + establishment_type_id)
@@ -122,7 +187,7 @@ class AdminPointApiService(BaseApiService):
 
     async def get_all_establishment_types(self) -> list[EstablishmentTypeAdminOut]:
         resp = await self._get(url="/map/establishment-types")
-        return [EstablishmentTypeAdminOut.model_validate(e) for e in resp]
+        return EstablishmentTypeAdminOut.list_validate(resp)
 
     async def create_establishment_type(self, name: str, path_to_icon: str) -> EstablishmentTypeAdminOut:
         icon_hash = await self.upload_file(path_to_icon)
@@ -158,7 +223,7 @@ class AdminPointApiService(BaseApiService):
 
     async def get_all_establishments(self) -> list[EstablishmentAdminOut]:
         resp = await self._get(url="/map/establishments")
-        return [EstablishmentAdminOut.model_validate(e) for e in resp]
+        return EstablishmentAdminOut.list_validate(resp)
 
     async def create_establishment(
             self,
@@ -240,7 +305,7 @@ class AdminPointApiService(BaseApiService):
 
     async def get_all_menu_items(self) -> list[MenuItemAdminOut]:
         resp = await self._get(url="/map/menu-items")
-        return [MenuItemAdminOut.model_validate(m) for m in resp]
+        return MenuItemAdminOut.list_validate(resp)
 
     async def create_menu_item(
             self,
@@ -319,7 +384,7 @@ class AdminPointApiService(BaseApiService):
 
     async def get_all_invitations(self) -> list[InvitationAdminOut]:
         resp = await self._get(url="/account/invitations")
-        return [InvitationAdminOut.model_validate(p) for p in resp]
+        return InvitationAdminOut.list_validate(resp)
 
     async def create_invitation(
             self,
@@ -348,7 +413,7 @@ class AdminPointApiService(BaseApiService):
 
     async def get_all_purpose_icons(self) -> list[PurposeIconAdminOut]:
         resp = await self._get(url="/account/purpose-icons")
-        return [PurposeIconAdminOut.model_validate(p) for p in resp]
+        return PurposeIconAdminOut.list_validate(resp)
 
     async def create_purpose_icon(
             self,
@@ -392,7 +457,7 @@ class AdminPointApiService(BaseApiService):
 
     async def get_all_assets(self) -> list[AssetAdminOut]:
         resp = await self._get(url="/tip/assets")
-        return [AssetAdminOut.model_validate(a) for a in resp]
+        return AssetAdminOut.list_validate(resp)
 
     async def create_asset(
             self,
@@ -416,7 +481,7 @@ class AdminPointApiService(BaseApiService):
 
     async def update_asset(
             self,
-            asset_id: str | None = None,
+            asset_id: str,
             symbol: str | None = None,
             name: str | None = None,
             decimals: int | None = None,
@@ -437,8 +502,8 @@ class AdminPointApiService(BaseApiService):
         )
         return AssetAdminOut.model_validate(resp)
 
-    async def delete_asset(self, establishment_type_id: str) -> None:
-        await self._delete(url="/tip/asset/" + establishment_type_id)
+    async def delete_asset(self, asset_id: str) -> None:
+        await self._delete(url="/tip/asset/" + asset_id)
 
 
 class PublicPointApiService(BaseApiService):
@@ -451,13 +516,13 @@ class PublicPointApiService(BaseApiService):
             self,
             user: AuthUserIn,
             hash: str,
-            referrer_data: str | None = None,
+            referrer_id: int | None = None,
     ) -> None:
         resp = await self._post(
             url="/account/auth",
             data=AuthIn(
                 hash=hash,
-                referrer_data=referrer_data,
+                referrer_id=referrer_id,
                 user=user,
             )
         )
@@ -479,30 +544,45 @@ class PublicPointApiService(BaseApiService):
             data=UserUpdateIn(wallet=wallet, meta=meta,)
         )
 
+    async def get_referrals(
+            self,
+            page: int = 1,
+            size: int = 100,
+    ) -> Page:
+        resp = await self._get(url=f"/earn/referrals?page={page}&size={size}")
+        resp["items"] = ReferralOut.list_validate(resp["items"])
+        return resp
+
+    async def get_tasks(self) -> list[TaskOut]:
+        resp = await self._get(url=f"/earn/tasks")
+        return TaskOut.list_validate(resp)
+
+    async def get_top(self) -> list[UserPublicOut]:
+        resp = await self._get(url=f"/earn/top")
+        return UserPublicOut.list_validate(resp)
+
     async def get_invitation(self) -> InvitationOut:
         resp = await self._get(url="/account/invitation")
         return InvitationOut.model_validate(resp)
 
     async def get_purpose_icons(self) -> list[PurposeIconOut]:
         resp = await self._get(url="/account/purpose-icons")
-        return [PurposeIconOut.model_validate(a) for a in resp]
+        return PurposeIconOut.list_validate(resp)
 
     async def create_employee(
             self,
-            purpose: PurposeIn,
             meta: EmployeeMeta,
             first_name: str,
             last_name: str,
             photo_path: str,
     ):
         create_in = EmployeeCreateIn(
-            purpose=purpose,
             first_name=first_name,
             last_name=last_name,
             meta=meta,
         )
         form = aiohttp.FormData()
-        form.add_field('update_in', create_in.model_dump_json(), content_type='application/json')
+        form.add_field('create_in', create_in.model_dump_json(), content_type='application/json')
         form.add_field(
             'file',
             open(photo_path, 'rb'),
@@ -567,7 +647,7 @@ class PublicPointApiService(BaseApiService):
             )
         )
 
-        return [EstablishmentPreview.model_validate(e) for e in resp]
+        return EstablishmentPreview.list_validate(resp)
 
     async def get_establishments_near(
             self,
@@ -586,7 +666,7 @@ class PublicPointApiService(BaseApiService):
             ),
         )
 
-        return [EstablishmentPreview.model_validate(e) for e in resp]
+        return EstablishmentPreview.list_validate(resp)
 
     async def get_establishment(self, establishment_id: str) -> EstablishmentOut:
         resp = await self._get(url="/map/establishment/" + establishment_id)
@@ -602,7 +682,7 @@ class PublicPointApiService(BaseApiService):
 
     async def get_assets(self) -> list[AssetOut]:
         resp = await self._get(url="/tip/assets")
-        return [AssetOut.model_validate(a) for a in resp]
+        return AssetOut.list_validate(resp)
 
     async def checkout_tip(
             self,
@@ -620,7 +700,7 @@ class PublicPointApiService(BaseApiService):
                 amount=Decimal(amount),
             )
         )
-        return [TransactionOut.model_validate(t) for t in resp]
+        return TransactionOut.list_validate(resp)
 
 
 async def main():

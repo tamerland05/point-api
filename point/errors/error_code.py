@@ -15,6 +15,7 @@ class ErrorCode(ErrorCodeBase):
 
     ESTABLISHMENT_TYPE_NOT_FOUND = "Establishment type not found", status.HTTP_404_NOT_FOUND
     ESTABLISHMENT_NOT_FOUND = "Establishment not found", status.HTTP_404_NOT_FOUND
+    ESTABLISHMENT_RATING_NOT_FOUND = "Establishment rating not found", status.HTTP_404_NOT_FOUND
     MENU_ITEM_NOT_FOUND = "Menu item not found", status.HTTP_404_NOT_FOUND
 
     ASSET_NOT_FOUND = "Asset not found", status.HTTP_404_NOT_FOUND
@@ -26,3 +27,4 @@ class ErrorCode(ErrorCodeBase):
     USER_NOT_FOUND = "User not found", status.HTTP_404_NOT_FOUND
     USER_HAVE_NOT_WALLET = "User have not wallet", status.HTTP_404_NOT_FOUND
 
+    TASK_NOT_FOUND = "Task not found", status.HTTP_404_NOT_FOUND

@@ -7,7 +7,7 @@ from . import AuthUserIn, AuthUserOut
 
 class AuthIn(PointBase):
     hash: str = Field(max_length=256)
-    referrer_data: str | None = Field(default=None, max_length=256)
+    referrer_id: int | None = Field(default=None, ge=0)
     user: AuthUserIn
 
 

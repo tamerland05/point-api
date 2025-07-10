@@ -12,6 +12,7 @@ class UserMeta(PointBase):
 
 class AuthUserIn(PointBase):
     id: int
+    is_premium: bool
     first_name: str | None = Field(default=None)
     last_name: str | None = Field(default=None)
     username: str | None = Field(default=None)
@@ -19,7 +20,10 @@ class AuthUserIn(PointBase):
     photo_url: Image | None = Field(default=None)
 
 
-class AuthUserOut(AuthUserIn):
+class AuthUserOut(PointBase):
+    name: str
+    username: str | None = Field(default=None)
+    photo_url: Image | None = Field(default=None)
     wallet: TonAddress | None = Field(default=None)
     rank: int | None = Field(default=None)
     bonus_balance: int = 0

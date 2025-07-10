@@ -22,15 +22,11 @@ async def create(request: Request, user: AuthUser = Depends(get_user)) -> None:
         request.form(),
     )
 
-    create_in = EmployeeCreateIn.model_validate(json.loads(form.get("update_in")))
+    create_in = EmployeeCreateIn.model_validate(json.loads(form.get("create_in")))
 
     photo = form.get("file")
-    photo_hash, purpose_icon = await asyncio.gather(
-        storage.put_file(filename=photo.filename, data=await photo.read()),
-        PurposeIconController.get(id=create_in.purpose.icon),
-    )
+    photo_hash = await storage.put_file(filename=photo.filename, data=await photo.read())
 
-    create_in.purpose.icon = purpose_icon.icon
     create_in = EmployeeDbCreateIn(
         job_place_id=invitation.establishment_id,
         profession=invitation.profession,

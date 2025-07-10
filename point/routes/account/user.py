@@ -11,8 +11,7 @@ router = APIRouter()
 async def get(user_id: int, _: AuthUser = Depends(get_user)) -> UserPublicOut:
     user = await UserController.get_user(user_id=user_id)
 
-    if user.employee is not None:
-        await EmployeeController.validate_meta(user.employee)
+    EmployeeController.validate_meta(user.employee)
     UserController.validate_meta(user)
 
     return UserPublicOut.model_validate(user)

@@ -14,7 +14,7 @@ router = APIRouter()
 @router.post("s")
 async def get_establishments(location: PointWithScale) -> list[EstablishmentPreview]:
     establishments = await EstablishmentController.filter("menu", enabled=True)
-    establishments = [EstablishmentPreview.model_validate(e) for e in establishments]
+    establishments = EstablishmentPreview.list_validate(establishments)
 
     establishments.sort(key=lambda establishment: point_distance(location, establishment.position))
 

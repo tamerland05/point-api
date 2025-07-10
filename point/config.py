@@ -34,12 +34,16 @@ class Settings(BaseSettings, extra="allow"):
 
     fix_fee: int
     jetton_transfer_amount: int
-
     point_wallet: str
-    admin_auth_key: str
+
+    bonus_reward_for_premium: int
+    bonus_reward_for_simple: int
+
     bot_token: str
     jwt_algorithm: str
     public_key: str
+
+    admin_auth_key: str
 
     app_env: AppEnv
 

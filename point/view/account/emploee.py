@@ -33,11 +33,9 @@ class EmployeeOut(EmployeePublicOut):
     last_name: str = Field(max_length=32)
     meta: EmployeeMeta
     job_place: JobPlaceOut
-    purpose: Purpose
 
 
 class EmployeeCreateIn(PointBase):
-    purpose: PurposeIn
     meta: EmployeeMeta
     first_name: str = Field(max_length=32)
     last_name: str = Field(max_length=32)

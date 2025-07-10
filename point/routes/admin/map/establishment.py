@@ -24,7 +24,7 @@ async def get_establishment(
 @router.get("s")
 async def get_all_establishments() -> list[EstablishmentAdminOut]:
     establishments = await EstablishmentController.filter("menu")
-    return [EstablishmentAdminOut.model_validate(e) for e in establishments]
+    return EstablishmentAdminOut.list_validate(establishments)
 
 
 @router.post("")

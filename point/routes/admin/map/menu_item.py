@@ -19,7 +19,7 @@ async def get_menu_item(
 @router.get("s")
 async def get_all_menu_items() -> list[MenuItemAdminOut]:
     menu_items = await MenuItemController.filter()
-    return [MenuItemAdminOut.model_validate(m) for m in menu_items]
+    return MenuItemAdminOut.list_validate(menu_items)
 
 
 @router.post("")

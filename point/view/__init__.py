@@ -10,6 +10,4 @@ from .account import *
 from .tip import *
 from .admin import *
 
-from .utils import random_address
-
 fake = faker.Faker()

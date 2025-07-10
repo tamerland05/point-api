@@ -7,4 +7,4 @@ from point.view import PointBase
 class ReferralOut(PointBase):
     name: str = Field(max_length=32)
     bonus_balance: int = 0
-    icon: Image
+    photo_url: Image

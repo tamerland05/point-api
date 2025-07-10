@@ -1,8 +1,11 @@
 from uuid import UUID
 
+from tortoise.transactions import in_transaction
+
+from point.config import settings
 from point.controllers.base import BaseController
 from point.errors import ErrorCode
-from point.models import User
+from point.models import User, Referral
 from point.view import AuthUserIn
 
 
@@ -23,7 +26,7 @@ class UserController(BaseController[User]):
 
     @classmethod
     async def get_user(cls, user_id: int) -> model:
-        user = await cls.get("employee", id=user_id, enabled=True)
+        user = await cls.get("employee", "employee__job_place", id=user_id, enabled=True)
 
         if user.employee_id is None:
             user.employee = None
@@ -36,9 +39,52 @@ class UserController(BaseController[User]):
 
     @classmethod
     async def find_by_employee_ids(cls, employee_ids: list[UUID]) -> list:
-        return await cls.model.filter(employee_id__in=employee_ids).values_list("employee_id", "id")
+        return await cls.filter(employee_id__in=employee_ids).values_list("employee_id", "id")
 
     @classmethod
     def validate_meta(cls, user: model) -> None:
         if "show_tips_left" not in user.meta or not user.meta["show_tips_left"]:
             user.tips_left = None
+
+    @classmethod
+    async def create_referral(cls, referrer_id: int, user_id: int, is_premium: bool) -> None:
+        async with in_transaction():
+            referrer = await cls.get_or_none(id=referrer_id, enabled=True)
+            if referrer is None:
+                return
+            await Referral.create(user_id=user_id, referral_id=user_id, referrer_id=referrer_id)
+            referrer.bonus_balance += (
+                settings.bonus_reward_for_premium if is_premium
+                else settings.bonus_reward_for_simple
+            )
+            await referrer.save(update_fields=["bonus_balance"])
+
+    @classmethod
+    async def find_referrals(
+            cls,
+            referrer_id: int,
+            page: int,
+            size: int,
+    ) -> list[model]:
+        offset = (page - 1) * size
+
+        referral_references = await (
+            Referral.filter(referrer_id=referrer_id)
+            .prefetch_related("referral")
+            .offset(offset)
+            .limit(size)
+            .order_by("-referral__bonus_balance")  # or referral_bonus_balance
+        )
+        return [referral_reference.referral for referral_reference in referral_references]
+
+    @classmethod
+    async def count_referrals(cls, referrer_id: int) -> int:
+        return await Referral.filter(referrer_id=referrer_id).count()
+
+    @classmethod
+    async def get_top_users(cls) -> list[model]:
+        return await (
+            cls.filter("employee", "employee__job_place", enabled=True)
+            .order_by("-bonus_balance")
+            .limit(100)
+        )

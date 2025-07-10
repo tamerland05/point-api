@@ -30,7 +30,7 @@ def check_transaction(
             blockchain_transaction.in_msg.destination == transaction.to and
             blockchain_transaction.in_msg.value == transaction.value and
             not blockchain_transaction.in_msg.bounced and
-            blockchain_transaction.in_msg.opcode == transaction.opcode and
+            blockchain_transaction.in_msg.opcode == transaction.out_message_opcode and
             blockchain_transaction.now >= transaction.now
     )
 

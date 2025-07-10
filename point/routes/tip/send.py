@@ -14,4 +14,4 @@ async def checkout_tip(checkout_in: CheckoutTipIn, user: AuthUser = Depends(get_
         checkout_in=checkout_in,
         sender_id=user.id,
     )
-    return [TransactionOut.model_validate(t) for t in tip.transactions]
+    return TransactionOut.list_validate(tip.transactions)

@@ -1,6 +1,7 @@
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Type, Any, Coroutine
 
 from tortoise.models import Model as TortoiseModel
+from tortoise.queryset import QuerySet, QuerySetSingle
 
 from point.errors import ErrorCode, APIException
 from point.view import PointBase
@@ -13,8 +14,8 @@ class BaseController(Generic[Model]):
     error_code: ErrorCode = ErrorCode.ENTITY_NOT_FOUND
 
     @classmethod
-    async def get_or_none(cls, *prefetch, **filters) -> Model | None:
-        return await cls.model.get_or_none(**filters).prefetch_related(*prefetch)
+    def get_or_none(cls, *prefetch, **filters) -> QuerySetSingle[Type[Model] | None]:
+        return cls.model.get_or_none(**filters).prefetch_related(*prefetch)
 
     @classmethod
     async def get(cls, *prefetch, **filters) -> Model:
@@ -26,16 +27,16 @@ class BaseController(Generic[Model]):
         return res
 
     @classmethod
-    async def get_all(cls, *prefetch, **filters) -> list[Model]:
-        return await cls.model.filter(**filters).prefetch_related(*prefetch)
+    def get_all(cls, *prefetch, **filters) -> QuerySet[Type[Model]]:
+        return cls.model.filter(**filters).prefetch_related(*prefetch)
 
     @classmethod
-    async def filter(cls, *prefetch, **filters) -> list[Model]:
-        return await cls.model.filter(**filters).prefetch_related(*prefetch)
+    def filter(cls, *prefetch, **filters) -> QuerySet[Type[Model]]:
+        return cls.model.filter(**filters).prefetch_related(*prefetch)
 
     @classmethod
-    async def create(cls, model_create_in: PointBase) -> Model:
-        return await cls.model.create(**model_create_in.model_dump(mode="json"))
+    def create(cls, model_create_in: PointBase) -> Coroutine[Any, Any, Model]:
+        return cls.model.create(**model_create_in.model_dump(mode="json"))
 
     @classmethod
     async def update(cls, *prefetch, model_update_in: PointBase, **filters) -> Model:
