@@ -11,5 +11,5 @@ class MenuItemOut(PointBase):
     establishment_id: UUID
     title: str = Field(max_length=128)
     description: str = Field(max_length=512)
-    photo: Image
+    photo: Image | None = Field(default=None)
     cost: Cost
