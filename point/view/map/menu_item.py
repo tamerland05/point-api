@@ -9,6 +9,7 @@ from point.view import PointBase, Cost
 class MenuItemOut(PointBase):
     id: UUID
     establishment_id: UUID
+    category: str = Field(max_length=32)
     title: str = Field(max_length=128)
     description: str = Field(max_length=512)
     photo: Image | None = Field(default=None)

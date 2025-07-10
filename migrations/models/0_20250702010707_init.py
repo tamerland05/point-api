@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS "invitations" (
 CREATE INDEX IF NOT EXISTS "idx_invitations_user_id_ebf60a" ON "invitations" ("user_id");
 CREATE TABLE IF NOT EXISTS "menu_items" (
     "id" UUID NOT NULL PRIMARY KEY,
+    "category" VARCHAR(32) NOT NULL,
     "title" VARCHAR(128) NOT NULL,
     "description" VARCHAR(128) NOT NULL,
     "photo_hash" TEXT,
@@ -172,12 +173,7 @@ CREATE TABLE IF NOT EXISTS "aerich" (
     "version" VARCHAR(255) NOT NULL,
     "app" VARCHAR(100) NOT NULL,
     "content" JSONB NOT NULL
-);
-CREATE TABLE IF NOT EXISTS "establishments_menu_items" (
-    "establishments_id" UUID NOT NULL REFERENCES "establishments" ("id") ON DELETE CASCADE,
-    "menuitem_id" UUID NOT NULL REFERENCES "menu_items" ("id") ON DELETE CASCADE
-);
-CREATE UNIQUE INDEX IF NOT EXISTS "uidx_establishme_establi_496c5b" ON "establishments_menu_items" ("establishments_id", "menuitem_id");"""
+);"""
 
 
 async def downgrade(db: BaseDBAsyncClient) -> str:

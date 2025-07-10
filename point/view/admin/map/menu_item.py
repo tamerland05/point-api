@@ -9,6 +9,7 @@ from point.view import PointBase, Cost
 
 class MenuItemCreateIn(PointBase):
     establishment_id: UUID
+    category: str = Field(max_length=32)
     title: str = Field(max_length=128)
     description: str = Field(max_length=512)
     photo_hash: PointHash | None = Field(default=None)
@@ -22,6 +23,7 @@ class MenuItemDbCreateIn(MenuItemCreateIn):
 
 class MenuItemUpdateIn(PointBase):
     establishment_id: UUID | None = Field(default=None)
+    category: str | None = Field(default=None, max_length=32)
     title: str | None = Field(default=None, max_length=128)
     description: str | None = Field(default=None, max_length=512)
     photo_hash: PointHash | None = Field(default=None)
@@ -33,6 +35,7 @@ class MenuItemUpdateIn(PointBase):
 class MenuItemAdminOut(PointBase):
     id: UUID
     establishment_id: UUID
+    category: str = Field(max_length=32)
     title: str = Field(max_length=128)
     description: str = Field(max_length=512)
     photo: Image | None = Field(default=None)

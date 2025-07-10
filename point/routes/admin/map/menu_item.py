@@ -26,15 +26,13 @@ async def get_all_menu_items() -> list[MenuItemAdminOut]:
 async def create_menu_item(
         menu_item_in: MenuItemCreateIn,
 ) -> MenuItemAdminOut:
-    establishment = await EstablishmentController.get(id=menu_item_in.establishment_id)
+    await EstablishmentController.get(id=menu_item_in.establishment_id)
 
     menu_item_in = MenuItemDbCreateIn(
         **menu_item_in.model_dump(),
         **menu_item_in.cost.model_dump(),
     )
     menu_item = await MenuItemController.create(menu_item_in)
-
-    await establishment.menu.add(menu_item)
 
     return MenuItemAdminOut.model_validate(menu_item)
 

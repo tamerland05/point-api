@@ -13,7 +13,7 @@ class EstablishmentController(BaseController[Establishment]):
 
     @classmethod
     async def get_establishment(cls, establishment_id: UUID) -> model:
-        return await cls.get("menu", id=establishment_id)
+        return await cls.get("menu", id=establishment_id, enabled=True)
 
     @classmethod
     async def admin_create(cls, establishment_create_in: EstablishmentDbCreateIn) -> Establishment:

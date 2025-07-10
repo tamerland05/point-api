@@ -30,7 +30,6 @@ class Establishment(Model):
     icon_hash = fields.TextField()
     photo_hash = fields.TextField()
     gallery_hashes = fields.JSONField(default=[])
-    menu = fields.ManyToManyField("models.MenuItem")
 
     rating = fields.DecimalField(max_digits=3, decimal_places=2, default=0)
 

@@ -310,6 +310,7 @@ class AdminPointApiService(BaseApiService):
     async def create_menu_item(
             self,
             establishment_id: str,
+            category: str,
             title: str,
             description: str,
             cost: Cost,
@@ -320,6 +321,7 @@ class AdminPointApiService(BaseApiService):
             url="/map/menu-item",
             data=MenuItemCreateIn(
                 establishment_id=UUID(establishment_id),
+                category=category,
                 title=title,
                 description=description,
                 photo_hash=photo_hash,
