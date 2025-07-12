@@ -426,7 +426,7 @@ class AdminPointApiService(BaseApiService):
     ) -> PurposeIconAdminOut:
         icon_hash, preview_hash = await self.upload_files([path_to_icon, path_to_preview])
         resp = await self._post(
-            url="/account/purpose-icon/",
+            url="/account/purpose-icon",
             data=PurposeIconCreateIn(icon_hash=icon_hash, preview_hash=preview_hash),
         )
         return PurposeIconAdminOut.model_validate(resp)

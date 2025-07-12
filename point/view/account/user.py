@@ -12,7 +12,7 @@ class UserMeta(PointBase):
 
 class AuthUserIn(PointBase):
     id: int
-    is_premium: bool
+    is_premium: bool = False
     first_name: str | None = Field(default=None)
     last_name: str | None = Field(default=None)
     username: str | None = Field(default=None)
