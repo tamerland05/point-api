@@ -1,3 +1,4 @@
+from decimal import Decimal
 from enum import StrEnum
 from typing import Any
 
@@ -24,6 +25,7 @@ class Settings(BaseSettings, extra="allow"):
     postgres_host: str
     postgres_db: str
 
+    assets_url: AnyUrl
     ton_indexer_url: AnyUrl
     ton_indexer_api_key: str
     ton_indexer_rps: int
@@ -32,7 +34,7 @@ class Settings(BaseSettings, extra="allow"):
     seed: str
     encryption_key: str
 
-    fix_fee: int
+    fix_fee: Decimal
     jetton_transfer_amount: int
     point_wallet: str
 

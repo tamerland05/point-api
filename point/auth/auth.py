@@ -63,8 +63,8 @@ def validate_telegram_init_data(init_data: AuthIn) -> bool:
             if key != "hash"
         ]
         data_check_array.sort()
-        secret_key = hmac.new(b'WebAppData', settings.bot_token.encode('utf-8'), hashlib.sha256).digest()
-        data_string = '\n'.join(data_check_array).encode('utf-8')
+        secret_key = hmac.new(b"WebAppData", settings.bot_token.encode("utf-8"), hashlib.sha256).digest()
+        data_string = "\n".join(data_check_array).encode("utf-8")
         calculated_hash = hmac.new(secret_key, data_string, hashlib.sha256).hexdigest()
         is_valid = hmac.compare_digest(calculated_hash, init_data.hash)
     else:

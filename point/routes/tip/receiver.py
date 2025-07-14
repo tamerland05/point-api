@@ -10,7 +10,7 @@ router = APIRouter()
 
 @router.get("s/{establishment_id}")
 async def get_receivers(establishment_id: UUID) -> ReceiversOut:
-    employees = await EmployeeController.filter(job_place_id=establishment_id)
+    employees = await EmployeeController.filter(job_place_id=establishment_id, enabled=True)
 
     # todo: remove this shit
     related_users = dict(await UserController.find_by_employee_ids([e.id for e in employees]))

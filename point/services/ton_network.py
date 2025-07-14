@@ -19,22 +19,6 @@ def create_text_cell(payload: str) -> Cell:
     )
 
 
-def check_transaction(
-        transaction: TransactionDbOut,
-        blockchain_transaction: BlockchainTransactionOut,
-) -> bool:
-    return (
-            blockchain_transaction.description.action.success and
-            blockchain_transaction.account == transaction.to and
-            blockchain_transaction.in_msg.source == transaction.sender and
-            blockchain_transaction.in_msg.destination == transaction.to and
-            blockchain_transaction.in_msg.value == transaction.value and
-            not blockchain_transaction.in_msg.bounced and
-            blockchain_transaction.in_msg.opcode == transaction.out_message_opcode and
-            blockchain_transaction.now >= transaction.now
-    )
-
-
 class TonNetworkService(Client):
     JETTON_TRANSFER_OPCODE = JETTON_TRANSFER_OPCODE
 
@@ -85,7 +69,7 @@ class TonNetworkService(Client):
             body=boc_to_base64_string(body.to_boc()),
             sender=sender_address,
             body_hash=PointBlockchainHash(root=boc_to_base64_string(body.hash)),
-            out_message_opcode=0,
+            out_message_opcode=JETTON_TRANSFER_OPCODE,
         )
 
     @staticmethod
@@ -103,7 +87,7 @@ class TonNetworkService(Client):
             body=boc_to_base64_string(body.to_boc()),
             sender=sender_address,
             body_hash=PointBlockchainHash(root=boc_to_base64_string(body.hash)),
-            out_message_opcode=JETTON_TRANSFER_OPCODE,
+            out_message_opcode=0,
         )
 
     @staticmethod
@@ -112,7 +96,7 @@ class TonNetworkService(Client):
             blockchain_transactions: list[BlockchainTransactionOut]
     ) -> BlockchainTransactionOut | None:
         for t in blockchain_transactions:
-            if check_transaction(transaction=transaction, blockchain_transaction=t):
+            if t.equal_to(db_trx=transaction):
                 return t
         return None
 
@@ -145,7 +129,7 @@ class TonNetworkService(Client):
         if blockchain_transaction is None:
             return False
 
-        match blockchain_transaction.in_msg.opcode:
+        match transaction.out_message_opcode:
             case self.JETTON_TRANSFER_OPCODE:
                 return await self._check_jetton_transfer(transaction=blockchain_transaction)
             case _:

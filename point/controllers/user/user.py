@@ -57,7 +57,7 @@ class UserController(BaseController[User]):
                 settings.bonus_reward_for_premium if is_premium
                 else settings.bonus_reward_for_simple
             )
-            await referrer.save(update_fields=["bonus_balance"])
+            await referrer.save(update_fields=["bonus_balance", "updated_at"])
 
     @classmethod
     async def find_referrals(
@@ -73,7 +73,7 @@ class UserController(BaseController[User]):
             .prefetch_related("referral")
             .offset(offset)
             .limit(size)
-            .order_by("-referral__bonus_balance")  # or referral_bonus_balance
+            .order_by("-referral__bonus_balance")
         )
         return [referral_reference.referral for referral_reference in referral_references]
 

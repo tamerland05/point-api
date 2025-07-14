@@ -6,7 +6,7 @@ from point.config import settings
 admin_api = APIKeyHeader(
     name="AdminApiKey",
     auto_error=True,
-    scheme_name='AdminApiKey',
+    scheme_name="AdminApiKey",
 )
 
 

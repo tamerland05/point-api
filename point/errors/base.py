@@ -26,7 +26,7 @@ class Error:
 
     @staticmethod
     def responses(*args) -> dict[str, Any]:  # type: ignore
-        rsp = {"model": ErrorResponse, "description": args if len(args) == 1 else "Bad Request"}
+        rsp: dict[str, Any] = {"model": ErrorResponse, "description": args if len(args) == 1 else "Bad Request"}
         if len(args) == 1:
             return {
                 "model": ErrorResponse,

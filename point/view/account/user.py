@@ -39,7 +39,6 @@ class AuthUser(PointBase):
 
 class UserPublicOut(PointBase):
     photo_url: Image | None = Field(default=None)
-    wallet: TonAddress | None = Field(default=None)
     name: str
     username: str
     rank: int | None = Field(default=None)  # todo: calculate rank

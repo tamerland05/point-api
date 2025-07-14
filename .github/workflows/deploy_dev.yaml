@@ -102,6 +102,7 @@ jobs:
           echo "POSTGRES_HOST=${{ secrets. POSTGRES_HOST}}" >> .env
           echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
           
+          echo "ASSETS_URL=${{ secrets.ASSETS_URL }}" >> .env
           echo "TON_INDEXER_URL=${{ secrets.TON_INDEXER_URL }}" >> .env
           echo "TON_INDEXER_API_KEY=${{ secrets.TON_INDEXER_API_KEY }}" >> .env
           echo "TON_INDEXER_RPS=${{ secrets.TON_INDEXER_RPS }}" >> .env

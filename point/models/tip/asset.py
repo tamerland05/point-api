@@ -16,7 +16,8 @@ class Asset(Model):
     address = fields.CharField(max_length=128)
     image_url = fields.TextField()
 
-    ton_price = fields.BigIntField(default=0)
+    price = fields.DecimalField(decimal_places=32, max_digits=64, default=0)
+    priority = fields.SmallIntField(default=0)
 
     enabled = fields.BooleanField(default=True, index=True)
     created_at = fields.DatetimeField(auto_now_add=True)

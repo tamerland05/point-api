@@ -1,21 +1,21 @@
 import asyncio
 import logging
-import traceback
 
-from . import TipController
+from point.controllers import TipController, AssetController
 
 app_pooling = asyncio.Event()
 
 
 async def start_pooling() -> None:
     while not app_pooling.is_set():
-        await asyncio.sleep(5)
         try:
             await asyncio.gather(
                 TipController.pooling_tips(),
+                AssetController.update_prices()
             )
         except Exception as e:
-            logging.exception(f"Pooling error: {e}\nTraceback: {traceback.format_exc()}")
+            logging.exception(f"Pooling error: {e}")
+        await asyncio.sleep(15)
 
 
 def stop_pooling() -> None:

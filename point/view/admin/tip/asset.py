@@ -13,6 +13,7 @@ class AssetCreateIn(PointBase):
     decimals: int
     address: str = Field(max_length=128)
     image_url: Image
+    priority: int
 
 
 class AssetUpdateIn(PointBase):
@@ -21,12 +22,13 @@ class AssetUpdateIn(PointBase):
     decimals: int | None = Field(default=None)
     address: str | None = Field(default=None, max_length=128)
     image_url: Image | None = Field(default=None)
+    priority: int | None = Field(default=None)
     enabled: bool | None = Field(default=None)
 
 
 class AssetAdminOut(AssetCreateIn):
     id: UUID
-    ton_price: int
+    price: int
     enabled: bool
     created_at: datetime
     updated_at: datetime

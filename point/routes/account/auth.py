@@ -17,10 +17,9 @@ async def post_auth(auth_data: AuthIn, background_tasks: BackgroundTasks) -> Aut
         raise APIException(ErrorCode.WRONG_CREDENTIALS)
 
     user, created = await UserController.get_or_create_user(user_in=auth_data.user)
-    if not created:
-        background_tasks.add_task(
-            func=user.update_from_dict(auth_data.user.model_dump(mode="json")).save
-        )
+    user_dct = auth_data.user.model_dump(mode="json")
+    if not created and any(getattr(user, field) != new for field, new in user_dct.items() if hasattr(user, field)):
+        background_tasks.add_task(func=user.update_from_dict(user_dct).save)
     elif auth_data.referrer_id is not None:
         background_tasks.add_task(
             func=UserController.create_referral,

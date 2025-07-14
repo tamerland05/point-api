@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar, Type, Any, Coroutine
+from typing import Generic, TypeVar, Any, Coroutine
 
 from tortoise.models import Model as TortoiseModel
 from tortoise.queryset import QuerySet, QuerySetSingle
@@ -14,7 +14,7 @@ class BaseController(Generic[Model]):
     error_code: ErrorCode = ErrorCode.ENTITY_NOT_FOUND
 
     @classmethod
-    def get_or_none(cls, *prefetch, **filters) -> QuerySetSingle[Type[Model] | None]:
+    def get_or_none(cls, *prefetch, **filters) -> QuerySetSingle[Model | None]:
         return cls.model.get_or_none(**filters).prefetch_related(*prefetch)
 
     @classmethod
@@ -27,11 +27,11 @@ class BaseController(Generic[Model]):
         return res
 
     @classmethod
-    def get_all(cls, *prefetch, **filters) -> QuerySet[Type[Model]]:
+    def get_all(cls, *prefetch, **filters) -> QuerySet[Model]:
         return cls.model.filter(**filters).prefetch_related(*prefetch)
 
     @classmethod
-    def filter(cls, *prefetch, **filters) -> QuerySet[Type[Model]]:
+    def filter(cls, *prefetch, **filters) -> QuerySet[Model]:
         return cls.model.filter(**filters).prefetch_related(*prefetch)
 
     @classmethod
@@ -46,7 +46,7 @@ class BaseController(Generic[Model]):
         await (
             entity
             .update_from_dict(model_update_in)
-            .save(update_fields=list(model_update_in.keys()))
+            .save(update_fields=list(model_update_in.keys()) + ["updated_at"])
         )
 
         return entity

@@ -37,7 +37,7 @@ class PointBlockchainHash(PointRoot[str]):
 class TonAddress(PointRoot[str]):
     root: str = Field(max_length=256, kw_only=True)
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def validate_model(self) -> Self:
         try:
             addr = Address(address=self.root)

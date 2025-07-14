@@ -113,9 +113,9 @@ class AdminPointApiService(BaseApiService):
         super().__init__(headers, origin + "/admin")
 
     async def upload_file(self, filepath: str) -> PointHash | None:
-        with open(filepath, 'rb') as f:
+        with open(filepath, "rb") as f:
             url = self.base_url + "/common/upload-file"
-            data = {'file': f}
+            data = {"file": f}
 
             async with aiohttp.ClientSession(headers=self.headers) as session, session.post(url, data=data) as resp:
                 return await self.log_or_return(resp)
@@ -396,7 +396,7 @@ class AdminPointApiService(BaseApiService):
             establishment_id: str,
     ) -> InvitationAdminOut:
         resp = await self._post(
-            url="/account/invitation/",
+            url="/account/invitation",
             data=InvitationCreateIn(user_id=user_id, establishment_id=UUID(establishment_id)),
         )
         return InvitationAdminOut.model_validate(resp)
@@ -470,6 +470,7 @@ class AdminPointApiService(BaseApiService):
             decimals: int,
             address: str,
             image_url: str,
+            priority: int
     ) -> AssetAdminOut:
         resp = await self._post(
             url="/tip/asset",
@@ -479,6 +480,7 @@ class AdminPointApiService(BaseApiService):
                 decimals=decimals,
                 address=address,
                 image_url=Image(image_url),
+                priority=priority
             ),
         )
         return AssetAdminOut.model_validate(resp)
@@ -491,6 +493,7 @@ class AdminPointApiService(BaseApiService):
             decimals: int | None = None,
             address: str | None = None,
             image_url: str | None = None,
+            priority: int | None = None,
             enabled: bool | None = None,
     ) -> AssetAdminOut:
         resp = await self._put(
@@ -501,6 +504,7 @@ class AdminPointApiService(BaseApiService):
                 decimals=decimals,
                 address=address,
                 image_url=image_url,
+                priority=priority,
                 enabled=enabled
             ),
         )
@@ -586,7 +590,7 @@ class PublicPointApiService(BaseApiService):
             meta=meta,
         )
         form = aiohttp.FormData()
-        form.add_field('create_in', create_in.model_dump_json(), content_type='application/json')
+        form.add_field("create_in", create_in.model_dump_json(), content_type="application/json")
         form.add_field(
             'file',
             open(photo_path, 'rb'),

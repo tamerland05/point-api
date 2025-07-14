@@ -19,6 +19,7 @@ class ErrorCode(ErrorCodeBase):
     MENU_ITEM_NOT_FOUND = "Menu item not found", status.HTTP_404_NOT_FOUND
 
     ASSET_NOT_FOUND = "Asset not found", status.HTTP_404_NOT_FOUND
+    USER_ASSET_NOT_FOUND = "User asset not found", status.HTTP_404_NOT_FOUND
     TIP_NOT_FOUND = "Tip not found", status.HTTP_404_NOT_FOUND
 
     PURPOSE_ICON_NOT_FOUND = "Purpose icon not found", status.HTTP_404_NOT_FOUND

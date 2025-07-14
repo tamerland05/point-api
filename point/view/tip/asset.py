@@ -12,7 +12,7 @@ class AssetOut(PointBase):
     symbol: str = Field(max_length=16)
     name: str = Field(max_length=32)
     address: TonAddress
-    ton_price: Decimal
+    price: Decimal
     image_url: Image
 
 

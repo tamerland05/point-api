@@ -1,12 +1,9 @@
 from uuid import UUID
 
 from fastapi import APIRouter
-from fastapi.params import Depends
 
-from point.auth import get_user
 from point.controllers import EstablishmentController
-from point.view import AuthUser, PointWithScale, EstablishmentPreview, NearEstablishmentCriteria, EstablishmentOut
-from point.view.utils import point_distance
+from point.view import PointWithScale, EstablishmentPreview, NearEstablishmentCriteria, EstablishmentOut
 
 router = APIRouter()
 
@@ -16,7 +13,7 @@ async def get_establishments(location: PointWithScale) -> list[EstablishmentPrev
     establishments = await EstablishmentController.filter("menu", enabled=True)
     establishments = EstablishmentPreview.list_validate(establishments)
 
-    establishments.sort(key=lambda establishment: point_distance(location, establishment.position))
+    establishments.sort(key=lambda establishment: location.distance(establishment.position))
 
     return establishments
 
@@ -31,7 +28,7 @@ async def get_establishments_near(
         if e.name is None or criteria.name in e.name
     ]
 
-    establishments.sort(key=lambda establishment: point_distance(criteria.location, establishment.position))
+    establishments.sort(key=lambda establishment: criteria.location.distance(establishment.position))
 
     return establishments
 
@@ -40,8 +37,3 @@ async def get_establishments_near(
 async def get_establishment(establishment_id: UUID) -> EstablishmentOut:
     establishment = await EstablishmentController.get("menu", id=establishment_id)
     return EstablishmentOut.model_validate(establishment)
-
-
-@router.post("/{establishment_id}/rate")
-async def set_establishment_rate(establishment_id: UUID, mark: int, user: AuthUser = Depends(get_user)) -> None:
-    return None

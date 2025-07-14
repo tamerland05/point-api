@@ -10,7 +10,8 @@ async def upgrade(db: BaseDBAsyncClient) -> str:
     "decimals" SMALLINT NOT NULL DEFAULT 9,
     "address" VARCHAR(128) NOT NULL,
     "image_url" TEXT NOT NULL,
-    "ton_price" BIGINT NOT NULL DEFAULT 0,
+    "price" DECIMAL(64,32) NOT NULL DEFAULT 0,
+    "priority" SMALLINT NOT NULL DEFAULT 0,
     "enabled" BOOL NOT NULL DEFAULT True,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
