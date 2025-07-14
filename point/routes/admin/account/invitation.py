@@ -18,10 +18,7 @@ async def get_all_invitations() -> list[InvitationAdminOut]:
 async def create_invitation(
         invitation_in: InvitationCreateIn,
 ) -> InvitationAdminOut:
-    await asyncio.gather(
-        UserController.get(id=invitation_in.user_id),
-        EstablishmentController.get(id=invitation_in.establishment_id),
-    )
+    await EstablishmentController.get(id=invitation_in.establishment_id)
     invitation = await InvitationController.create(invitation_in)
     return InvitationAdminOut.model_validate(invitation)
 
