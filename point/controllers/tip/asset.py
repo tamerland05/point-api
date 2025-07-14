@@ -17,8 +17,6 @@ class AssetController(BaseController[Asset]):
     model = Asset
 
     assets_url = str(settings.assets_url)
-    multiply = Decimal("0e-32")
-    base = Decimal("1e-32")
 
     @classmethod
     @alru_cache(ttl=60)
@@ -70,6 +68,6 @@ class AssetController(BaseController[Asset]):
     @classmethod
     def _safe_decimal(cls, val: str) -> Decimal:
         try:
-            return (Decimal(val) * cls.multiply).quantize(cls.base)
+            return Decimal(val)
         except (InvalidOperation, ValueError, TypeError):
             return Decimal("0")
