@@ -8,6 +8,7 @@ app_pooling = asyncio.Event()
 
 async def start_pooling() -> None:
     while not app_pooling.is_set():
+        await asyncio.sleep(15)
         try:
             await asyncio.gather(
                 TipController.pooling_tips(),
@@ -15,7 +16,6 @@ async def start_pooling() -> None:
             )
         except Exception as e:
             logging.exception(f"Pooling error: {e}")
-        await asyncio.sleep(15)
 
 
 def stop_pooling() -> None:

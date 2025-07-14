@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from tortoise import Model, fields
 from tortoise.fields import OnDelete
 
@@ -22,11 +24,13 @@ class User(Model):
     tips_left = fields.BigIntField(default=0, index=True)
     meta: UserMeta = fields.JSONField(default={})
 
+    employee_id: UUID
     employee = fields.ForeignKeyField(
         model_name="models.Employee",
         null=True,
         on_delete=OnDelete.SET_NULL,
         unique=True,
+        related_name="user",
     )
 
     enabled = fields.BooleanField(default=True, index=True)

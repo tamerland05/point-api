@@ -17,8 +17,8 @@ class AssetController(BaseController[Asset]):
     model = Asset
 
     assets_url = str(settings.assets_url)
-    multiply = Decimal("0-e32")
-    base = Decimal("1-e32")
+    multiply = Decimal("0e-32")
+    base = Decimal("1e-32")
 
     @classmethod
     @alru_cache(ttl=60)

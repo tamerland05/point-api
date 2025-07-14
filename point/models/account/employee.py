@@ -5,12 +5,15 @@ from tortoise.fields import OnDelete
 
 from point.models.utils import hash_to_link
 
+from .user import User
+
 
 class Employee(Model):
 
     class Meta:
         table = "employers"
 
+    user: list[User]
     job_place = fields.ForeignKeyField("models.Establishment", on_delete=OnDelete.RESTRICT)
 
     id = fields.UUIDField(pk=True, default=uuid4)
