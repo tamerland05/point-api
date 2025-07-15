@@ -23,7 +23,7 @@ class Tip(Model):
     status = fields.CharEnumField(TipStatus, default=TipStatus.created, index=True)
 
     amount = fields.BigIntField()
-    tips_left_amount = fields.BigIntField()
+    tips_left_amount = fields.DecimalField(max_digits=64, decimal_places=32)
 
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)

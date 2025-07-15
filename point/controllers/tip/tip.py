@@ -2,7 +2,7 @@ import asyncio
 import datetime
 import logging
 import uuid
-from decimal import ROUND_HALF_UP
+from decimal import ROUND_HALF_UP, Decimal
 
 from tortoise.transactions import in_transaction
 
@@ -93,7 +93,7 @@ class TipController(BaseController[Tip]):
             tip_transaction=tip_transaction.model_dump(mode="json"),
             expired_at=(datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=30)),
             amount=asset_amount,
-            tips_left_amount=tips_left_amount.to_integral_value(rounding=ROUND_HALF_UP)
+            tips_left_amount=tips_left_amount
         )
 
         return tip
@@ -143,7 +143,8 @@ class TipController(BaseController[Tip]):
         # todo: notify if employee
 
     @staticmethod
-    def calculate_bonus(tip_amount: int) -> int:
+    def calculate_bonus(tip_amount: Decimal) -> int:
+        amount = tip_amount.to_integral_value(rounding=ROUND_HALF_UP)
         ranges = [
             (1, 4, 2_000),
             (5, 9, 10_000),
@@ -152,4 +153,4 @@ class TipController(BaseController[Tip]):
             (100, float("inf"), 250_000),
         ]
 
-        return next((bonus for start, end, bonus in ranges if start <= tip_amount < end), 0)
+        return next((bonus for start, end, bonus in ranges if start <= amount < end), 0)

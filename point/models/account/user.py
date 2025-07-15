@@ -3,8 +3,7 @@ from uuid import UUID
 from tortoise import Model, fields
 from tortoise.fields import OnDelete
 
-from point.entity_types import TonAddress
-from point.view import UserMeta
+from point.models.custom import TonAddressField, BigIntDecimalField
 
 
 class User(Model):
@@ -19,10 +18,10 @@ class User(Model):
     language_code = fields.TextField(null=True)
     photo_url = fields.TextField(null=True)
 
-    wallet: TonAddress = fields.TextField(null=True)
+    wallet = TonAddressField(null=True)
     bonus_balance = fields.BigIntField(default=0, index=True)
-    tips_left = fields.BigIntField(default=0, index=True)
-    meta: UserMeta = fields.JSONField(default={})
+    tips_left = BigIntDecimalField(default=0, index=True)
+    meta = fields.JSONField(default={})
 
     employee_id: UUID
     employee = fields.ForeignKeyField(

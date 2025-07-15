@@ -1,4 +1,6 @@
-from pydantic import Field
+from decimal import Decimal, ROUND_HALF_UP
+
+from pydantic import Field, field_validator
 
 from point.entity_types import Image, TonAddress
 from point.view import PointBase
@@ -20,14 +22,27 @@ class AuthUserIn(PointBase):
     photo_url: Image | None = Field(default=None)
 
 
-class AuthUserOut(PointBase):
-    name: str
-    username: str | None = Field(default=None)
+class UserPublicOut(PointBase):
     photo_url: Image | None = Field(default=None)
+    name: str
+    username: str
+    rank: int | None = Field(default=None)  # todo: calculate rank
+    tips_left: Decimal | None = Field(ge=0, default=None)
+    employee: EmployeePublicOut | None = Field(default=None)
+
+    @field_validator("tips_left", mode="after")
+    def validate_employee(cls, tips_left: Decimal | None) -> Decimal | None:
+        if tips_left is None:
+            return None
+        else:
+            return tips_left.quantize(Decimal("0.1"), rounding=ROUND_HALF_UP).normalize()
+
+
+class AuthUserOut(UserPublicOut):
     wallet: TonAddress | None = Field(default=None)
     rank: int | None = Field(default=None)
     bonus_balance: int = 0
-    tips_left: int = Field(ge=0)
+    tips_left: Decimal = Field(ge=0)
     meta: UserMeta
     employee: EmployeeOut | None = Field(default=None)
 
@@ -35,15 +50,6 @@ class AuthUserOut(PointBase):
 class AuthUser(PointBase):
     id: int
     sessionId: str | None = Field(default=None)
-
-
-class UserPublicOut(PointBase):
-    photo_url: Image | None = Field(default=None)
-    name: str
-    username: str
-    rank: int | None = Field(default=None)  # todo: calculate rank
-    tips_left: int | None = Field(ge=0, default=None)
-    employee: EmployeePublicOut | None = Field(default=None)
 
 
 class UserUpdateIn(PointBase):

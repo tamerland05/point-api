@@ -1,7 +1,7 @@
 from tortoise import BaseDBAsyncClient
 
 
-async def upgrade(db: BaseDBAsyncClient) -> str:
+async def upgrade(_: BaseDBAsyncClient) -> str:
     return """
         CREATE TABLE IF NOT EXISTS "assets" (
     "id" UUID NOT NULL PRIMARY KEY,
@@ -28,19 +28,19 @@ CREATE TABLE IF NOT EXISTS "establishment_types" (
 CREATE INDEX IF NOT EXISTS "idx_establishme_enabled_e074dc" ON "establishment_types" ("enabled");
 CREATE TABLE IF NOT EXISTS "establishments" (
     "id" UUID NOT NULL PRIMARY KEY,
-    "latitude" DECIMAL(9,6) NOT NULL,
-    "longitude" DECIMAL(9,6) NOT NULL,
+    "latitude" INT NOT NULL,
+    "longitude" INT NOT NULL,
     "address" VARCHAR(128) NOT NULL,
-    "service_wallet" VARCHAR(128),
+    "service_wallet" TEXT,
     "service_wallet_seed" TEXT,
-    "official_wallet" VARCHAR(128),
+    "official_wallet" TEXT,
     "name" VARCHAR(128) NOT NULL,
     "description" VARCHAR(512) NOT NULL,
     "channel_link" VARCHAR(512) NOT NULL,
     "icon_hash" TEXT NOT NULL,
     "photo_hash" TEXT NOT NULL,
     "gallery_hashes" JSONB NOT NULL,
-    "rating" DECIMAL(3,2) NOT NULL DEFAULT 0,
+    "rating" SMALLINT NOT NULL DEFAULT 0,
     "enabled" BOOL NOT NULL DEFAULT True,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -97,6 +97,20 @@ CREATE TABLE IF NOT EXISTS "purpose_icons" (
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS "idx_purpose_ico_enabled_f0ab0d" ON "purpose_icons" ("enabled");
+CREATE TABLE IF NOT EXISTS "tasks" (
+    "id" UUID NOT NULL PRIMARY KEY,
+    "title" VARCHAR(128) NOT NULL,
+    "description" VARCHAR(512) NOT NULL,
+    "profit" BIGINT NOT NULL,
+    "icon_hash" VARCHAR(128) NOT NULL,
+    "link" VARCHAR(1024) NOT NULL,
+    "integration_type" VARCHAR(7) NOT NULL,
+    "enabled" BOOL NOT NULL DEFAULT True,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS "idx_tasks_enabled_9d6ba4" ON "tasks" ("enabled");
+COMMENT ON COLUMN "tasks"."integration_type" IS 'link: link\nchannel: channel';
 CREATE TABLE IF NOT EXISTS "users" (
     "id" BIGSERIAL NOT NULL PRIMARY KEY,
     "first_name" TEXT,
@@ -116,27 +130,6 @@ CREATE TABLE IF NOT EXISTS "users" (
 CREATE INDEX IF NOT EXISTS "idx_users_bonus_b_7e88f8" ON "users" ("bonus_balance");
 CREATE INDEX IF NOT EXISTS "idx_users_tips_le_b640c2" ON "users" ("tips_left");
 CREATE INDEX IF NOT EXISTS "idx_users_enabled_e41084" ON "users" ("enabled");
-CREATE TABLE IF NOT EXISTS "referrals" (
-    "id" SERIAL NOT NULL PRIMARY KEY,
-    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "referral_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE,
-    "referrer_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE,
-    CONSTRAINT "uid_referrals_referre_ec3a4e" UNIQUE ("referrer_id", "referral_id")
-);
-CREATE TABLE IF NOT EXISTS "tasks" (
-    "id" UUID NOT NULL PRIMARY KEY,
-    "title" VARCHAR(128) NOT NULL,
-    "description" VARCHAR(512) NOT NULL,
-    "profit" BIGINT NOT NULL,
-    "icon_hash" VARCHAR(128) NOT NULL,
-    "link" VARCHAR(1024) NOT NULL,
-    "integration_type" VARCHAR(7) NOT NULL,
-    "enabled" BOOL NOT NULL DEFAULT True,
-    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-CREATE INDEX IF NOT EXISTS "idx_task_enabled_f0ab0d" ON "tasks" ("enabled");
-COMMENT ON COLUMN "tasks"."integration_type" IS 'created: link\naccepted: channel';
 CREATE TABLE IF NOT EXISTS "completed_tasks" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -151,6 +144,13 @@ CREATE TABLE IF NOT EXISTS "place_ratings" (
     "user_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE RESTRICT,
     CONSTRAINT "uid_place_ratin_user_id_ec145a" UNIQUE ("user_id", "place_id")
 );
+CREATE TABLE IF NOT EXISTS "referrals" (
+    "id" SERIAL NOT NULL PRIMARY KEY,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "referral_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE,
+    "referrer_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE,
+    CONSTRAINT "uid_referrals_referre_ec3a4e" UNIQUE ("referrer_id", "referral_id")
+);
 CREATE TABLE IF NOT EXISTS "tips" (
     "id" UUID NOT NULL PRIMARY KEY,
     "fee_transaction" JSONB NOT NULL,
@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS "tips" (
     "expired_at" TIMESTAMPTZ NOT NULL,
     "status" VARCHAR(8) NOT NULL DEFAULT 'created',
     "amount" BIGINT NOT NULL,
-    "tips_left_amount" BIGINT NOT NULL,
+    "tips_left_amount" DECIMAL(64, 32) NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "asset_id" UUID NOT NULL REFERENCES "assets" ("id") ON DELETE RESTRICT,
@@ -177,6 +177,6 @@ CREATE TABLE IF NOT EXISTS "aerich" (
 );"""
 
 
-async def downgrade(db: BaseDBAsyncClient) -> str:
+async def downgrade(_: BaseDBAsyncClient) -> str:
     return """
         """

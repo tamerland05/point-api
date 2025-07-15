@@ -4,6 +4,7 @@ from tortoise import Model, fields
 from tortoise.fields import OnDelete
 
 from point.entity_types import TonAddress
+from point.models.custom import TonAddressField, IntDecimalField, SmallIntDecimalField
 from point.models.utils import hash_to_link
 
 
@@ -16,13 +17,13 @@ class Establishment(Model):
 
     id = fields.UUIDField(pk=True, default=uuid4)
 
-    latitude = fields.DecimalField(max_digits=9, decimal_places=6, index=True)
-    longitude = fields.DecimalField(max_digits=9, decimal_places=6, index=True)
+    latitude = IntDecimalField(multiplier=6, index=True)
+    longitude = IntDecimalField(multiplier=6, index=True)
     address = fields.CharField(max_length=128)
 
-    service_wallet = fields.CharField(null=True, max_length=128)
+    service_wallet = TonAddressField(null=True)
     service_wallet_seed = fields.TextField(null=True)
-    official_wallet = fields.CharField(max_length=128, null=True, default=None)
+    official_wallet = TonAddressField(null=True, default=None)
 
     name = fields.CharField(max_length=128)
     description = fields.CharField(max_length=512)
@@ -31,7 +32,7 @@ class Establishment(Model):
     photo_hash = fields.TextField()
     gallery_hashes = fields.JSONField(default=[])
 
-    rating = fields.DecimalField(max_digits=3, decimal_places=2, default=0)
+    rating = SmallIntDecimalField(multiplier=2, default=0)
 
     enabled = fields.BooleanField(default=True, index=True)
     created_at = fields.DatetimeField(auto_now_add=True)
@@ -60,4 +61,3 @@ class Establishment(Model):
     @property
     def wallet(self) -> TonAddress | None:
         return self.official_wallet or self.service_wallet
-
