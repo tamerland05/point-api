@@ -50,3 +50,7 @@ class TonAddress(PointRoot[str]):
             is_bounceable=False
         )
         return self
+
+    @property
+    def original(self) -> Address:
+        return Address(address=self.root)

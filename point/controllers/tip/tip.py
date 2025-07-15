@@ -2,7 +2,7 @@ import asyncio
 import datetime
 import logging
 import uuid
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import ROUND_HALF_UP, Decimal, getcontext
 
 from tortoise.transactions import in_transaction
 
@@ -24,6 +24,8 @@ class TipController(BaseController[Tip]):
 
     @classmethod
     async def create_tip(cls, checkout_in: CheckoutTipIn, sender_id: int) -> model:
+        getcontext().prec = 32
+
         sender, asset, ton, recipient = await asyncio.gather(
             UserController.get_user(user_id=sender_id),
             AssetController.get_asset(asset_id=checkout_in.asset_id),
@@ -65,7 +67,8 @@ class TipController(BaseController[Tip]):
                     jetton_master=asset.address,
                     owner_address=sender.wallet,
                 )
-            except:
+            except Exception as e:
+                logging.exception(f"Exception while fetch info about user asset {e}")
                 raise APIException(ErrorCode.USER_ASSET_NOT_FOUND)
             trx_fun = jetton_trx_fun_builder(sender_jetton_wallet.address)
 

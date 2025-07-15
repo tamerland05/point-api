@@ -6,6 +6,8 @@ from cryptography.fernet import Fernet
 from pydantic import AnyUrl
 from pydantic_settings import BaseSettings
 
+from point.entity_types import TonAddress
+
 
 class AppEnv(StrEnum):
     DEV = "dev"
@@ -36,7 +38,7 @@ class Settings(BaseSettings, extra="allow"):
 
     fix_fee: Decimal
     jetton_transfer_amount: int
-    point_wallet: str
+    point_wallet: TonAddress
 
     bonus_reward_for_premium: int
     bonus_reward_for_simple: int

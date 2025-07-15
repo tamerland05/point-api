@@ -1,4 +1,4 @@
-from pytoniq_core import Address, Cell, begin_cell
+from pytoniq_core import Cell, begin_cell
 from tonutils.client import Client
 from tonutils.jetton import JettonWalletStandard
 from tonutils.jetton.contract.standard.op_codes import JETTON_TRANSFER_OPCODE
@@ -33,8 +33,8 @@ class TonNetworkService(Client):
         method = "/jetton/wallets"
 
         resp = await self._get(method=method, params={
-            "jetton_address": jetton_master,
-            "owner_address": owner_address,
+            "jetton_address": jetton_master.root,
+            "owner_address": owner_address.root,
         })
 
         jetton_wallet = resp["jetton_wallets"][0]
@@ -57,8 +57,8 @@ class TonNetworkService(Client):
             payload: str
     ) -> TransactionDbOut:
         body = JettonWalletStandard.build_transfer_body(
-            recipient_address=Address(destination_address),
-            response_address=Address(sender_address),
+            recipient_address=destination_address.original,
+            response_address=sender_address.original,
             jetton_amount=jetton_amount,
             forward_payload=create_text_cell(payload)
         )

@@ -41,9 +41,10 @@ class AssetController(BaseController[Asset]):
             update_tasks = []
 
             for asset in assets:
-                if asset.address not in assets_prices:
-                    logging.warning(f"Asset {asset.address} is not prised.")
-                new_price = cls._safe_decimal(assets_prices.get(asset.address, "0"))
+                asset_address = asset.address.original.to_str(is_user_friendly=True)
+                if asset_address not in assets_prices:
+                    logging.warning(f"Asset {asset_address} is not prised.")
+                new_price = cls._safe_decimal(assets_prices.get(asset_address, "0"))
                 if asset.price == new_price:
                     continue
                 asset.price = new_price
