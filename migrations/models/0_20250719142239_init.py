@@ -8,7 +8,7 @@ async def upgrade(_: BaseDBAsyncClient) -> str:
     "symbol" VARCHAR(16) NOT NULL UNIQUE,
     "name" VARCHAR(128) NOT NULL,
     "decimals" SMALLINT NOT NULL DEFAULT 9,
-    "address" VARCHAR(128) NOT NULL,
+    "address" TEXT NOT NULL,
     "image_url" TEXT NOT NULL,
     "price" DECIMAL(64,32) NOT NULL DEFAULT 0,
     "priority" SMALLINT NOT NULL DEFAULT 0,
@@ -137,13 +137,14 @@ CREATE TABLE IF NOT EXISTS "completed_tasks" (
     "task_id" UUID NOT NULL REFERENCES "tasks" ("id") ON DELETE CASCADE,
     CONSTRAINT "uid_completed_t_task_id_e2f118" UNIQUE ("task_id", "executor_id")
 );
-CREATE TABLE IF NOT EXISTS "place_ratings" (
-    "id" SERIAL NOT NULL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS "establishment_ratings" (
+    "id" UUID NOT NULL PRIMARY KEY,
     "mark" SMALLINT NOT NULL,
-    "place_id" UUID NOT NULL REFERENCES "establishments" ("id") ON DELETE RESTRICT,
-    "user_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE RESTRICT,
-    CONSTRAINT "uid_place_ratin_user_id_ec145a" UNIQUE ("user_id", "place_id")
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "place_id" UUID NOT NULL REFERENCES "establishments" ("id") ON DELETE CASCADE,
+    "user_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE
 );
+CREATE INDEX IF NOT EXISTS "idx_establishme_place_i_edff04" ON "establishment_ratings" ("place_id");
 CREATE TABLE IF NOT EXISTS "referrals" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -158,7 +159,7 @@ CREATE TABLE IF NOT EXISTS "tips" (
     "expired_at" TIMESTAMPTZ NOT NULL,
     "status" VARCHAR(8) NOT NULL DEFAULT 'created',
     "amount" BIGINT NOT NULL,
-    "tips_left_amount" DECIMAL(64, 32) NOT NULL,
+    "tips_left_amount" DECIMAL(64,32) NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "asset_id" UUID NOT NULL REFERENCES "assets" ("id") ON DELETE RESTRICT,
