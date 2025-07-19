@@ -19,7 +19,7 @@ wheels = [
 
 [[package]]
 name = "aiobotocore"
-version = "2.23.0"
+version = "2.23.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -30,9 +30,35 @@ dependencies = [
     { name = "python-dateutil" },
     { name = "wrapt" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9d/25/4b06ea1214ddf020a28df27dc7136ac9dfaf87929d51e6f6044dd350ed67/aiobotocore-2.23.0.tar.gz", hash = "sha256:0333931365a6c7053aee292fe6ef50c74690c4ae06bb019afdf706cb6f2f5e32", size = 115825 }
+sdist = { url = "https://files.pythonhosted.org/packages/f6/1d/babe191fa10a7ecda6c6832c08231536c60cc33b4cddfb3b72133505673e/aiobotocore-2.23.1.tar.gz", hash = "sha256:a59f2a78629b97d52f10936b79c73de64e481a8c44a62c1871f088df6c1afc4f", size = 115869 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ea/43/ccf9b29669cdb09fd4bfc0a8effeb2973b22a0f3c3be4142d0b485975d11/aiobotocore-2.23.0-py3-none-any.whl", hash = "sha256:8202cebbf147804a083a02bc282fbfda873bfdd0065fd34b64784acb7757b66e", size = 84161 },
+    { url = "https://files.pythonhosted.org/packages/92/d9/25a697a959a7149c93efa4d849421aa5f22bcb82350ac89b4284b0b88aa8/aiobotocore-2.23.1-py3-none-any.whl", hash = "sha256:d81c54d2eae2406ea9a473fea518fed580cf37bc4fc51ce43ba81546e5305114", size = 84219 },
+]
+
+[[package]]
+name = "aiofiles"
+version = "24.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0b/03/a88171e277e8caa88a4c77808c20ebb04ba74cc4681bf1e9416c862de237/aiofiles-24.1.0.tar.gz", hash = "sha256:22a075c9e5a3810f0c2e48f3008c94d68c65d763b9b03857924c99e57355166c", size = 30247 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a5/45/30bb92d442636f570cb5651bc661f52b610e2eec3f891a5dc3a4c3667db0/aiofiles-24.1.0-py3-none-any.whl", hash = "sha256:b4ec55f4195e3eb5d7abd1bf7e061763e864dd4954231fb8539a0ef8bb8260e5", size = 15896 },
+]
+
+[[package]]
+name = "aiogram"
+version = "3.21.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "aiofiles" },
+    { name = "aiohttp" },
+    { name = "certifi" },
+    { name = "magic-filter" },
+    { name = "pydantic" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/70/11/414c49e31ac353b12dba4f89e66141e4504d359c453dfdd5d259cefb97a4/aiogram-3.21.0.tar.gz", hash = "sha256:24cd0015ed73471fa3028b47788e57b43a475c66d176a857de2b6b67bd37e1dd", size = 1500486 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c7/0b/606c9cdff82f5a5e004d72a14368d46ed00298c94a8d83b6faf8fb70499f/aiogram-3.21.0-py3-none-any.whl", hash = "sha256:0995e11be66bba46c0aab4ac8a41587fb2749b72399aff46a20e6610ccebe3ae", size = 677316 },
 ]
 
 [[package]]
@@ -317,16 +343,16 @@ css = [
 
 [[package]]
 name = "botocore"
-version = "1.38.27"
+version = "1.38.46"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jmespath" },
     { name = "python-dateutil" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/36/5e/67899214ad57f7f26af5bd776ac5eb583dc4ecf5c1e52e2cbfdc200e487a/botocore-1.38.27.tar.gz", hash = "sha256:9788f7efe974328a38cbade64cc0b1e67d27944b899f88cb786ae362973133b6", size = 13919963 }
+sdist = { url = "https://files.pythonhosted.org/packages/cf/5f/d76870e4399fbfc12aa5c3bb36029edfc1a434392afc70a343c9d7d96e90/botocore-1.38.46.tar.gz", hash = "sha256:8798e5a418c27cf93195b077153644aea44cb171fcd56edc1ecebaa1e49e226e", size = 14074340 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7e/83/a753562020b69fa90cebc39e8af2c753b24dcdc74bee8355ee3f6cefdf34/botocore-1.38.27-py3-none-any.whl", hash = "sha256:a785d5e9a5eda88ad6ab9ed8b87d1f2ac409d0226bba6ff801c55359e94d91a8", size = 13580545 },
+    { url = "https://files.pythonhosted.org/packages/a4/00/dd90b7a0255587ba1c9754d32a221adb4a9022f181df3eef401b0b9fadfc/botocore-1.38.46-py3-none-any.whl", hash = "sha256:89ca782ffbf2e8769ca9c89234cfa5ca577f1987d07d913ee3c68c4776b1eb5b", size = 13736872 },
 ]
 
 [[package]]
@@ -522,14 +548,14 @@ wheels = [
 
 [[package]]
 name = "faker"
-version = "37.4.0"
+version = "37.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "tzdata" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/65/f9/66af4019ee952fc84b8fe5b523fceb7f9e631ed8484417b6f1e3092f8290/faker-37.4.0.tar.gz", hash = "sha256:7f69d579588c23d5ce671f3fa872654ede0e67047820255f43a4aa1925b89780", size = 1901976 }
+sdist = { url = "https://files.pythonhosted.org/packages/65/95/da573e055608e180086e2ac3208f8c15d8b44220912f565a9821b9bff33a/faker-37.4.2.tar.gz", hash = "sha256:8e281bbaea30e5658895b8bea21cc50d27aaf3a43db3f2694409ca5701c56b0a", size = 1902890 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/78/5e/c8c3c5ea0896ab747db2e2889bf5a6f618ed291606de6513df56ad8670a8/faker-37.4.0-py3-none-any.whl", hash = "sha256:cb81c09ebe06c32a10971d1bbdb264bb0e22b59af59548f011ac4809556ce533", size = 1942992 },
+    { url = "https://files.pythonhosted.org/packages/26/1c/b909a055be556c11f13cf058cfa0e152f9754d803ff3694a937efe300709/faker-37.4.2-py3-none-any.whl", hash = "sha256:b70ed1af57bfe988cbcd0afd95f4768c51eaf4e1ce8a30962e127ac5c139c93f", size = 1943179 },
 ]
 
 [[package]]
@@ -991,6 +1017,15 @@ wheels = [
 ]
 
 [[package]]
+name = "magic-filter"
+version = "1.0.12"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e6/08/da7c2cc7398cc0376e8da599d6330a437c01d3eace2f2365f300e0f3f758/magic_filter-1.0.12.tar.gz", hash = "sha256:4751d0b579a5045d1dc250625c4c508c18c3def5ea6afaf3957cb4530d03f7f9", size = 11071 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cc/75/f620449f0056eff0ec7c1b1e088f71068eb4e47a46eb54f6c065c6ad7675/magic_filter-1.0.12-py3-none-any.whl", hash = "sha256:e5929e544f310c2b1f154318db8c5cdf544dd658efa998172acd2e4ba0f6c6a6", size = 11335 },
+]
+
+[[package]]
 name = "markupsafe"
 version = "3.0.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1238,6 +1273,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "aerich" },
     { name = "aiobotocore" },
+    { name = "aiogram" },
     { name = "async-lru" },
     { name = "asyncpg" },
     { name = "cryptography" },
@@ -1258,11 +1294,12 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "aerich", specifier = ">=0.9.1" },
-    { name = "aiobotocore", specifier = ">=2.23.0" },
+    { name = "aiobotocore", specifier = ">=2.23.1" },
+    { name = "aiogram", specifier = ">=3.21.0" },
     { name = "async-lru", specifier = ">=2.0.5" },
     { name = "asyncpg", specifier = ">=0.30.0" },
     { name = "cryptography", specifier = ">=45.0.5" },
-    { name = "faker", specifier = ">=37.4.0" },
+    { name = "faker", specifier = ">=37.4.2" },
     { name = "fastapi", specifier = ">=0.116.1" },
     { name = "fastapi-pagination", specifier = ">=0.13.3" },
     { name = "notebook", specifier = ">=7.4.4" },
@@ -1271,7 +1308,7 @@ requires-dist = [
     { name = "python-jose", specifier = ">=3.5.0" },
     { name = "python-multipart", specifier = ">=0.0.20" },
     { name = "tomlkit", specifier = ">=0.13.3" },
-    { name = "tonutils", specifier = ">=0.5.0" },
+    { name = "tonutils", specifier = ">=0.5.1" },
     { name = "tortoise-orm", specifier = ">=0.25.1" },
     { name = "uvicorn", specifier = ">=0.35.0" },
 ]
@@ -1865,7 +1902,7 @@ wheels = [
 
 [[package]]
 name = "tonutils"
-version = "0.5.0"
+version = "0.5.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -1875,9 +1912,9 @@ dependencies = [
     { name = "pynacl" },
     { name = "pytoniq-core" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ad/bb/d4ac64ccc619dc17986de8afc8c2f4fe8f7671ec174739b622107592652f/tonutils-0.5.0.tar.gz", hash = "sha256:10d6c1d3b98b63c84c8cf48fecac242401b916fa9fa32d8fb38906fc0370e74b", size = 97341 }
+sdist = { url = "https://files.pythonhosted.org/packages/ec/b8/90a1c493a0602853410db8a114e471acb033f9d303fe39a7fc9f419b260a/tonutils-0.5.1.tar.gz", hash = "sha256:9b7824d3549fc078ea85018a56d8203fe285780545dee6eaea12ac41608630e5", size = 97272 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5e/23/7680273b7b481a0bfbc13299d670f8165c79ca18520527d30b8e272ed16a/tonutils-0.5.0-py3-none-any.whl", hash = "sha256:465704bde3bbb2c662386ff2acf262ea4e25f9003382154dac1a99937f1f0e90", size = 145900 },
+    { url = "https://files.pythonhosted.org/packages/1d/72/3a71cd925cc47742dd1ddfb7529a37c4bedbee4d749eb32485474f506f4d/tonutils-0.5.1-py3-none-any.whl", hash = "sha256:cf9164f1dee83e9909c85c1ef5eabc93497b269a43834ee021436cf99aa4e04b", size = 145889 },
 ]
 
 [[package]]

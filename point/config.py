@@ -75,7 +75,7 @@ class Settings(BaseSettings, extra="allow"):
         }
 
     @property
-    def merchant_cipher(self) -> Fernet:
+    def fernet_cipher(self) -> Fernet:
         return Fernet(self.encryption_key.encode())
 
     def __init__(self):

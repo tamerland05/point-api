@@ -3,7 +3,7 @@ from pytoniq_core.crypto.keys import mnemonic_new, mnemonic_to_seed
 from tonutils.wallet import WalletV5R1
 
 from point.config import settings
-from point.security.keys import SecurityWalletPrivateKey
+from point.security.keys import ServiceWalletPrivateKey
 
 from .ton_network import tns
 
@@ -25,6 +25,6 @@ class WalletService:
 
         address = wallet.address.to_str(is_url_safe=True, is_user_friendly=True, is_bounceable=False)
 
-        seed = SecurityWalletPrivateKey(seed).get_encrypted()
+        seed = ServiceWalletPrivateKey(seed).get_encrypted()
 
         return address, seed

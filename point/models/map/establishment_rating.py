@@ -5,10 +5,11 @@ from tortoise.fields import OnDelete
 class EstablishmentRating(Model):
 
     class Meta:
-        table = "place_ratings"
-        unique_together = ("user_id", "place_id")
+        table = "establishment_ratings"
 
-    user = fields.ForeignKeyField("models.User", on_delete=OnDelete.RESTRICT)
-    place = fields.ForeignKeyField("models.Establishment", on_delete=OnDelete.RESTRICT)
+    id = fields.UUIDField(pk=True)
+    user = fields.ForeignKeyField("models.User", on_delete=OnDelete.CASCADE)
+    place = fields.ForeignKeyField("models.Establishment", on_delete=OnDelete.CASCADE, index=True)
 
     mark = fields.SmallIntField()
+    created_at = fields.DatetimeField(auto_now_add=True)

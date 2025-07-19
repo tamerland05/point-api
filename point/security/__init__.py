@@ -1,1 +1,1 @@
-from .keys import SecurityWalletPrivateKey
+from .keys import ServiceWalletPrivateKey
