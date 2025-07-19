@@ -26,7 +26,7 @@ class UserPublicOut(PointBase):
     photo_url: Image | None = Field(default=None)
     name: str
     username: str
-    rank: int | None = Field(default=None)  # todo: calculate rank
+    rank: int  # todo: calculate rank
     tips_left: Decimal | None = Field(ge=0, default=None)
     employee: EmployeePublicOut | None = Field(default=None)
 
@@ -40,7 +40,6 @@ class UserPublicOut(PointBase):
 
 class AuthUserOut(UserPublicOut):
     wallet: TonAddress | None = Field(default=None)
-    rank: int | None = Field(default=None)
     bonus_balance: int = 0
     tips_left: Decimal = Field(ge=0)
     meta: UserMeta
