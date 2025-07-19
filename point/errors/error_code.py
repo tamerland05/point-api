@@ -29,3 +29,5 @@ class ErrorCode(ErrorCodeBase):
     USER_HAVE_NOT_WALLET = "User have not wallet", status.HTTP_404_NOT_FOUND
 
     TASK_NOT_FOUND = "Task not found", status.HTTP_404_NOT_FOUND
+
+    PAYMENT_NOT_FOUND = "Payment not found", status.HTTP_404_NOT_FOUND

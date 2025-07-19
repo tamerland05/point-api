@@ -6,7 +6,7 @@ from cryptography.fernet import Fernet
 from pydantic import AnyUrl
 from pydantic_settings import BaseSettings
 
-from point.entity_types import TonAddress
+from point.entity_types import TonAddress, PointHash
 
 
 class AppEnv(StrEnum):
@@ -42,6 +42,9 @@ class Settings(BaseSettings, extra="allow"):
 
     bonus_reward_for_premium: int
     bonus_reward_for_simple: int
+
+    logo_hash: PointHash
+    set_rating_amount: int
 
     bot_token: str
     jwt_algorithm: str

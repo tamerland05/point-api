@@ -117,6 +117,10 @@ jobs:
 
           echo "BONUS_REWARD_FOR_PREMIUM=${{ secrets.BONUS_REWARD_FOR_PREMIUM }}" >> .env
           echo "BONUS_REWARD_FOR_SIMPLE=${{ secrets.BONUS_REWARD_FOR_SIMPLE }}" >> .env
+          
+          echo "LOGO_HASH=${{ secrets.LOGO_HASH }}" >> .env
+          echo "SET_RATING_AMOUNT=${{ secrets.SET_RATING_AMOUNT }}" >> .env
+
 
           echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" >> .env
           echo "JWT_ALGORITHM=${{ secrets.JWT_ALGORITHM }}" >> .env

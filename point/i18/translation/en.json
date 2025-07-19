@@ -1,0 +1,10 @@
+{
+    "payment": {
+        "stars": {
+            "establishment_rating": {
+                "description": "Good ratings in the Point app make your favorite venues more popular",
+                "title": "Rating"
+            }
+        }
+    }
+}

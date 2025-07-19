@@ -58,7 +58,7 @@ from point.view import (
     TaskCreateIn,
     TaskUpdateIn,
     ReferralOut,
-    TaskOut,
+    TaskOut, EstablishmentRatingCreateIn,
 )
 
 
@@ -679,6 +679,20 @@ class PublicPointApiService(BaseApiService):
     async def get_establishment(self, establishment_id: str) -> EstablishmentOut:
         resp = await self._get(url="/map/establishment/" + establishment_id)
         return EstablishmentOut.model_validate(resp)
+
+    async def set_establishment_rating(
+            self,
+            establishment_id: str,
+            mark: int,
+    ) -> str:
+        resp = await self._post(
+            url="/map/establishment-rating/create-invoice",
+            data=EstablishmentRatingCreateIn(
+                establishment_id=UUID(establishment_id),
+                mark=mark,
+            )
+        )
+        return resp
 
     async def get_menu_item(self, menu_item_id: str) -> MenuItemOut:
         resp = await self._get(url="/map/menu-item/" + menu_item_id)

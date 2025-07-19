@@ -88,6 +88,14 @@ CREATE TABLE IF NOT EXISTS "menu_items" (
     CONSTRAINT "uid_menu_items_title_9a00bf" UNIQUE ("title", "establishment_id")
 );
 CREATE INDEX IF NOT EXISTS "idx_menu_items_enabled_2c09a4" ON "menu_items" ("enabled");
+CREATE TABLE IF NOT EXISTS "payments" (
+    "id" UUID NOT NULL PRIMARY KEY,
+    "tag" TEXT NOT NULL,
+    "done" BOOL NOT NULL DEFAULT False,
+    "meta" JSONB NOT NULL,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 CREATE TABLE IF NOT EXISTS "purpose_icons" (
     "id" UUID NOT NULL PRIMARY KEY,
     "preview_hash" TEXT NOT NULL,

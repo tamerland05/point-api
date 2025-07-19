@@ -18,6 +18,7 @@ dependencies = [
     "pydantic-settings>=2.10.1",
     "python-jose>=3.5.0",
     "python-multipart>=0.0.20",
+    "quick-i18n>=0.1.2",
     "tomlkit>=0.13.3",
     "tonutils>=0.5.1",
     "tortoise-orm>=0.25.1",

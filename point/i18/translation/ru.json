@@ -1,0 +1,14 @@
+{
+    "payment": {
+        "establishment_rating": {
+            "description": "description",
+            "title": "title"
+        },
+        "stars": {
+            "establishment_rating": {
+                "description": "Хорошие оценки внутри приложения Point обеспечивают вашим любимым заведениям большую популярность",
+                "title": "Рейтинг"
+            }
+        }
+    }
+}

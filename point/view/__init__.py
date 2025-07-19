@@ -4,6 +4,7 @@ from .base import PointBase
 from .common import PointRequestIn, PointUploadIn, PointOut, PointWithScale, Cost
 from .earn import *
 from .map import *
+from .payments import *
 from .selection import *
 from .task import *
 from .account import *

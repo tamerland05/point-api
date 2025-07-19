@@ -1,3 +1,4 @@
 from .establishment import EstablishmentController
+from .establishment_rating import EstablishmentRatingController
 from .establishment_type import EstablishmentTypeController
 from .menu_item import MenuItemController
