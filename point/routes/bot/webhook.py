@@ -14,6 +14,10 @@ async def telegram_webhook(request: Request):
     data = await request.json()
     update = Update.model_validate(data)
 
+    if update.pre_checkout_query is not None:
+        await update.pre_checkout_query.answer(ok=True)
+        return {"ok": True}
+
     if update.message is None or update.message.successful_payment is None:
         return {"ok": True}
 
