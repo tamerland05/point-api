@@ -14,7 +14,7 @@ async def telegram_webhook(request: Request):
     data = await request.json()
     update = Update.model_validate(data)
 
-    if update.message.successful_payment is None:
+    if update.message is None or update.message.successful_payment is None:
         return {"ok": True}
 
     payload = update.message.successful_payment.invoice_payload
