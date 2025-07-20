@@ -23,7 +23,7 @@ class User(Model):
     tips_left = BigIntDecimalField(default=0, index=True)
     meta = fields.JSONField(default={})
 
-    employee_id: UUID
+    employee_id: UUID | None
     employee = fields.ForeignKeyField(
         model_name="models.Employee",
         null=True,

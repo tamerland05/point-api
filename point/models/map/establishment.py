@@ -1,10 +1,11 @@
+from decimal import Decimal
 from uuid import uuid4
 
 from tortoise import Model, fields
-from tortoise.fields import OnDelete
+from tortoise.fields import OnDelete, BigIntField
 
 from point.entity_types import TonAddress
-from point.models.custom import TonAddressField, IntDecimalField, SmallIntDecimalField
+from point.models.custom import TonAddressField, IntDecimalField
 from point.models.utils import hash_to_link
 
 
@@ -32,7 +33,8 @@ class Establishment(Model):
     photo_hash = fields.TextField()
     gallery_hashes = fields.JSONField(default=[])
 
-    rating = SmallIntDecimalField(multiplier=2, default=0)
+    rating_sum = BigIntField(default=0)
+    rating_count = BigIntField(default=0)
 
     enabled = fields.BooleanField(default=True, index=True)
     created_at = fields.DatetimeField(auto_now_add=True)
@@ -61,3 +63,9 @@ class Establishment(Model):
     @property
     def wallet(self) -> TonAddress | None:
         return self.official_wallet or self.service_wallet
+
+    @property
+    def rating(self) -> Decimal:
+        if self.rating_count == 0:
+            return Decimal("0")
+        return (Decimal(self.rating_sum) / Decimal(self.rating_count)).quantize(Decimal('.1'))

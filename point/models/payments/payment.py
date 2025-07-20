@@ -7,8 +7,8 @@ class Payment(Model):
         table = "payments"
 
     id = fields.UUIDField(pk=True)
-    tag = fields.TextField()
-    done = fields.BooleanField(default=False)
+    tag = fields.CharField(max_length=32, index=True)
+    done = fields.BooleanField(default=False, index=True)
 
     meta = fields.JSONField()
 

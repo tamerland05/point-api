@@ -139,10 +139,8 @@ class TipController(BaseController[Tip]):
             await tip.fetch_related("sender")
             tip.sender.bonus_balance += cls.calculate_bonus(tip.tips_left_amount)
             tip.sender.tips_left += tip.tips_left_amount
-            await asyncio.gather(
-                tip.save(update_fields=["status", "updated_at"]),
-                tip.sender.save(update_fields=["bonus_balance", "tips_left", "updated_at"]),
-            )
+            await tip.save(update_fields=["status", "updated_at"])
+            await tip.sender.save(update_fields=["bonus_balance", "tips_left", "updated_at"])
         # todo: notify if employee
 
     @staticmethod

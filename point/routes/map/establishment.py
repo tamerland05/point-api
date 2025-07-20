@@ -1,9 +1,10 @@
 from uuid import UUID
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-from point.controllers import EstablishmentController
-from point.view import PointWithScale, EstablishmentPreview, NearEstablishmentCriteria, EstablishmentOut
+from point.auth import get_user
+from point.controllers import EstablishmentController, EstablishmentRatingController
+from point.view import PointWithScale, EstablishmentPreview, NearEstablishmentCriteria, EstablishmentOut, AuthUser
 
 router = APIRouter()
 
@@ -34,6 +35,14 @@ async def get_establishments_near(
 
 
 @router.get("/{establishment_id}")
-async def get_establishment(establishment_id: UUID) -> EstablishmentOut:
+async def get_establishment(
+        establishment_id: UUID,
+        user: AuthUser = Depends(get_user),
+) -> EstablishmentOut:
     establishment = await EstablishmentController.get("menu", id=establishment_id)
+    establishment.user_rating = await EstablishmentRatingController.get_user_rating(
+        establishment_id=establishment_id,
+        user_id=user.id
+    )
+
     return EstablishmentOut.model_validate(establishment)

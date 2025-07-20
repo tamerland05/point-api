@@ -1,21 +1,25 @@
 import asyncio
 import logging
 
-from point.controllers import TipController, AssetController
+from point.controllers import TipController, AssetController, EstablishmentRatingController
 
 app_pooling = asyncio.Event()
 
 
-async def start_pooling() -> None:
+async def periodic_task(coro_func, interval: int):
     while not app_pooling.is_set():
-        await asyncio.sleep(15)
         try:
-            await asyncio.gather(
-                TipController.pooling_tips(),
-                AssetController.update_prices()
-            )
+            await asyncio.gather(coro_func(), asyncio.sleep(interval))
         except Exception as e:
-            logging.exception(f"Pooling error: {e}")
+            logging.exception(f"Error in pooling task {coro_func.__name__}: {e}")
+
+
+async def start_pooling() -> None:
+    await asyncio.gather(
+        periodic_task(TipController.pooling_tips, 15),
+        periodic_task(AssetController.update_prices, 30),
+        periodic_task(EstablishmentRatingController.allow_ratings, 5)
+    )
 
 
 def stop_pooling() -> None:

@@ -37,10 +37,8 @@ async def create(request: Request, user: AuthUser = Depends(get_user)) -> None:
     async with in_transaction():
         employee = await EmployeeController.create(model_create_in=create_in)
         user.employee_id = employee.id
-        await asyncio.gather(
-            user.save(update_fields=["employee_id", "updated_at"]),
-            invitation.delete()
-        )
+        await user.save(update_fields=["employee_id", "updated_at"])
+        await invitation.delete()
 
 
 @router.put("")
@@ -74,7 +72,5 @@ async def delete(user: AuthUser = Depends(get_user)) -> None:
     employee.enabled = False
 
     async with in_transaction():
-        await asyncio.gather(
-            user.save(update_fields=["employee_id", "updated_at"]),
-            employee.save(update_fields=["enabled", "updated_at"]),
-        )
+        await user.save(update_fields=["employee_id", "updated_at"])
+        await employee.save(update_fields=["enabled", "updated_at"])

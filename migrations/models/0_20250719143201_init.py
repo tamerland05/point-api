@@ -40,7 +40,8 @@ CREATE TABLE IF NOT EXISTS "establishments" (
     "icon_hash" TEXT NOT NULL,
     "photo_hash" TEXT NOT NULL,
     "gallery_hashes" JSONB NOT NULL,
-    "rating" SMALLINT NOT NULL DEFAULT 0,
+    "rating_count" BIGINT NOT NULL DEFAULT 0,
+    "rating_sum" BIGINT NOT NULL DEFAULT 0,
     "enabled" BOOL NOT NULL DEFAULT True,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -90,12 +91,14 @@ CREATE TABLE IF NOT EXISTS "menu_items" (
 CREATE INDEX IF NOT EXISTS "idx_menu_items_enabled_2c09a4" ON "menu_items" ("enabled");
 CREATE TABLE IF NOT EXISTS "payments" (
     "id" UUID NOT NULL PRIMARY KEY,
-    "tag" TEXT NOT NULL,
+    "tag" VARCHAR(32) NOT NULL,
     "done" BOOL NOT NULL DEFAULT False,
     "meta" JSONB NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+CREATE INDEX IF NOT EXISTS "idx_payments_tag_72ef00" ON "payments" ("tag");
+CREATE INDEX IF NOT EXISTS "idx_payments_done_69e9fb" ON "payments" ("done");
 CREATE TABLE IF NOT EXISTS "purpose_icons" (
     "id" UUID NOT NULL PRIMARY KEY,
     "preview_hash" TEXT NOT NULL,
@@ -146,13 +149,14 @@ CREATE TABLE IF NOT EXISTS "completed_tasks" (
     CONSTRAINT "uid_completed_t_task_id_e2f118" UNIQUE ("task_id", "executor_id")
 );
 CREATE TABLE IF NOT EXISTS "establishment_ratings" (
-    "id" UUID NOT NULL PRIMARY KEY,
+    "id" SERIAL NOT NULL PRIMARY KEY,
     "mark" SMALLINT NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "place_id" UUID NOT NULL REFERENCES "establishments" ("id") ON DELETE CASCADE,
+    "establishment_id" UUID NOT NULL REFERENCES "establishments" ("id") ON DELETE CASCADE,
     "user_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE
 );
-CREATE INDEX IF NOT EXISTS "idx_establishme_place_i_edff04" ON "establishment_ratings" ("place_id");
+CREATE INDEX IF NOT EXISTS "idx_establishme_establi_b66005" 
+    ON "establishment_ratings" ("establishment_id", "user_id", "created_at" DESC);
 CREATE TABLE IF NOT EXISTS "referrals" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
