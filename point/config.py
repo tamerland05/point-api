@@ -46,6 +46,7 @@ class Settings(BaseSettings, extra="allow"):
     logo_hash: PointHash
     set_rating_amount: int
 
+    point_app_url: AnyUrl
     bot_token: str
     jwt_algorithm: str
     public_key: str

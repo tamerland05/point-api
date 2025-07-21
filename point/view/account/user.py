@@ -26,7 +26,7 @@ class UserPublicOut(PointBase):
     photo_url: Image | None = Field(default=None)
     name: str
     username: str
-    rank: int | None = Field(default=None)  # todo: calculate rank
+    rank: int = Field(ge=0)
     tips_left: Decimal | None = Field(ge=0, default=None)
     employee: EmployeePublicOut | None = Field(default=None)
 

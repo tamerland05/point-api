@@ -16,7 +16,7 @@ class ScaledDecimalField(Field):
     def to_db_value(self, value: int | float | Decimal | None, instance) -> int | None:
         if value is None:
             return None
-        return int((value * self.multiplier))
+        return int(value * self.multiplier)
 
     def to_python_value(self, value: int) -> Decimal | None:
         if value is None:

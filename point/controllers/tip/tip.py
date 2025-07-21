@@ -10,9 +10,10 @@ from point.config import settings
 from point.controllers.base import BaseController
 from point.controllers import EstablishmentController, UserController
 from point.entity_types import RecipientType, TipStatus
+from point.i18 import translate
 from point.errors import ErrorCode, APIException
 from point.models import Tip
-from point.services import tns
+from point.services import tns, bs
 from point.view import CheckoutTipIn, TransactionDbOut
 
 from .asset import AssetController
@@ -95,7 +96,7 @@ class TipController(BaseController[Tip]):
             fee_transaction=fee_transaction.model_dump(mode="json"),
             tip_transaction=tip_transaction.model_dump(mode="json"),
             expired_at=(datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=30)),
-            amount=asset_amount,
+            amount=asset_amount - supposed_fee,
             tips_left_amount=tips_left_amount
         )
 
@@ -128,8 +129,6 @@ class TipController(BaseController[Tip]):
         elif tip.expired_at <= datetime.datetime.now(datetime.timezone.utc):
             tip.status = TipStatus.failed
             await tip.save(update_fields=["status", "updated_at"])
-        else:
-            return
 
     @classmethod
     async def _on_tip_completion(cls, tip: model) -> None:
@@ -141,7 +140,38 @@ class TipController(BaseController[Tip]):
             tip.sender.tips_left += tip.tips_left_amount
             await tip.save(update_fields=["status", "updated_at"])
             await tip.sender.save(update_fields=["bonus_balance", "tips_left", "updated_at"])
-        # todo: notify if employee
+
+        if tip.employee_id is None:
+            return
+
+        try:
+            await cls.notify_employee(tip)
+        except Exception as e:
+            logging.exception(f"error while notify employee {tip.id}: {e}")
+
+    @staticmethod
+    async def notify_employee(tip: model) -> None:
+        await tip.fetch_related("sender", "asset", "employee", "employee__user")
+        if len(tip.employee.user) != 1:
+            return
+        employee = tip.employee.user[0]
+        amount = (
+            (tip.amount / Decimal(10 ** tip.asset.decimals) + Decimal("0e-3"))
+            .quantize(Decimal("1e-3"), rounding=ROUND_HALF_UP)
+            .normalize()
+        )
+        await bs.send_message_with_app(
+            text=translate(
+                tag_or_text="employee",
+                domain="tip.on_success",
+                lang=employee.language_code,
+                amount=amount,
+                symbol=tip.asset.symbol,
+                sender_name=tip.sender.name,
+            ),
+            user_id=employee.id,
+
+        )
 
     @staticmethod
     def calculate_bonus(tip_amount: Decimal) -> int:

@@ -1,14 +1,20 @@
 {
     "payment": {
-        "establishment_rating": {
-            "description": "description",
-            "title": "title"
-        },
         "stars": {
             "establishment_rating": {
                 "description": "Хорошие оценки внутри приложения Point обеспечивают вашим любимым заведениям большую популярность",
                 "title": "Рейтинг"
             }
+        }
+    },
+    "tip": {
+        "on_success": {
+            "employee": "Вы получили чаевые в размере <b>{amount} {symbol}</b> от пользователя <b>{sender_name}</b>"
+        }
+    },
+    "common": {
+        "keyboards": {
+            "app": "Перейти в Point"
         }
     }
 }

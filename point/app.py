@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from contextlib import asynccontextmanager
+from decimal import getcontext
 
 from starlette.responses import JSONResponse
 from fastapi import FastAPI, HTTPException, Request, status
@@ -25,6 +26,7 @@ APP_BASE = "/api/v1/point"
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    getcontext().prec = 64
     asyncio.ensure_future(start_pooling())
 
     yield

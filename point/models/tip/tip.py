@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from tortoise import Model, fields
 from tortoise.fields import OnDelete
 
@@ -15,6 +17,7 @@ class Tip(Model):
     asset = fields.ForeignKeyField("models.Asset", on_delete=OnDelete.RESTRICT)
 
     establishment = fields.ForeignKeyField("models.Establishment", null=True)
+    employee_id: UUID | None
     employee = fields.ForeignKeyField("models.Employee", null=True)
 
     fee_transaction = fields.JSONField()

@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from point.controllers import TipController, AssetController, EstablishmentRatingController
+from point.controllers import TipController, AssetController, EstablishmentRatingController, UserController
 
 app_pooling = asyncio.Event()
 
@@ -18,7 +18,8 @@ async def start_pooling() -> None:
     await asyncio.gather(
         periodic_task(TipController.pooling_tips, 15),
         periodic_task(AssetController.update_prices, 30),
-        periodic_task(EstablishmentRatingController.allow_ratings, 60)
+        periodic_task(EstablishmentRatingController.allow_ratings, 60),
+        periodic_task(UserController.update_user_ranks, 60),
     )
 
 

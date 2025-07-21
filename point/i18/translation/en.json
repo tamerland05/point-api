@@ -6,5 +6,15 @@
                 "title": "Rating"
             }
         }
+    },
+    "tip": {
+        "on_success": {
+            "employee": "You have received a tip of <b>{amount} {symbol}</b> from the user <b>{sender_name}</b>"
+        }
+    },
+    "common": {
+        "keyboards": {
+            "app": "Go to Point"
+        }
     }
 }

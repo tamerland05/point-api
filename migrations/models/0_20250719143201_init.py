@@ -131,16 +131,16 @@ CREATE TABLE IF NOT EXISTS "users" (
     "photo_url" TEXT,
     "wallet" TEXT,
     "bonus_balance" BIGINT NOT NULL DEFAULT 0,
-    "tips_left" BIGINT NOT NULL DEFAULT 0,
+    "tips_left" DECIMAL(64, 32) NOT NULL DEFAULT 0,
+    "rank" BIGINT NOT NULL DEFAULT 0,
     "meta" JSONB NOT NULL,
     "enabled" BOOL NOT NULL DEFAULT True,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "employee_id" UUID REFERENCES "employers" ("id") ON DELETE SET NULL
 );
-CREATE INDEX IF NOT EXISTS "idx_users_bonus_b_7e88f8" ON "users" ("bonus_balance");
-CREATE INDEX IF NOT EXISTS "idx_users_tips_le_b640c2" ON "users" ("tips_left");
 CREATE INDEX IF NOT EXISTS "idx_users_enabled_e41084" ON "users" ("enabled");
+CREATE INDEX idx_users_bonus_balance_id ON users(bonus_balance DESC, id ASC);
 CREATE TABLE IF NOT EXISTS "completed_tasks" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,

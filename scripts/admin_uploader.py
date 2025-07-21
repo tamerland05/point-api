@@ -708,17 +708,17 @@ class PublicPointApiService(BaseApiService):
 
     async def checkout_tip(
             self,
-            recipient_id: UUID,
+            recipient_id: str,
             recipient_type: RecipientType,
-            asset_id: UUID,
+            asset_id: str,
             amount: str,
     ) -> list[TransactionOut]:
         resp = await self._post(
             url="/tip/send/checkout",
             data=CheckoutTipIn(
-                recipient_id=recipient_id,
+                recipient_id=UUID(recipient_id),
                 recipient_type=recipient_type,
-                asset_id=asset_id,
+                asset_id=UUID(asset_id),
                 amount=Decimal(amount),
             )
         )
