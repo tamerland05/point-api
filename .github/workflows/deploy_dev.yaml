@@ -121,7 +121,7 @@ jobs:
           echo "LOGO_HASH=${{ secrets.LOGO_HASH }}" >> .env
           echo "SET_RATING_AMOUNT=${{ secrets.SET_RATING_AMOUNT }}" >> .env
 
-
+          echo "POINT_APP_URL=${{ secrets.POINT_APP_URL }}" >> .env
           echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" >> .env
           echo "JWT_ALGORITHM=${{ secrets.JWT_ALGORITHM }}" >> .env
           echo "PUBLIC_KEY=${{ secrets.PUBLIC_KEY }}" >> .env
