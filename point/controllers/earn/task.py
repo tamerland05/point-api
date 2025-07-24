@@ -14,7 +14,6 @@ class TaskController(BaseController[Task]):
         completed_tasks_ids = [t.task_id for t in completed_tasks]
 
         for task in tasks:
-            if task.id in completed_tasks_ids:
-                task.done = True
+            task.done = task.id in completed_tasks_ids
 
         return tasks

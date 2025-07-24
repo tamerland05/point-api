@@ -24,5 +24,5 @@ class Task(Model):
     done = False
 
     @property
-    def icon_url(self) -> str:
+    def icon(self) -> str:
         return hash_to_link(self.icon_hash)
