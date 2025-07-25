@@ -25,8 +25,6 @@ class TipController(BaseController[Tip]):
 
     @classmethod
     async def create_tip(cls, checkout_in: CheckoutTipIn, sender_id: int) -> model:
-        getcontext().prec = 32
-
         sender, asset, ton, recipient = await asyncio.gather(
             UserController.get_user(user_id=sender_id),
             AssetController.get_asset(asset_id=checkout_in.asset_id),
