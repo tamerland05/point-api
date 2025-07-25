@@ -23,9 +23,11 @@ class AuthUserIn(PointBase):
 
 
 class UserPublicOut(PointBase):
+    id: int
     photo_url: Image | None = Field(default=None)
     name: str
     username: str | None = Field(default=None)
+    bonus_balance: int = 0
     rank: int = Field(ge=0)
     tips_left: Decimal | None = Field(ge=0, default=None)
     employee: EmployeePublicOut | None = Field(default=None)
@@ -40,7 +42,6 @@ class UserPublicOut(PointBase):
 
 class AuthUserOut(UserPublicOut):
     wallet: TonAddress | None = Field(default=None)
-    bonus_balance: int = 0
     tips_left: Decimal = Field(ge=0)
     meta: UserMeta
     employee: EmployeeOut | None = Field(default=None)

@@ -93,7 +93,7 @@ class UserController(BaseController[User]):
     async def get_top_users(cls) -> list[model]:
         return await (
             cls.filter("employee", "employee__job_place", enabled=True)
-            .order_by("-rank")
+            .order_by("-bonus_balance")
             .limit(100)
         )
 
