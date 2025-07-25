@@ -25,7 +25,7 @@ class AuthUserIn(PointBase):
 class UserPublicOut(PointBase):
     photo_url: Image | None = Field(default=None)
     name: str
-    username: str
+    username: str | None = Field(default=None)
     rank: int = Field(ge=0)
     tips_left: Decimal | None = Field(ge=0, default=None)
     employee: EmployeePublicOut | None = Field(default=None)
