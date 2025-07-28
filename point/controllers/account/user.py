@@ -9,14 +9,6 @@ from point.models import User, Referral
 from point.view import AuthUserIn
 
 
-UPDATE_RANKS_SQL = """
-                       UPDATE users u SET rank = ranked.rank
-                       FROM (SELECT id, ROW_NUMBER() OVER (ORDER BY bonus_balance DESC, id) AS rank
-                                FROM users) AS ranked
-                       WHERE u.id = ranked.id 
-                       """
-
-
 class UserController(BaseController[User]):
     error_code: ErrorCode = ErrorCode.USER_NOT_FOUND
     model = User
@@ -100,3 +92,11 @@ class UserController(BaseController[User]):
     @classmethod
     async def update_user_ranks(cls):
         await cls.model.raw(UPDATE_RANKS_SQL)
+
+
+UPDATE_RANKS_SQL = """
+    UPDATE users u SET rank = ranked.rank
+    FROM (SELECT id, ROW_NUMBER() OVER (ORDER BY bonus_balance DESC, id) AS rank
+            FROM users) AS ranked
+    WHERE u.id = ranked.id 
+"""

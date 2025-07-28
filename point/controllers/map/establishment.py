@@ -1,3 +1,4 @@
+from decimal import Decimal
 from uuid import UUID
 
 from point.controllers.base import BaseController
@@ -27,3 +28,68 @@ class EstablishmentController(BaseController[Establishment]):
         await establishment.fetch_related("menu")
 
         return establishment
+
+    @classmethod
+    async def get_establishments_by_rectangle(
+            cls,
+            rectangle: tuple,
+            limit: int | None = None,
+            M: int = 100,
+    ) -> list[model]:
+        query = GET_ESTABLISHMENTS_RECTANGLE_SQL
+        if limit is not None:
+            query += f" LIMIT {limit}"
+
+        establishments = await Establishment.raw(query % (rectangle + (M,) * 3))
+        return establishments
+
+    @classmethod
+    async def get_establishments_near(
+            cls,
+            lon: Decimal,
+            lat: Decimal,
+            limit: int | None = None,
+            name_contains: str | None = None,
+    ) -> list[model]:
+        where_clause = "WHERE enabled = TRUE"
+
+        if name_contains is not None:
+            where_clause += f" AND name ILIKE '%{name_contains}%'"
+
+        query = f"""
+            SELECT *, ST_Distance(location, ST_MakePoint({lon}, {lat})::geography) AS dist
+            FROM establishments
+            {where_clause}
+            ORDER BY dist
+        """
+
+        if limit is not None:
+            query += f" LIMIT {limit}"
+
+        establishments = await Establishment.raw(query)
+        return establishments
+
+
+GET_ESTABLISHMENTS_RECTANGLE_SQL = """
+    WITH
+        filtered AS (
+            SELECT * FROM establishments
+            WHERE enabled = TRUE AND ST_Within(location::geometry, ST_MakeEnvelope(%f, %f, %f, %f, 4326))
+        ),
+        avg_rating AS (
+            SELECT 
+                (CASE WHEN SUM(rating_count) > 0 THEN SUM(rating_sum)::DECIMAL / SUM(rating_count) ELSE 0 END)
+                    AS c
+            FROM filtered
+        ),
+        ranked AS (
+            SELECT
+               e.*,
+               (e.rating_count / (e.rating_count + %d)) *
+               (CASE WHEN e.rating_count > 0 THEN e.rating_sum::DECIMAL / e.rating_count ELSE 0 END)
+                   +
+               (%d / (e.rating_count + %d)) * a.c AS z
+            FROM filtered e, avg_rating a
+        )
+    SELECT * FROM ranked ORDER BY z DESC
+"""

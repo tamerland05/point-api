@@ -58,8 +58,10 @@ from point.view import (
     TaskCreateIn,
     TaskUpdateIn,
     ReferralOut,
-    TaskOut, EstablishmentRatingCreateIn,
+    TaskOut,
+    EstablishmentRatingCreateIn,
 )
+from point.view.common import ViewPortSize
 
 
 class BaseApiService:
@@ -644,14 +646,16 @@ class PublicPointApiService(BaseApiService):
             self,
             latitude: str,
             longitude: str,
-            scale: str,
+            scale: int,
+            view_port_size: ViewPortSize
     ) -> list[EstablishmentPreview]:
         resp = await self._post(
             url="/map/establishments",
             data=PointWithScale(
                 latitude=Decimal(latitude),
                 longitude=Decimal(longitude),
-                scale=Decimal(scale),
+                scale=scale,
+                view_port_size=view_port_size
             )
         )
 

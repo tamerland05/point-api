@@ -32,7 +32,7 @@ class StorageService:
     async def put_raw_file(self, data: bytes, extension: str = "") -> str | None:
         try:
             async with self.get_client() as client:
-                key = hashlib.md5(data).hexdigest() + extension
+                key = hashlib.md5(data).hexdigest()
 
                 content_type, _ = mimetypes.guess_type("file" + extension)
                 content_type = content_type or "application/octet-stream"

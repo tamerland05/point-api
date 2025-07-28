@@ -22,9 +22,11 @@ class EstablishmentCreateIn(PointBase):
 
 
 class EstablishmentDbCreateIn(EstablishmentCreateIn):
-    latitude: Decimal = Field(ge=-90, le=90)
-    longitude: Decimal = Field(ge=-180, le=180)
     address: str = Field(max_length=128)
+
+    @property
+    def location(self) -> tuple[Decimal, Decimal]:
+        return self.position.longitude, self.position.latitude
 
 
 class EstablishmentUpdateIn(PointBase):

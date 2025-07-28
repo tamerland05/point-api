@@ -25,8 +25,14 @@ class PointOut(PointUploadIn):
     pass
 
 
+class ViewPortSize(PointBase):
+    width: int = Field(gt=0)
+    height: int = Field(gt=0)
+
+
 class PointWithScale(PointRequestIn):
-    scale: Decimal = Field(ge=0)
+    scale: int = Field(ge=0, le=22)
+    view_port_size: ViewPortSize
 
 
 class Cost(PointBase):

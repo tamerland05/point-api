@@ -1,3 +1,4 @@
+import struct
 from decimal import Decimal
 
 from tortoise.fields import Field, TextField, BigIntField, SmallIntField, IntField
@@ -52,3 +53,32 @@ class TonAddressField(TextField):
         if value is None:
             return None
         return TonAddress(root=value)
+
+
+class GeographyPointField(Field):
+    SQL_TYPE = "geography(Point, 4326)"
+
+    def to_db_value(self, value: tuple[Decimal, Decimal], instance) -> str:
+        lon, lat = value
+        return f"SRID=4326;POINT({lon} {lat})"
+
+    def to_python_value(self, value: str) -> tuple[Decimal, Decimal]:
+        wkb_bytes = bytes.fromhex(value)
+
+        endian = wkb_bytes[0]
+        byte_order = "<" if endian == 1 else ">"
+
+        geom_type_with_flags = struct.unpack(byte_order + "I", wkb_bytes[1:5])[0]
+        geom_type = geom_type_with_flags & 0xFF
+
+        if geom_type != 1:
+            raise ValueError(f"Unsupported geometry type: {geom_type}")
+
+        offset = 5
+        if has_srid := bool(geom_type_with_flags & 0x20000000):
+            offset += 4
+
+        lon = struct.unpack(byte_order + "d", wkb_bytes[offset:offset+8])[0]
+        lat = struct.unpack(byte_order + "d", wkb_bytes[offset+8:offset+16])[0]
+
+        return Decimal(str(lon)), Decimal(str(lat))

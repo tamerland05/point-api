@@ -28,8 +28,7 @@ CREATE TABLE IF NOT EXISTS "establishment_types" (
 CREATE INDEX IF NOT EXISTS "idx_establishme_enabled_e074dc" ON "establishment_types" ("enabled");
 CREATE TABLE IF NOT EXISTS "establishments" (
     "id" UUID NOT NULL PRIMARY KEY,
-    "latitude" INT NOT NULL,
-    "longitude" INT NOT NULL,
+    "location" geography(Point, 4326) NOT NULL,
     "address" VARCHAR(128) NOT NULL,
     "service_wallet" TEXT,
     "service_wallet_seed" TEXT,
@@ -47,8 +46,7 @@ CREATE TABLE IF NOT EXISTS "establishments" (
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "establishment_type_id" UUID NOT NULL REFERENCES "establishment_types" ("id") ON DELETE RESTRICT
 );
-CREATE INDEX IF NOT EXISTS "idx_establishme_latitud_2c8a71" ON "establishments" ("latitude");
-CREATE INDEX IF NOT EXISTS "idx_establishme_longitu_b41cdb" ON "establishments" ("longitude");
+CREATE INDEX IF NOT EXISTS establishments_location_idx ON establishments USING GIST(location);
 CREATE INDEX IF NOT EXISTS "idx_establishme_enabled_90ab06" ON "establishments" ("enabled");
 CREATE TABLE IF NOT EXISTS "employers" (
     "id" UUID NOT NULL PRIMARY KEY,
@@ -65,13 +63,12 @@ CREATE TABLE IF NOT EXISTS "employers" (
 );
 CREATE INDEX IF NOT EXISTS "idx_employers_enabled_ac4be2" ON "employers" ("enabled");
 CREATE TABLE IF NOT EXISTS "invitations" (
-    "id" SERIAL NOT NULL PRIMARY KEY,
     "user_id" BIGINT NOT NULL,
     "profession" VARCHAR(32) NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "establishment_id" UUID NOT NULL REFERENCES "establishments" ("id") ON DELETE CASCADE,
-    CONSTRAINT "uid_invitations_user_id_10cff6" UNIQUE ("user_id", "establishment_id")
+    PRIMARY KEY ("user_id", "establishment_id")
 );
 CREATE INDEX IF NOT EXISTS "idx_invitations_user_id_ebf60a" ON "invitations" ("user_id");
 CREATE TABLE IF NOT EXISTS "menu_items" (
@@ -97,8 +94,7 @@ CREATE TABLE IF NOT EXISTS "payments" (
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-CREATE INDEX IF NOT EXISTS "idx_payments_tag_72ef00" ON "payments" ("tag");
-CREATE INDEX IF NOT EXISTS "idx_payments_done_69e9fb" ON "payments" ("done");
+CREATE INDEX IF NOT EXISTS "idx_payments_tag_72ef00" ON "payments" ("done", "tag");
 CREATE TABLE IF NOT EXISTS "purpose_icons" (
     "id" UUID NOT NULL PRIMARY KEY,
     "preview_hash" TEXT NOT NULL,
@@ -140,29 +136,25 @@ CREATE TABLE IF NOT EXISTS "users" (
     "employee_id" UUID REFERENCES "employers" ("id") ON DELETE SET NULL
 );
 CREATE INDEX IF NOT EXISTS "idx_users_enabled_e41084" ON "users" ("enabled");
-CREATE INDEX idx_users_bonus_balance_id ON users(bonus_balance DESC, id ASC);
+CREATE INDEX IF NOT EXISTS "idx_users_bonus_balance_id" ON "users" (bonus_balance DESC, id ASC);
 CREATE TABLE IF NOT EXISTS "completed_tasks" (
-    "id" SERIAL NOT NULL PRIMARY KEY,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "executor_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE,
     "task_id" UUID NOT NULL REFERENCES "tasks" ("id") ON DELETE CASCADE,
-    CONSTRAINT "uid_completed_t_task_id_e2f118" UNIQUE ("task_id", "executor_id")
+    PRIMARY KEY ("task_id", "executor_id")
 );
 CREATE TABLE IF NOT EXISTS "establishment_ratings" (
-    "id" SERIAL NOT NULL PRIMARY KEY,
     "mark" SMALLINT NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "establishment_id" UUID NOT NULL REFERENCES "establishments" ("id") ON DELETE CASCADE,
-    "user_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE
+    "user_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE,
+    PRIMARY KEY ("establishment_id", "user_id", "created_at")
 );
-CREATE INDEX IF NOT EXISTS "idx_establishme_establi_b66005" 
-    ON "establishment_ratings" ("establishment_id", "user_id", "created_at" DESC);
 CREATE TABLE IF NOT EXISTS "referrals" (
-    "id" SERIAL NOT NULL PRIMARY KEY,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "referral_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE,
     "referrer_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE,
-    CONSTRAINT "uid_referrals_referre_ec3a4e" UNIQUE ("referrer_id", "referral_id")
+    PRIMARY KEY ("referrer_id", "referral_id")
 );
 CREATE TABLE IF NOT EXISTS "tips" (
     "id" UUID NOT NULL PRIMARY KEY,
@@ -182,6 +174,12 @@ CREATE TABLE IF NOT EXISTS "tips" (
 );
 CREATE INDEX IF NOT EXISTS "idx_tips_status_b521b6" ON "tips" ("status");
 COMMENT ON COLUMN "tips"."status" IS 'created: created\naccepted: accepted\nfailed: failed';
+CREATE TABLE IF NOT EXISTS "user_visits" (
+    "visits" INT NOT NULL,
+    "establishment_id" UUID NOT NULL REFERENCES "establishments" ("id") ON DELETE CASCADE,
+    "user_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE,
+    PRIMARY KEY ("user_id", "establishment_id")
+);
 CREATE TABLE IF NOT EXISTS "aerich" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "version" VARCHAR(255) NOT NULL,

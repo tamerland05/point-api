@@ -10,7 +10,7 @@ class User(Model):
 
     class Meta:
         table = "users"
-        indexes = [("bonus_balance_id", "id")]
+        indexes = [("bonus_balance", "id")]
 
     id = fields.BigIntField(pk=True)
     first_name = fields.TextField(null=True)

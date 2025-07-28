@@ -5,7 +5,7 @@ from tortoise import Model, fields
 from tortoise.fields import OnDelete, BigIntField
 
 from point.entity_types import TonAddress
-from point.models.custom import TonAddressField, IntDecimalField
+from point.models.custom import TonAddressField, GeographyPointField
 from point.models.utils import hash_to_link
 
 
@@ -18,8 +18,7 @@ class Establishment(Model):
 
     id = fields.UUIDField(pk=True, default=uuid4)
 
-    latitude = IntDecimalField(multiplier=6, index=True)
-    longitude = IntDecimalField(multiplier=6, index=True)
+    location = GeographyPointField()
     address = fields.CharField(max_length=128)
 
     service_wallet = TonAddressField(null=True)
@@ -43,8 +42,8 @@ class Establishment(Model):
     @property
     def position(self) -> dict:
         return {
-            "latitude": self.latitude,
-            "longitude": self.longitude,
+            "longitude": self.location[0],
+            "latitude": self.location[1],
             "address": self.address,
         }
 
