@@ -31,7 +31,7 @@ class ViewPortSize(PointBase):
 
 
 class PointWithScale(PointRequestIn):
-    scale: int = Field(ge=0, le=22)
+    scale: float = Field(ge=0, le=22)
     view_port_size: ViewPortSize
 
 

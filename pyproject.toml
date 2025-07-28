@@ -5,7 +5,7 @@ description = "Add your description here"
 requires-python = ">=3.13"
 dependencies = [
     "aerich>=0.9.1",
-    "aiobotocore>=2.23.1",
+    "aiobotocore>=2.23.2",
     "aiogram>=3.21.0",
     "aiolimiter>=1.2.1",
     "async-lru>=2.0.5",

@@ -646,7 +646,7 @@ class PublicPointApiService(BaseApiService):
             self,
             latitude: str,
             longitude: str,
-            scale: int,
+            scale: float,
             view_port_size: ViewPortSize
     ) -> list[EstablishmentPreview]:
         resp = await self._post(

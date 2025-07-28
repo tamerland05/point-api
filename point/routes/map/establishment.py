@@ -1,3 +1,4 @@
+import math
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, BackgroundTasks
@@ -12,7 +13,7 @@ router = APIRouter()
 
 @router.post("s")
 async def get_establishments(location: PointWithScale) -> list[EstablishmentPreview]:
-    limit = CoordinatesService.process_scale(scale=location.scale)
+    limit = CoordinatesService.process_scale(scale=math.floor(location.scale))
     if limit == 0:
         return []
 

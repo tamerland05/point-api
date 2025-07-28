@@ -2,7 +2,7 @@ import asyncio
 import datetime
 import logging
 import uuid
-from decimal import ROUND_HALF_UP, Decimal, getcontext
+from decimal import ROUND_HALF_UP, Decimal
 
 from tortoise.transactions import in_transaction
 
