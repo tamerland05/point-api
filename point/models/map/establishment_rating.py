@@ -15,4 +15,4 @@ class EstablishmentRating(Model):
     establishment = fields.ForeignKeyField("models.Establishment", on_delete=OnDelete.CASCADE)
 
     mark = fields.SmallIntField()
-    created_at = fields.DatetimeField(auto_now_add=True)
+    created_at = fields.DatetimeField(auto_now_add=True, pk=True)

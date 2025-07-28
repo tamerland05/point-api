@@ -16,5 +16,5 @@ class Invitation(Model):
     establishment = fields.ForeignKeyField("models.Establishment", on_delete=OnDelete.CASCADE)
     profession = fields.CharField(max_length=32)
 
-    created_at = fields.DatetimeField(auto_now=True)
+    created_at = fields.DatetimeField(auto_now=True, pk=True)
     updated_at = fields.DatetimeField(auto_now_add=True)

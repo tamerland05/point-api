@@ -21,7 +21,7 @@ class User(Model):
 
     wallet = TonAddressField(null=True)
     bonus_balance = fields.BigIntField(default=0)
-    tips_left = fields.DecimalField(max_digits=64, decimal_places=32)
+    tips_left = fields.DecimalField(default=0, max_digits=64, decimal_places=32)
     rank = fields.BigIntField(default=0)
     meta = fields.JSONField(default={})
 
