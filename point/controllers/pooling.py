@@ -9,9 +9,11 @@ app_pooling = asyncio.Event()
 async def periodic_task(coro_func, interval: int):
     while not app_pooling.is_set():
         try:
-            await asyncio.gather(coro_func(), asyncio.sleep(interval))
+            await coro_func()
         except Exception as e:
             logging.exception(f"Error in pooling task {coro_func.__name__}: {e}")
+        finally:
+            await asyncio.sleep(interval)
 
 
 async def start_pooling() -> None:

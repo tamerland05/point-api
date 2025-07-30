@@ -5,10 +5,11 @@ class Payment(Model):
 
     class Meta:
         table = "payments"
+        indexes = [("done", "tag")]
 
     id = fields.UUIDField(pk=True)
-    tag = fields.CharField(max_length=32, index=True)
-    done = fields.BooleanField(default=False, index=True)
+    tag = fields.CharField(max_length=32)
+    done = fields.BooleanField(default=False)
 
     meta = fields.JSONField()
 

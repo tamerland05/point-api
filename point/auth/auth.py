@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import parse_qsl
 
 from fastapi import Depends, Request, Security
 from fastapi.exceptions import HTTPException
@@ -7,11 +8,10 @@ from jose import jwt
 
 from point.config import settings
 from point.errors import APIException, ErrorCode
-from point.view import AuthIn
+from point.services import bs
+from point.view import AuthIn, AuthUserIn
 from point.view import AuthUser
 
-import hashlib
-import hmac
 
 admin_api = APIKeyHeader(name="ApiKey", auto_error=True)
 
@@ -56,21 +56,9 @@ def get_user(token_data=Depends(JWTBearer())) -> AuthUser:
     return user
 
 
-def validate_telegram_init_data(init_data: AuthIn) -> bool:
-    if settings.bot_token != "" and False:
-        data_check_array = [
-            f"{key}={value}" for key, value in init_data.model_dump(mode="json", exclude_unset=True).items()
-            if key != "hash"
-        ]
-        data_check_array.sort()
-        secret_key = hmac.new(b"WebAppData", settings.bot_token.encode("utf-8"), hashlib.sha256).digest()
-        data_string = "\n".join(data_check_array).encode("utf-8")
-        calculated_hash = hmac.new(secret_key, data_string, hashlib.sha256).hexdigest()
-        is_valid = hmac.compare_digest(calculated_hash, init_data.hash)
-    else:
-        is_valid = True
+def validate_telegram_init_data(init_data: AuthIn) -> AuthUserIn | None:
+    init_data_dict = dict(parse_qsl(init_data.init_data_raw, keep_blank_values=True))
+    if "user" not in init_data_dict or not bs.validate_data(data_dict=init_data_dict):
+        return None
 
-    if not is_valid:
-        return False
-
-    return True
+    return AuthUserIn.model_validate_json(init_data_dict["user"])

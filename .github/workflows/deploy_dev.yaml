@@ -115,8 +115,8 @@ jobs:
           echo "JETTON_TRANSFER_AMOUNT=${{ secrets.JETTON_TRANSFER_AMOUNT }}" >> .env
           echo "POINT_WALLET=${{ secrets.POINT_WALLET }}" >> .env
 
-          echo "BONUS_REWARD_FOR_PREMIUM=${{ secrets.BONUS_REWARD_FOR_PREMIUM }}" >> .env
-          echo "BONUS_REWARD_FOR_SIMPLE=${{ secrets.BONUS_REWARD_FOR_SIMPLE }}" >> .env
+          echo "BONUS_REWARD_FOR_PREMIUM=${{ vars.BONUS_REWARD_FOR_PREMIUM }}" >> .env
+          echo "BONUS_REWARD_FOR_SIMPLE=${{ vars.BONUS_REWARD_FOR_SIMPLE }}" >> .env
           
           echo "LOGO_HASH=${{ vars.LOGO_HASH }}" >> .env
           echo "SET_RATING_AMOUNT=${{ vars.SET_RATING_AMOUNT }}" >> .env

@@ -13,11 +13,11 @@ router = APIRouter()
 
 @router.post("")
 async def post_auth(auth_data: AuthIn, background_tasks: BackgroundTasks) -> AuthOut:
-    if not validate_telegram_init_data(auth_data):
+    if (user_in := validate_telegram_init_data(auth_data)) is None:
         raise APIException(ErrorCode.WRONG_CREDENTIALS)
 
-    user, created = await UserController.get_or_create_user(user_in=auth_data.user)
-    user_dct = auth_data.user.model_dump(mode="json")
+    user, created = await UserController.get_or_create_user(user_in=user_in)
+    user_dct = user_in.model_dump(mode="json")
     if not created and any(getattr(user, field) != new for field, new in user_dct.items() if hasattr(user, field)):
         background_tasks.add_task(func=user.update_from_dict(user_dct).save)
     if auth_data.referrer_id is not None and created and auth_data.referrer_id != user.id:
@@ -25,7 +25,7 @@ async def post_auth(auth_data: AuthIn, background_tasks: BackgroundTasks) -> Aut
             func=UserController.create_referral,
             referrer_id=auth_data.referrer_id,
             user_id=user.id,
-            is_premium=auth_data.user.is_premium,
+            is_premium=user_in.is_premium,
         )
 
     if user.employee_id is None:

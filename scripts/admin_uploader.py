@@ -524,16 +524,14 @@ class PublicPointApiService(BaseApiService):
 
     async def auth(
             self,
-            user: AuthUserIn,
-            hash: str,
+            init_data_raw: str,
             referrer_id: int | None = None,
     ) -> None:
         resp = await self._post(
             url="/account/auth",
             data=AuthIn(
-                hash=hash,
                 referrer_id=referrer_id,
-                user=user,
+                init_data_raw=init_data_raw,
             )
         )
         auth_out = AuthOut.model_validate(resp)

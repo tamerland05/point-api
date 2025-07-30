@@ -8,7 +8,6 @@ class EstablishmentRating(Model):
 
     class Meta:
         table = "establishment_ratings"
-        indexes = [("establishment_id", "user_id", "created_at")]
 
     user = fields.ForeignKeyField("models.User", on_delete=OnDelete.CASCADE)
     establishment_id: UUID
