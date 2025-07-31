@@ -79,7 +79,7 @@ bs = BotService()
 
 @dp.message(CommandStart())
 async def handle_start(message: Message) -> None:
-    lang = "ru"
+    lang = message.from_user.language_code
     await bs.send_message_with_intro(
         text=translate(tag_or_text="start", domain="common.replies", lang=lang),
         user_id=message.from_user.id,
