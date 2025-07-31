@@ -57,7 +57,7 @@ class EstablishmentController(BaseController[Establishment]):
             where_clause += f" AND LOWER(name) LIKE '%{name_contains.lower()}%'"
 
         query = f"""
-            SELECT *, ST_Distance(location, ST_MakePoint({lon}, {lat})::geography) AS dist
+            SELECT {ESTABLISHMENT_PREVIEW_FIELDS}, ST_Distance(location, ST_MakePoint({lon}, {lat})::geography) AS dist
             FROM establishments
             {where_clause}
             ORDER BY dist
@@ -70,10 +70,14 @@ class EstablishmentController(BaseController[Establishment]):
         return establishments
 
 
-GET_ESTABLISHMENTS_RECTANGLE_SQL = """
+ESTABLISHMENT_PREVIEW_FIELDS = ", ".join(
+    ["id", "name", "photo_hash", "establishment_type_id", "location", "address", "rating_sum", "rating_count"]
+)
+
+GET_ESTABLISHMENTS_RECTANGLE_SQL = f"""
     WITH
         filtered AS (
-            SELECT * FROM establishments
+            SELECT {ESTABLISHMENT_PREVIEW_FIELDS} FROM establishments
             WHERE enabled = TRUE AND ST_Within(location::geometry, ST_MakeEnvelope(%f, %f, %f, %f, 4326))
         ),
         avg_rating AS (

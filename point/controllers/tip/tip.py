@@ -158,7 +158,7 @@ class TipController(BaseController[Tip]):
             .quantize(Decimal("1e-3"), rounding=ROUND_HALF_UP)
             .normalize()
         )
-        await bs.send_message_with_app(
+        await bs.send_message_with_intro(
             text=translate(
                 tag_or_text="employee",
                 domain="tip.on_success",
@@ -168,7 +168,7 @@ class TipController(BaseController[Tip]):
                 sender_name=tip.sender.name,
             ),
             user_id=employee.id,
-
+            lang=employee.language_code,
         )
 
     @staticmethod

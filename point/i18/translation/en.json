@@ -14,7 +14,11 @@
     },
     "common": {
         "keyboards": {
-            "app": "Go to Point"
+            "app": "Go to Point",
+            "channel": "Join channel"
+        },
+        "replies": {
+            "start": "<b>Welcome to Point!</b>\n\nWe are the premier Telegram application for food & beverage businesses and their customers!\n\n<b>Discover the best venues for yourself and your loved ones!</b>"
         }
     }
 }

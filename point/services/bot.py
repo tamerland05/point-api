@@ -2,14 +2,17 @@ import hashlib
 import hmac
 import logging
 
-from aiogram import Bot
-from aiogram.types import WebAppInfo, InlineKeyboardMarkup
+from aiogram import Bot, Dispatcher
+from aiogram.filters import CommandStart
+from aiogram.types import WebAppInfo, InlineKeyboardMarkup, Message, Update, PreCheckoutQuery
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiolimiter import AsyncLimiter
 
 from point.config import settings, AppEnv
 from point.i18 import translate
 from point.view import InvoiceRequest
+
+dp = Dispatcher()
 
 
 class BotService:
@@ -34,17 +37,26 @@ class BotService:
             except Exception as e:
                 logging.exception(f"Error while send message {text} to {user_id}: {e}")
 
-    async def send_message_with_app(self, text: str, user_id: int) -> None:
-        builder = InlineKeyboardBuilder().button(
-            text=translate(tag_or_text="app", domain="common.keyboards"),
+    async def send_message_with_intro(self, text: str, user_id: int, lang: str) -> None:
+        builder = InlineKeyboardBuilder()
+        builder.button(
+            text=translate(tag_or_text="app", domain="common.keyboards", lang=lang),
             web_app=WebAppInfo(url=self.point_app_url)
         )
+        builder.button(
+            text=translate(tag_or_text="channel", domain="common.keyboards", lang=lang),
+            web_app=WebAppInfo(url=self.point_app_url)
+        )
+        builder.adjust(1, repeat=True)
 
         await self.send_message(
             text=text,
             user_id=user_id,
             reply_markup=builder.as_markup(),
         )
+
+    async def feed_update(self, update: Update) -> None:
+        await dp.feed_update(self.bot, update)
 
     def validate_data(self, data_dict: dict) -> bool:
         if settings.app_env == AppEnv.DEV:
@@ -63,3 +75,18 @@ class BotService:
 
 
 bs = BotService()
+
+
+@dp.message(CommandStart())
+async def handle_start(message: Message) -> None:
+    lang = "ru"
+    await bs.send_message_with_intro(
+        text=translate(tag_or_text="start", domain="common.replies", lang=lang),
+        user_id=message.from_user.id,
+        lang=lang
+    )
+
+
+@dp.pre_checkout_query()
+async def handle_pre_checkout(query: PreCheckoutQuery) -> None:
+    await query.bot.answer_pre_checkout_query(query.id, ok=True)
