@@ -53,8 +53,8 @@ class EstablishmentController(BaseController[Establishment]):
     ) -> list[model]:
         where_clause = "WHERE enabled = TRUE"
 
-        if name_contains is not None:
-            where_clause += f" AND name ILIKE '%{name_contains}%'"
+        if name_contains is not None or name_contains == "":
+            where_clause += f" AND LOWER(name) LIKE '%{name_contains.lower()}%'"
 
         query = f"""
             SELECT *, ST_Distance(location, ST_MakePoint({lon}, {lat})::geography) AS dist

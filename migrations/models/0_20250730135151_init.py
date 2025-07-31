@@ -3,7 +3,8 @@ from tortoise import BaseDBAsyncClient
 
 async def upgrade(_: BaseDBAsyncClient) -> str:
     return """
-        CREATE TABLE IF NOT EXISTS "assets" (
+        CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE TABLE IF NOT EXISTS "assets" (
     "id" UUID NOT NULL PRIMARY KEY,
     "symbol" VARCHAR(16) NOT NULL UNIQUE,
     "name" VARCHAR(128) NOT NULL,
@@ -48,6 +49,7 @@ CREATE TABLE IF NOT EXISTS "establishments" (
 );
 CREATE INDEX IF NOT EXISTS establishments_location_idx ON establishments USING GIST(location);
 CREATE INDEX IF NOT EXISTS "idx_establishme_enabled_90ab06" ON "establishments" ("enabled");
+CREATE INDEX IF NOT EXISTS idx_user_name_trgm ON establishments USING gin (LOWER(name) gin_trgm_ops);
 CREATE TABLE IF NOT EXISTS "employers" (
     "id" UUID NOT NULL PRIMARY KEY,
     "profession" VARCHAR(32) NOT NULL,
