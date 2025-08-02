@@ -19,8 +19,10 @@ class BotService:
     def __init__(self):
         self.bot = Bot(token=settings.bot_token)
         self._global_limiter = AsyncLimiter(max_rate=30, time_period=1)
-        self.point_app_url = str(settings.point_app_url)
         self._secret_key = hmac.new(b'WebAppData', settings.bot_token.encode('utf-8'), hashlib.sha256).digest()
+
+        self.point_app_url = str(settings.point_app_url)
+        self.point_channel_url = str(settings.point_channel_url)
 
     async def create_invoice_link(self, request: InvoiceRequest) -> str:
         return await self.bot.create_invoice_link(**request.model_dump(mode="json"))
@@ -45,7 +47,7 @@ class BotService:
         )
         builder.button(
             text=translate(tag_or_text="channel", domain="common.keyboards", lang=lang),
-            web_app=WebAppInfo(url=self.point_app_url)
+            url=self.point_channel_url,
         )
         builder.adjust(1, repeat=True)
 
