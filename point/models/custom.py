@@ -62,7 +62,10 @@ class GeographyPointField(Field):
         lon, lat = value
         return f"SRID=4326;POINT({lon} {lat})"
 
-    def to_python_value(self, value: str) -> tuple[Decimal, Decimal]:
+    def to_python_value(self, value: str | tuple[Decimal, Decimal]) -> tuple[Decimal, Decimal]:
+        if isinstance(value, tuple | list) and len(value) == 2:
+            return value
+
         wkb_bytes = bytes.fromhex(value)
 
         endian = wkb_bytes[0]

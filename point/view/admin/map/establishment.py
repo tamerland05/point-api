@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import Field, AnyUrl
 
-from point.entity_types import PointHash
+from point.entity_types import PointHash, TonAddress
 from point.view import PointBase, PointUploadIn, EstablishmentOut
 
 
@@ -23,10 +23,7 @@ class EstablishmentCreateIn(PointBase):
 
 class EstablishmentDbCreateIn(EstablishmentCreateIn):
     address: str = Field(max_length=128)
-
-    @property
-    def location(self) -> tuple[Decimal, Decimal]:
-        return self.position.longitude, self.position.latitude
+    location: tuple[Decimal, Decimal] = Field(default_factory=tuple)
 
 
 class EstablishmentUpdateIn(PointBase):
@@ -47,9 +44,9 @@ class EstablishmentUpdateIn(PointBase):
 
 
 class EstablishmentAdminOut(EstablishmentOut):
-    service_wallet: str | None = Field(default=None, max_length=128)
+    service_wallet: TonAddress | None = Field(default=None)
     service_wallet_seed: str | None = Field(default=None)
-    official_wallet: str | None = Field(default=None, max_length=128)
+    official_wallet: TonAddress | None = Field(default=None)
 
     enabled: bool
     created_at: datetime | None = Field(default=None)

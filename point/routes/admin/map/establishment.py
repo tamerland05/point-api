@@ -36,6 +36,7 @@ async def create_establishment(
     establishment_in = EstablishmentDbCreateIn(
         **establishment_in.model_dump(),
         **establishment_in.position.model_dump(),
+        location=(establishment_in.position.longitude, establishment_in.position.latitude),
     )
     establishment = await EstablishmentController.admin_create(establishment_in)
     return EstablishmentAdminOut.model_validate(establishment)
