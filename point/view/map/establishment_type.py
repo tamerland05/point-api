@@ -10,3 +10,4 @@ class EstablishmentTypeOut(PointBase):
     id: UUID
     name: str = Field(max_length=128)
     icon: Image
+    color_code: str | None = Field(default=None)

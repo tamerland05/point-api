@@ -191,11 +191,16 @@ class AdminPointApiService(BaseApiService):
         resp = await self._get(url="/map/establishment-types")
         return EstablishmentTypeAdminOut.list_validate(resp)
 
-    async def create_establishment_type(self, name: str, path_to_icon: str) -> EstablishmentTypeAdminOut:
+    async def create_establishment_type(
+            self,
+            name: str,
+            path_to_icon: str,
+            color_code: str | None = None,
+    ) -> EstablishmentTypeAdminOut:
         icon_hash = await self.upload_file(path_to_icon)
         resp = await self._post(
             url="/map/establishment-type",
-            data=EstablishmentTypeCreateIn(name=name, icon_hash=icon_hash),
+            data=EstablishmentTypeCreateIn(name=name, icon_hash=icon_hash, color_code=color_code),
         )
         return EstablishmentTypeAdminOut.model_validate(resp)
 
@@ -205,6 +210,7 @@ class AdminPointApiService(BaseApiService):
             name: str | None = None,
             icon_hash: PointHash | None = None,
             path_to_icon: str | None = None,
+            color_code: str | None = None,
             enabled: bool | None = None,
     ) -> EstablishmentTypeAdminOut:
         if icon_hash is None and path_to_icon is not None:
@@ -212,7 +218,7 @@ class AdminPointApiService(BaseApiService):
 
         resp = await self._put(
             url="/map/establishment-type/" + establishment_type_id,
-            data=EstablishmentTypeUpdateIn(name=name, icon_hash=icon_hash, enabled=enabled),
+            data=EstablishmentTypeUpdateIn(name=name, icon_hash=icon_hash, color_code=color_code, enabled=enabled),
         )
         return EstablishmentTypeAdminOut.model_validate(resp)
 
