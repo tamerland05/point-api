@@ -8,59 +8,7 @@ from fastapi_pagination import Page
 from pydantic import AnyUrl
 
 from point.entity_types import PointHash, RecipientType, Image, TaskIntegrationType
-from point.view import (
-    PointBase,
-    EstablishmentTypeCreateIn,
-    EstablishmentTypeUpdateIn,
-    EstablishmentCreateIn,
-    EstablishmentUpdateIn,
-    PointUploadIn,
-    MenuItemOut,
-    Cost,
-    MenuItemCreateIn,
-    MenuItemUpdateIn,
-    MenuItemAdminOut,
-    EstablishmentTypeAdminOut,
-    EstablishmentAdminOut,
-    AssetAdminOut,
-    AssetCreateIn,
-    AssetUpdateIn,
-    AuthUserIn,
-    AuthIn,
-    AuthOut,
-    AuthUserOut,
-    PointWithScale,
-    EstablishmentPreview,
-    NearEstablishmentCriteria,
-    PointRequestIn,
-    EstablishmentOut,
-    EstablishmentTypeOut,
-    ReceiversOut,
-    AssetOut,
-    TransactionOut,
-    CheckoutTipIn,
-    UserMeta,
-    UserUpdateIn,
-    UserPublicOut,
-    PurposeIconAdminOut,
-    PurposeIconCreateIn,
-    PurposeIconUpdateIn,
-    PurposeIconOut,
-    PurposeIn,
-    EmployeeMeta,
-    EmployeeUpdateIn,
-    InvitationAdminOut,
-    InvitationCreateIn,
-    InvitationDeleteIn,
-    InvitationOut,
-    EmployeeCreateIn,
-    TaskAdminOut,
-    TaskCreateIn,
-    TaskUpdateIn,
-    ReferralOut,
-    TaskOut,
-    EstablishmentRatingCreateIn,
-)
+from point.view import *
 from point.view.common import ViewPortSize
 
 
@@ -114,16 +62,22 @@ class AdminPointApiService(BaseApiService):
         headers = {"AdminApiKey": admin_auth_api_key}
         super().__init__(headers, origin + "/admin")
 
-    async def upload_file(self, filepath: str) -> PointHash | None:
+    async def upload_file(self, file) -> PointHash | None:
+        url = self.base_url + "/common/upload-file"
+        data = {"file": file}
+
+        async with aiohttp.ClientSession(headers=self.headers) as session, session.post(url, data=data) as resp:
+            return await self.log_or_return(resp)
+
+    async def upload_files(self, files: list) -> list[PointHash | None]:
+        return await asyncio.gather(*[self.upload_file(file) for file in files])
+
+    async def upload_file_by_path(self, filepath: str) -> PointHash | None:
         with open(filepath, "rb") as f:
-            url = self.base_url + "/common/upload-file"
-            data = {"file": f}
+            return await self.upload_file(file=f)
 
-            async with aiohttp.ClientSession(headers=self.headers) as session, session.post(url, data=data) as resp:
-                return await self.log_or_return(resp)
-
-    async def upload_files(self, filepaths: list[str]) -> list[PointHash] | None:
-        return await asyncio.gather(*[self.upload_file(filepath) for filepath in filepaths])
+    async def upload_files_by_paths(self, filepaths: list[str]) -> list[PointHash | None]:
+        return await asyncio.gather(*[self.upload_file_by_path(filepath) for filepath in filepaths])
 
     async def get_task(self, task_id: str) -> TaskAdminOut:
         resp = await self._get(url="/earn/task/" + task_id)
@@ -197,7 +151,7 @@ class AdminPointApiService(BaseApiService):
             path_to_icon: str,
             color_code: str | None = None,
     ) -> EstablishmentTypeAdminOut:
-        icon_hash = await self.upload_file(path_to_icon)
+        icon_hash = await self.upload_file_by_path(path_to_icon)
         resp = await self._post(
             url="/map/establishment-type",
             data=EstablishmentTypeCreateIn(name=name, icon_hash=icon_hash, color_code=color_code),
@@ -214,7 +168,7 @@ class AdminPointApiService(BaseApiService):
             enabled: bool | None = None,
     ) -> EstablishmentTypeAdminOut:
         if icon_hash is None and path_to_icon is not None:
-            icon_hash = await self.upload_file(path_to_icon)
+            icon_hash = await self.upload_file_by_path(path_to_icon)
 
         resp = await self._put(
             url="/map/establishment-type/" + establishment_type_id,
@@ -236,21 +190,33 @@ class AdminPointApiService(BaseApiService):
     async def create_establishment(
             self,
             establishment_type_id: str,
-            position: PointUploadIn,
+            latitude: Decimal,
+            longitude: Decimal,
+            address: str,
             name: str,
             description: str,
-            path_to_icon: str,
-            path_to_photo: str,
-            paths_to_gallery: list[str],
+            icon_hash: PointHash | None = None,
+            path_to_icon: str | None = None,
+            photo_hash: PointHash | None = None,
+            path_to_photo: str | None = None,
+            paths_to_gallery: list[str] | None = None,
+            gallery_hashes: list[PointHash] | None = None,
             channel_link: str | None = None,
     ) -> EstablishmentAdminOut:
-        icon_hash, photo_hash = await self.upload_files([path_to_icon, path_to_photo])
-        gallery_hashes = await self.upload_files(paths_to_gallery)  # можно сделать, чтобы указывалась директория
+        if icon_hash is None and path_to_icon is not None:
+            icon_hash = await self.upload_file_by_path(path_to_icon)
+        if photo_hash is None and path_to_photo is not None:
+            photo_hash = await self.upload_file_by_path(path_to_photo)
+        if gallery_hashes is None and paths_to_gallery is not None:
+            gallery_hashes = await self.upload_files_by_paths(paths_to_gallery)
+
         resp = await self._post(
             url="/map/establishment",
             data=EstablishmentCreateIn(
                 establishment_type_id=UUID(establishment_type_id),
-                position=position,
+                longitude=longitude,
+                latitude=latitude,
+                address=address,
                 name=name,
                 description=description,
                 icon_hash=icon_hash,
@@ -275,16 +241,16 @@ class AdminPointApiService(BaseApiService):
             photo_hash: PointHash | None = None,
             path_to_photo: str | None = None,
             paths_to_gallery: list[str] | None = None,
-            gallery: list[PointHash] | None = None,
+            gallery_hashes: list[PointHash] | None = None,
             channel_link: str | None = None,
             enabled: bool | None = None,
     ) -> EstablishmentAdminOut:
         if icon_hash is None and path_to_icon is not None:
-            icon_hash = await self.upload_file(path_to_icon)
+            icon_hash = await self.upload_file_by_path(path_to_icon)
         if photo_hash is None and path_to_photo is not None:
-            photo_hash = await self.upload_file(path_to_photo)
-        if gallery is None and paths_to_gallery is not None:
-            gallery = await self.upload_files(paths_to_gallery)
+            photo_hash = await self.upload_file_by_path(path_to_photo)
+        if gallery_hashes is None and paths_to_gallery is not None:
+            gallery_hashes = await self.upload_files_by_paths(paths_to_gallery)
 
         resp = await self._put(
             url="/map/establishment/" + establishment_id,
@@ -297,7 +263,7 @@ class AdminPointApiService(BaseApiService):
                 description=description,
                 icon_hash=icon_hash,
                 photo_hash=photo_hash,
-                gallery=gallery,
+                gallery_hashes=gallery_hashes,
                 channel_link=channel_link,
                 enabled=enabled,
             ),
@@ -322,9 +288,11 @@ class AdminPointApiService(BaseApiService):
             title: str,
             description: str,
             cost: Cost,
+            photo_hash: PointHash | None = None,
             path_to_photo: str | None = None,
     ) -> MenuItemAdminOut:
-        photo_hash = None if path_to_photo is None else await self.upload_file(path_to_photo)
+        if photo_hash is None:
+            photo_hash = None if path_to_photo is None else await self.upload_file_by_path(path_to_photo)
         resp = await self._post(
             url="/map/menu-item",
             data=MenuItemCreateIn(
@@ -344,12 +312,13 @@ class AdminPointApiService(BaseApiService):
             category: str,
             title: str,
             description: str,
-            path_to_photo: str,
             cost: Cost,
+            photo_hash: PointHash | None = None,
+            path_to_photo: str | None = None,
     ) -> None:
-        photo_hash = await self.upload_file(path_to_photo)
-
-        for establishment_id in establishment_ids:
+        if photo_hash is None:
+            photo_hash = None if path_to_photo is None else await self.upload_file_by_path(path_to_photo)
+        for establishment_id in set(establishment_ids):
             await self._post(
                 url="/map/menu-item",
                 data=MenuItemCreateIn(
@@ -366,6 +335,7 @@ class AdminPointApiService(BaseApiService):
             self,
             menu_item_id: str,
             establishment_id: str | None = None,
+            category: str | None = None,
             title: str | None = None,
             description: str | None = None,
             path_to_photo: str | None = None,
@@ -375,12 +345,13 @@ class AdminPointApiService(BaseApiService):
             enabled: bool | None = None,
     ) -> MenuItemAdminOut:
         if photo_hash is None and path_to_photo is not None:
-            photo_hash = await self.upload_file(path_to_photo)
+            photo_hash = await self.upload_file_by_path(path_to_photo)
 
         resp = await self._put(
             url="/map/menu-item/" + menu_item_id,
             data=MenuItemUpdateIn(
                 establishment_id=establishment_id,
+                category=category,
                 title=title,
                 description=description,
                 photo_hash=photo_hash,
@@ -432,7 +403,7 @@ class AdminPointApiService(BaseApiService):
             path_to_icon: str,
             path_to_preview: str
     ) -> PurposeIconAdminOut:
-        icon_hash, preview_hash = await self.upload_files([path_to_icon, path_to_preview])
+        icon_hash, preview_hash = await self.upload_files_by_paths([path_to_icon, path_to_preview])
         resp = await self._post(
             url="/account/purpose-icon",
             data=PurposeIconCreateIn(icon_hash=icon_hash, preview_hash=preview_hash),
@@ -449,10 +420,10 @@ class AdminPointApiService(BaseApiService):
             enabled: bool | None = None,
     ) -> PurposeIconAdminOut:
         if icon_hash is None and path_to_icon is not None:
-            icon_hash = await self.upload_file(path_to_icon)
+            icon_hash = await self.upload_file_by_path(path_to_icon)
 
         if preview_hash is None and path_to_preview is not None:
-            preview_hash = await self.upload_file(path_to_preview)
+            preview_hash = await self.upload_file_by_path(path_to_preview)
 
         resp = await self._put(
             url="/account/purpose-icon/" + purpose_icon_id,

@@ -1,7 +1,7 @@
 import faker
 
 from .base import PointBase
-from .common import PointRequestIn, PointUploadIn, PointOut, PointWithScale, Cost
+from .common import PointRequestIn, PointOut, PointWithScale, Cost
 from .earn import *
 from .map import *
 from .payments import *

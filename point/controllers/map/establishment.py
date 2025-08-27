@@ -5,7 +5,7 @@ from point.controllers.base import BaseController
 from point.errors import ErrorCode
 from point.models import Establishment
 from point.services import WalletService
-from point.view import EstablishmentDbCreateIn
+from point.view import EstablishmentCreateIn
 
 
 class EstablishmentController(BaseController[Establishment]):
@@ -17,11 +17,12 @@ class EstablishmentController(BaseController[Establishment]):
         return await cls.get("menu", id=establishment_id, enabled=True)
 
     @classmethod
-    async def admin_create(cls, establishment_create_in: EstablishmentDbCreateIn) -> Establishment:
+    async def admin_create(cls, establishment_create_in: EstablishmentCreateIn) -> Establishment:
         address, seed = await WalletService.create()
 
         establishment = await cls.model.create(
             **establishment_create_in.model_dump(mode="json"),
+            location=(establishment_create_in.longitude, establishment_create_in.latitude),
             service_wallet=address,
             service_wallet_seed=seed,
         )

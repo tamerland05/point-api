@@ -5,13 +5,15 @@ from uuid import UUID
 from pydantic import Field, AnyUrl
 
 from point.entity_types import PointHash, TonAddress
-from point.view import PointBase, PointUploadIn, EstablishmentOut
+from point.view import PointBase, EstablishmentOut
 
 
 class EstablishmentCreateIn(PointBase):
     establishment_type_id: UUID
 
-    position: PointUploadIn
+    latitude: Decimal = Field(ge=-90, le=90)
+    longitude: Decimal = Field(ge=-180, le=180)
+    address: str = Field(max_length=128)
 
     name: str = Field(max_length=128)
     description: str = Field(max_length=512)
@@ -19,11 +21,6 @@ class EstablishmentCreateIn(PointBase):
     icon_hash: PointHash
     photo_hash: PointHash
     gallery_hashes: list[PointHash] = Field(default_factory=list)
-
-
-class EstablishmentDbCreateIn(EstablishmentCreateIn):
-    address: str = Field(max_length=128)
-    location: tuple[Decimal, Decimal] = Field(default_factory=tuple)
 
 
 class EstablishmentUpdateIn(PointBase):
@@ -38,7 +35,7 @@ class EstablishmentUpdateIn(PointBase):
     channel_link: AnyUrl | None = Field(default=None, max_length=512)
     icon_hash: PointHash | None = Field(default=None)
     photo_hash: PointHash | None = Field(default=None)
-    gallery: list[PointHash] | None = Field(default=None)
+    gallery_hashes: list[PointHash] | None = Field(default=None)
 
     enabled: bool | None = Field(default=None)
 

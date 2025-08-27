@@ -17,12 +17,8 @@ class PointRequestIn(PointBase):
         ).sqrt()
 
 
-class PointUploadIn(PointRequestIn):
+class PointOut(PointRequestIn):
     address: str = Field(max_length=128)
-
-
-class PointOut(PointUploadIn):
-    pass
 
 
 class ViewPortSize(PointBase):
