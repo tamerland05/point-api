@@ -183,9 +183,25 @@ class AdminPointApiService(BaseApiService):
         resp = await self._get(url="/map/establishment/" + establishment_id)
         return EstablishmentAdminOut.model_validate(resp)
 
-    async def get_all_establishments(self) -> list[EstablishmentAdminOut]:
-        resp = await self._get(url="/map/establishments")
-        return EstablishmentAdminOut.list_validate(resp)
+    async def get_all_establishments(
+            self,
+            name_contains: str | None = None,
+            establishment_type_id: str | None = None,
+            page: int | None = None,
+            size: int | None = None,
+            sort: list[EstablishmentSortOrder] | None = None,
+    ) -> Page[EstablishmentAdminOut]:
+        resp = await self._post(
+            url="/map/establishments",
+            data=EstablishmentCriteria(
+                name_contains=name_contains,
+                establishment_type_id=establishment_type_id,
+                page=page,
+                size=size,
+                sort=sort,
+            )
+        )
+        return Page.model_validate(resp)
 
     async def create_establishment(
             self,

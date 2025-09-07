@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import Field, AnyUrl
 
-from point.entity_types import PointHash, TonAddress
+from point.entity_types import PointHash, TonAddress, EstablishmentOrderColumn, SortOrder
 from point.view import PointBase, EstablishmentOut
 
 
@@ -45,6 +45,24 @@ class EstablishmentAdminOut(EstablishmentOut):
     service_wallet_seed: str | None = Field(default=None)
     official_wallet: TonAddress | None = Field(default=None)
 
+    icon_hash: PointHash = Field(default=None)
+    photo_hash: PointHash = Field(default=None)
+
     enabled: bool
     created_at: datetime | None = Field(default=None)
     updated_at: datetime | None = Field(default=None)
+
+
+class EstablishmentSortOrder(PointBase):
+    field: EstablishmentOrderColumn
+    order: SortOrder
+
+
+class EstablishmentCriteria(PointBase):
+    name_contains: str | None = Field(default=None)
+    establishment_type_id: UUID | None = Field(default=None)
+
+    page: int = Field(default=1)
+    size: int = Field(default=100)
+
+    sort: list[EstablishmentSortOrder] | None = Field(default=None)

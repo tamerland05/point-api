@@ -1,9 +1,12 @@
+from math import ceil
 from uuid import UUID
 
 from fastapi import APIRouter
+from fastapi_pagination import Page
+from tortoise.expressions import RawSQL
 
 from point.controllers import EstablishmentController, EstablishmentTypeController
-from point.view import EstablishmentCreateIn, EstablishmentUpdateIn, EstablishmentAdminOut
+from point.view import EstablishmentCreateIn, EstablishmentUpdateIn, EstablishmentAdminOut, EstablishmentCriteria
 
 router = APIRouter()
 
@@ -16,10 +19,32 @@ async def get_establishment(
     return EstablishmentAdminOut.model_validate(establishment)
 
 
-@router.get("s")
-async def get_all_establishments() -> list[EstablishmentAdminOut]:
-    establishments = await EstablishmentController.filter("menu")
-    return EstablishmentAdminOut.list_validate(establishments)
+@router.post("s")
+async def get_all_establishments(
+        criteria: EstablishmentCriteria,
+) -> Page[EstablishmentAdminOut]:
+    find_query = EstablishmentController.filter("menu")
+    if criteria.name_contains is not None and criteria.name_contains != "":
+        find_query = (
+            find_query
+            .annotate(name_lower=RawSQL("LOWER(name)"))
+            .filter(name_lower__contains=criteria.name_contains.lower())
+        )
+    if criteria.establishment_type_id is not None:
+        find_query = find_query.filter(establishment_type_id=criteria.establishment_type_id)
+
+    total_rows = await find_query.count()
+
+    total_pages = ceil(total_rows / criteria.size)
+    offset = (criteria.page - 1) * criteria.size
+    if criteria.sort:
+        for s in criteria.sort:
+            find_query = find_query.order_by(s.order + s.field)
+
+    establishments = await find_query.offset(offset).limit(criteria.size)
+
+    return Page(total=total_rows, page=criteria.page, size=criteria.size, pages=total_pages,
+                items=EstablishmentAdminOut.list_validate(establishments))
 
 
 @router.post("")
