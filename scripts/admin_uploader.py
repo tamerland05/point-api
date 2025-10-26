@@ -148,10 +148,13 @@ class AdminPointApiService(BaseApiService):
     async def create_establishment_type(
             self,
             name: str,
-            path_to_icon: str,
+            path_to_icon: str = None,
+            icon_hash: PointHash | None = None,
             color_code: str | None = None,
     ) -> EstablishmentTypeAdminOut:
-        icon_hash = await self.upload_file_by_path(path_to_icon)
+        if icon_hash is None and path_to_icon is not None:
+            icon_hash = await self.upload_file_by_path(path_to_icon)
+
         resp = await self._post(
             url="/map/establishment-type",
             data=EstablishmentTypeCreateIn(name=name, icon_hash=icon_hash, color_code=color_code),

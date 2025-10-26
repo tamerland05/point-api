@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS "establishments" (
     "official_wallet" TEXT,
     "name" VARCHAR(128) NOT NULL,
     "description" VARCHAR(512) NOT NULL,
-    "channel_link" VARCHAR(512) NOT NULL,
+    "channel_link" VARCHAR(512),
     "icon_hash" TEXT NOT NULL,
     "photo_hash" TEXT NOT NULL,
     "gallery_hashes" JSONB NOT NULL,

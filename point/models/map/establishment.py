@@ -27,7 +27,7 @@ class Establishment(Model):
 
     name = fields.CharField(max_length=128)
     description = fields.CharField(max_length=512)
-    channel_link = fields.CharField(max_length=512)
+    channel_link = fields.CharField(null=True, max_length=512)
     icon_hash = fields.TextField()
     photo_hash = fields.TextField()
     gallery_hashes = fields.JSONField(default=[])

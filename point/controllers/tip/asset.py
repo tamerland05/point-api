@@ -58,10 +58,11 @@ class AssetController(BaseController[Asset]):
     @classmethod
     async def _get_assets_prices(cls, assets: list[str]) -> dict[str, Decimal]:
         price_key = "dex_price_usd"
-        url = cls.assets_url + f"assets/query?" + "".join(f"unconditional_asset={a}&" for a in assets)
+        url = cls.assets_url + f"assets/query"
+        data = {"unconditional_assets": [str(a) for a in assets]}
 
         async with aiohttp.ClientSession(base_url=cls.assets_url) as session:
-            async with session.post(url=url) as response:
+            async with session.post(url=url, json=data) as response:
                 data = await response.json()
                 asset_list = data.get("asset_list", [])
         return {asset["contract_address"]: asset[price_key] for asset in asset_list if price_key in asset}
