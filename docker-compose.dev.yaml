@@ -27,7 +27,7 @@ services:
   api:
     image: ${IMAGE_REF}
     ports:
-      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:8080:8000"
     depends_on:
       migration:
         condition: service_completed_successfully
