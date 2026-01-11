@@ -14,5 +14,3 @@ WORKDIR /app/point-core
 ENV UV_PROJECT_ENVIRONMENT=/usr/local
 
 RUN uv sync --frozen
-
-WORKDIR /app/point-core/src
