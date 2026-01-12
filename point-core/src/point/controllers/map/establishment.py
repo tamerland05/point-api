@@ -96,5 +96,6 @@ GET_ESTABLISHMENTS_RECTANGLE_SQL = f"""
                (%d / (e.rating_count + %d)) * a.c AS z
             FROM filtered e, avg_rating a
         )
-    SELECT * FROM ranked ORDER BY z DESC
+    SELECT * FROM ranked 
+    ORDER BY z DESC, id 
 """

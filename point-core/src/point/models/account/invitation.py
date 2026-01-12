@@ -10,11 +10,11 @@ class Invitation(Model):
         table = "invitations"
         unique_together = ("user_id", "establishment_id")
 
-    user_id = fields.BigIntField(index=True)
+    user_id = fields.BigIntField(db_index=True)
 
     establishment_id: UUID
     establishment = fields.ForeignKeyField("models.Establishment", on_delete=OnDelete.CASCADE)
     profession = fields.CharField(max_length=32)
 
-    created_at = fields.DatetimeField(auto_now=True, pk=True)
+    created_at = fields.DatetimeField(auto_now=True, primary_key=True)
     updated_at = fields.DatetimeField(auto_now_add=True)

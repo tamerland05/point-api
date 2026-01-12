@@ -17,4 +17,4 @@ class Referral(Model):
         related_name="referrals_received",
     )
 
-    created_at = fields.DatetimeField(auto_now_add=True, pk=True)
+    created_at = fields.DatetimeField(auto_now_add=True, primary_key=True)

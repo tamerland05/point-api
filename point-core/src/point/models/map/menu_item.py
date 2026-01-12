@@ -18,7 +18,7 @@ class MenuItem(Model):
         related_name="menu",
     )
 
-    id = fields.UUIDField(pk=True, default=uuid4)
+    id = fields.UUIDField(primary_key=True, default=uuid4)
 
     category = fields.CharField(max_length=32)
     title = fields.CharField(max_length=128)
@@ -28,7 +28,7 @@ class MenuItem(Model):
     amount = fields.DecimalField(decimal_places=18, max_digits=64)
     currency = fields.CharField(max_length=8)
 
-    enabled = fields.BooleanField(default=True, index=True)
+    enabled = fields.BooleanField(default=True, db_index=True)
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
 

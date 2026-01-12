@@ -20,7 +20,10 @@ async def get_establishments(location: PointWithScale) -> list[EstablishmentPrev
     rectangle = CoordinatesService.latlon_bounds_mercator(location)
     establishments = await EstablishmentController.get_establishments_by_rectangle(rectangle, limit)
 
-    accepted_indices = CoordinatesService.filter_points_by_shape(points=tuple(e.location for e in establishments))
+    accepted_indices = CoordinatesService.filter_points_by_shape(
+        points=tuple(e.location for e in establishments),
+        scale=location.scale
+    )
     accepted_establishments = [establishments[i] for i in accepted_indices]
 
     return EstablishmentPreview.list_validate(accepted_establishments)

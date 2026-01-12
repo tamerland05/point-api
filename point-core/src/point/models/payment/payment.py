@@ -7,7 +7,7 @@ class Payment(Model):
         table = "payments"
         indexes = [("done", "tag")]
 
-    id = fields.UUIDField(pk=True)
+    id = fields.UUIDField(primary_key=True)
     tag = fields.CharField(max_length=32)
     done = fields.BooleanField(default=False)
 

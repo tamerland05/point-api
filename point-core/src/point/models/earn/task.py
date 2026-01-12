@@ -8,7 +8,7 @@ class Task(Model):
     class Meta:
         table = "tasks"
 
-    id = fields.UUIDField(pk=True)
+    id = fields.UUIDField(primary_key=True)
     title = fields.CharField(max_length=128)
     description = fields.CharField(max_length=512)
     profit = fields.BigIntField(ge=0)
@@ -17,7 +17,7 @@ class Task(Model):
     link = fields.CharField(max_length=1024)
     integration_type = fields.CharEnumField(enum_type=TaskIntegrationType)
 
-    enabled = fields.BooleanField(default=True, index=True)
+    enabled = fields.BooleanField(default=True, db_index=True)
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
 

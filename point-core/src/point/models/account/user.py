@@ -12,7 +12,7 @@ class User(Model):
         table = "users"
         indexes = [("bonus_balance", "id")]
 
-    id = fields.BigIntField(pk=True)
+    id = fields.BigIntField(primary_key=True)
     first_name = fields.TextField(null=True)
     last_name = fields.TextField(null=True)
     username = fields.TextField(null=True)
@@ -34,7 +34,7 @@ class User(Model):
         related_name="user",
     )
 
-    enabled = fields.BooleanField(default=True, index=True)
+    enabled = fields.BooleanField(default=True, db_index=True)
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
 

@@ -10,12 +10,12 @@ class PurposeIcon(Model):
     class Meta:
         table = "purpose_icons"
 
-    id = fields.UUIDField(pk=True, default=uuid4)
+    id = fields.UUIDField(primary_key=True, default=uuid4)
 
     preview_hash = fields.TextField()
     icon_hash = fields.TextField()
 
-    enabled = fields.BooleanField(default=True, index=True)
+    enabled = fields.BooleanField(default=True, db_index=True)
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
 

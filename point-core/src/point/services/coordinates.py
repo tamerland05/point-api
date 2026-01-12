@@ -62,15 +62,18 @@ class CoordinatesService:
         return lon_min, lat_min, lon_max, lat_max
 
     @classmethod
-    def filter_points_by_shape(cls, points: tuple) -> list[int]:
+    def filter_points_by_shape(cls, points: tuple, scale: float) -> list[int]:
         shape_offsets = cls.get_shape_offsets()
+        
+        resolution = cls.__INITIAL_RESOLUTION / (2 ** scale)
+
         occupied = set()
         accepted_indices = []
 
         for i in range(len(points)):
             lon, lat = points[i]
-            px = cls.__lon_to_m(float(lon))
-            py = cls.__lat_to_m(float(lat))
+            px = cls.__lon_to_m(float(lon)) // resolution
+            py = cls.__lat_to_m(float(lat)) // resolution
 
             blocked = False
             for dx, dy in shape_offsets:

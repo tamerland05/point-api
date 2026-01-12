@@ -16,7 +16,7 @@ class Employee(Model):
     user: list[User]
     job_place = fields.ForeignKeyField("models.Establishment", on_delete=OnDelete.RESTRICT)
 
-    id = fields.UUIDField(pk=True, default=uuid4)
+    id = fields.UUIDField(primary_key=True, default=uuid4)
     profession = fields.CharField(max_length=32)
     first_name = fields.CharField(max_length=32)
     last_name = fields.CharField(max_length=32)
@@ -24,7 +24,7 @@ class Employee(Model):
     purpose = fields.JSONField(null=True)
     meta = fields.JSONField()
 
-    enabled = fields.BooleanField(default=True, index=True)
+    enabled = fields.BooleanField(default=True, db_index=True)
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
 

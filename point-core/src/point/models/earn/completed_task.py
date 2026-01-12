@@ -12,4 +12,4 @@ class CompletedTask(Model):
     task = fields.ForeignKeyField("models.Task", on_delete=fields.CASCADE)
     executor = fields.ForeignKeyField("models.User", on_delete=fields.CASCADE)
 
-    created_at = fields.DatetimeField(auto_now_add=True, pk=True)
+    created_at = fields.DatetimeField(auto_now_add=True, primary_key=True)
