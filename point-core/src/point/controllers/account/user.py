@@ -14,7 +14,7 @@ class UserController(BaseController[User]):
     model = User
 
     @classmethod
-    async def get_or_create_user(cls, user_in: AuthUserIn) -> (model, bool):
+    async def get_or_create_user(cls, user_in: AuthUserIn) -> tuple[model, bool]:
         user = await cls.get_or_none(id=user_in.id, enabled=True)
         created = False
 

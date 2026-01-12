@@ -33,7 +33,7 @@ class EstablishmentController(BaseController[Establishment]):
     @classmethod
     async def get_establishments_by_rectangle(
             cls,
-            rectangle: tuple,
+            rectangle: tuple[float, ...],
             limit: int | None = None,
             M: int = 100,
     ) -> list[model]:

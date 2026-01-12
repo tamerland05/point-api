@@ -13,7 +13,7 @@ class WalletService:
     seed = settings.seed.encode("utf-8")
 
     @classmethod
-    async def create(cls) -> (str, str):
+    async def create(cls) -> tuple[str, str]:
         mnemonic = mnemonic_new(24)
         seed = mnemonic_to_seed(mnemonic, cls.seed)[:32]
         public_key, private_key = crypto_sign_seed_keypair(seed)

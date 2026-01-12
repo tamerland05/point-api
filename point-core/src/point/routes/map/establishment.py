@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, BackgroundTasks
 
 from point.auth import get_user
 from point.controllers import EstablishmentController, EstablishmentRatingController, UserVisitController
-from point.services import CoordinatesService
+from point.services import CoordinatesService, PointCollisionResolverService
 from point.view import PointWithScale, EstablishmentPreview, NearEstablishmentCriteria, EstablishmentOut, AuthUser
 
 router = APIRouter()
@@ -18,15 +18,14 @@ async def get_establishments(location: PointWithScale) -> list[EstablishmentPrev
         return []
 
     rectangle = CoordinatesService.latlon_bounds_mercator(location)
-    establishments = await EstablishmentController.get_establishments_by_rectangle(rectangle, limit)
+    establishments = await EstablishmentController.get_establishments_by_rectangle(rectangle)  # TODO: apply limit
 
-    accepted_indices = CoordinatesService.filter_points_by_shape(
+    accepted_indices = PointCollisionResolverService.filter_points(
         points=tuple(e.location for e in establishments),
-        scale=location.scale
+        scale=location.scale,
     )
-    accepted_establishments = [establishments[i] for i in accepted_indices]
 
-    return EstablishmentPreview.list_validate(accepted_establishments)
+    return EstablishmentPreview.list_validate([establishments[i] for i in accepted_indices])
 
 
 @router.post("s/near")
