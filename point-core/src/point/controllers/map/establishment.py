@@ -79,21 +79,21 @@ GET_ESTABLISHMENTS_RECTANGLE_SQL = f"""
     WITH
         filtered AS (
             SELECT {ESTABLISHMENT_PREVIEW_FIELDS} FROM establishments
-            WHERE enabled = TRUE AND ST_Within(location::geometry, ST_MakeEnvelope(%f, %f, %f, %f, 4326))
+            WHERE enabled AND ST_Within(location::geometry, ST_MakeEnvelope(%f, %f, %f, %f, 4326))
         ),
         avg_rating AS (
-            SELECT 
-                (CASE WHEN SUM(rating_count) > 0 THEN SUM(rating_sum)::DECIMAL / SUM(rating_count) ELSE 0 END)
+            SELECT
+                (CASE WHEN SUM(rating_count) > 0 THEN SUM(rating_sum)::NUMERIC / SUM(rating_count) ELSE 0::NUMERIC END)
                     AS c
             FROM filtered
         ),
         ranked AS (
             SELECT
                e.*,
-               (e.rating_count / (e.rating_count + %d)) *
-               (CASE WHEN e.rating_count > 0 THEN e.rating_sum::DECIMAL / e.rating_count ELSE 0 END)
+               (e.rating_count::NUMERIC / (e.rating_count + %d)) *
+               (CASE WHEN e.rating_count > 0 THEN e.rating_sum::NUMERIC / e.rating_count ELSE 0::NUMERIC END)
                    +
-               (%d / (e.rating_count + %d)) * a.c AS z
+               (%d::NUMERIC / (e.rating_count + %d)) * a.c AS z
             FROM filtered e, avg_rating a
         )
     SELECT * FROM ranked 

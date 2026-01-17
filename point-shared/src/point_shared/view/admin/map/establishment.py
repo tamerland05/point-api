@@ -47,6 +47,7 @@ class EstablishmentAdminOut(EstablishmentOut):
 
     icon_hash: PointHash = Field(default=None)
     photo_hash: PointHash = Field(default=None)
+    gallery_hashes: list[PointHash] = Field(default_factory=list)
 
     enabled: bool
     created_at: datetime | None = Field(default=None)
