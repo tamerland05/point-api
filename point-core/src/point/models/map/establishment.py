@@ -17,6 +17,7 @@ class Establishment(Model):
     establishment_type = fields.ForeignKeyField("models.EstablishmentType", on_delete=OnDelete.RESTRICT)
 
     id = fields.UUIDField(primary_key=True, default=uuid4)
+    external_id = fields.BigIntField(unique=True, null=True)
 
     location = GeographyPointField()
     address = fields.CharField(max_length=128)

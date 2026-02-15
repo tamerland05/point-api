@@ -10,6 +10,7 @@ from point_shared.view import PointBase, EstablishmentOut
 
 class EstablishmentCreateIn(PointBase):
     establishment_type_id: UUID
+    external_id: int | None = Field(le=2 ** 64 - 1, default=None)
 
     latitude: Decimal = Field(ge=-90, le=90)
     longitude: Decimal = Field(ge=-180, le=180)
@@ -25,6 +26,7 @@ class EstablishmentCreateIn(PointBase):
 
 class EstablishmentUpdateIn(PointBase):
     establishment_type_id: UUID | None = Field(default=None)
+    external_id: int | None = Field(le=2 ** 64 - 1, default=None)
 
     latitude: Decimal | None = Field(default=None, ge=-90, le=90)
     longitude: Decimal | None = Field(default=None, ge=-180, le=180)
@@ -41,6 +43,8 @@ class EstablishmentUpdateIn(PointBase):
 
 
 class EstablishmentAdminOut(EstablishmentOut):
+    external_id: int | None = Field(default=None)
+
     service_wallet: TonAddress | None = Field(default=None)
     service_wallet_seed: str | None = Field(default=None)
     official_wallet: TonAddress | None = Field(default=None)

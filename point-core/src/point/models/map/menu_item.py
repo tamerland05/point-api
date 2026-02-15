@@ -22,7 +22,7 @@ class MenuItem(Model):
 
     category = fields.CharField(max_length=32)
     title = fields.CharField(max_length=128)
-    description = fields.CharField(max_length=128)
+    description = fields.CharField(max_length=512)
     photo_hash = fields.TextField(null=True)
 
     amount = fields.DecimalField(decimal_places=18, max_digits=64)
@@ -38,7 +38,11 @@ class MenuItem(Model):
 
     @property
     def cost(self) -> dict:
+        formatted_amount = str(self.amount)
+        if "." in formatted_amount:
+            formatted_amount = formatted_amount.rstrip('0').rstrip('.')
+
         return {
-            "amount": self.amount.normalize().to_eng_string(),
+            "amount": formatted_amount,
             "currency": self.currency
         }
