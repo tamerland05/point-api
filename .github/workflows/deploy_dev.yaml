@@ -122,7 +122,7 @@ jobs:
           LOGO_HASH=${{ vars.LOGO_HASH }}
           SET_RATING_AMOUNT=${{ vars.SET_RATING_AMOUNT }}
 
-          POINT_APP_NMA=${{ vars.POINT_APP_URL }}
+          POINT_APP_URL=${{ vars.POINT_APP_URL }}
           POINT_BOT_NAME=${{ vars.POINT_BOT_NAME }}
           POINT_CHANNEL_NAME=${{ vars.POINT_CHANNEL_URL }}
           BOT_TOKEN=${{ secrets.BOT_TOKEN }}
