@@ -1,10 +1,11 @@
 from fastapi import Request, APIRouter
 from aiogram.types import Update
 
+from point.config import settings
 from point.controllers import PaymentController
 from point.services import bs
 
-router = APIRouter()
+router = APIRouter(prefix="/" + settings.bot_token, include_in_schema=False)
 
 
 @router.post("")

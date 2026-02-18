@@ -3,41 +3,51 @@ import hmac
 import logging
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
-from aiogram.types import WebAppInfo, InlineKeyboardMarkup, Message, Update, PreCheckoutQuery
+from aiogram.types import (
+    WebAppInfo,
+    InlineKeyboardMarkup,
+    Message,
+    Update,
+    PreCheckoutQuery,
+    InlineQueryResultPhoto,
+    InlineQueryResultArticle,
+    InputTextMessageContent,
+    InlineKeyboardButton,
+)
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiolimiter import AsyncLimiter
 
 from point.config import settings, AppEnv
 from point.i18 import translate
-from point.view import InvoiceRequest
+from point.view import InvoiceRequest, Button
 
 dp = Dispatcher()
 
 
 class BotService:
     def __init__(self):
-        self.bot = Bot(token=settings.bot_token)
+        self.bot = Bot(
+            token=settings.bot_token,
+            default=DefaultBotProperties(parse_mode=ParseMode.HTML),
+        )
         self._global_limiter = AsyncLimiter(max_rate=30, time_period=1)
         self._secret_key = hmac.new(b'WebAppData', settings.bot_token.encode('utf-8'), hashlib.sha256).digest()
 
         self.point_app_url = str(settings.point_app_url)
-        self.point_channel_url = str(settings.point_channel_url)
+        self.point_channel_url = "t.me/" + settings.point_channel_name
 
     async def create_invoice_link(self, request: InvoiceRequest) -> str:
         return await self.bot.create_invoice_link(**request.model_dump(mode="json"))
 
-    async def send_message(self, text: str, user_id: int, reply_markup: InlineKeyboardMarkup) -> None:
+    async def request(self, func, **kwargs):
         async with self._global_limiter:
             try:
-                await self.bot.send_message(
-                    chat_id=user_id,
-                    text=text,
-                    parse_mode="HTML",
-                    reply_markup=reply_markup,
-                )
+                return await func(**kwargs)
             except Exception as e:
-                logging.exception(f"Error while send message {text} to {user_id}: {e}")
+                logging.exception(f"Error while send request with kwargs {kwargs}: {e}")
 
     async def send_message_with_intro(self, text: str, user_id: int, lang: str) -> None:
         builder = InlineKeyboardBuilder()
@@ -51,11 +61,51 @@ class BotService:
         )
         builder.adjust(1, repeat=True)
 
-        await self.send_message(
+        await self.request(
+            func=self.bot.send_message,
+            chat_id=user_id,
             text=text,
-            user_id=user_id,
             reply_markup=builder.as_markup(),
         )
+
+    async def prepare_inline_message(self, user_id: int, text: str, photo: str | None, buttons: list[Button]) -> str:
+        if buttons:
+            reply_markup = InlineKeyboardMarkup(
+                inline_keyboard=[
+                    [InlineKeyboardButton(text=b.text, url=str(b.url))]
+                    for b in buttons
+                ]
+            )
+        else:
+            reply_markup = None
+
+        if photo:
+            prepared_message = InlineQueryResultPhoto(
+                id=self.make_result_id(text + photo),
+                photo_url=photo,
+                thumbnail_url=photo,
+                caption=text,
+                reply_markup=reply_markup,
+            )
+        else:
+            prepared_message = InlineQueryResultArticle(
+                id=self.make_result_id(text),
+                title="Share",
+                input_message_content=InputTextMessageContent(message_text=text),
+                reply_markup=reply_markup,
+            )
+
+        message = await self.request(
+            func=self.bot.save_prepared_inline_message,
+            user_id=user_id,
+            result=prepared_message,
+            allow_user_chats=True,
+            allow_bot_chats=True,
+            allow_group_chats=True,
+            allow_channel_chats=True,
+        )
+
+        return message.id
 
     async def feed_update(self, update: Update) -> None:
         await dp.feed_update(self.bot, update)
@@ -74,6 +124,10 @@ class BotService:
 
         calculated_hash = hmac.new(self._secret_key, data, hashlib.sha256).hexdigest()
         return hmac.compare_digest(calculated_hash, data_hash)
+
+    @staticmethod
+    def make_result_id(text: str) -> str:
+        return hashlib.sha256(text.encode()).hexdigest()
 
 
 bs = BotService()

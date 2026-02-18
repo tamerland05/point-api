@@ -47,7 +47,8 @@ class Settings(BaseSettings, extra="allow"):
     set_rating_amount: int
 
     point_app_url: AnyUrl
-    point_channel_url: AnyUrl
+    point_bot_name: str
+    point_channel_name: str
     bot_token: str
     jwt_algorithm: str
     public_key: str

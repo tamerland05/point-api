@@ -90,46 +90,50 @@ jobs:
 
       - name: Creating .env for docker-compose.dev.yaml
         run: |
-          echo "AWS_SERVICE_NAME=${{ vars.AWS_SERVICE_NAME }}" >> .env
-          echo "AWS_ENDPOINT_URL=${{ vars.AWS_ENDPOINT_URL }}" >> .env
-          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
-          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
-          echo "AWS_BUCKET_NAME=${{ vars.AWS_BUCKET_NAME }}" >> .env
+          cat > .env << EOF
+          AWS_SERVICE_NAME=${{ vars.AWS_SERVICE_NAME }}
+          AWS_ENDPOINT_URL=${{ vars.AWS_ENDPOINT_URL }}
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_BUCKET_NAME=${{ vars.AWS_BUCKET_NAME }}
           
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
-          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
-          echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> .env
-          echo "POSTGRES_HOST=${{ secrets. POSTGRES_HOST}}" >> .env
-          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
+          POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}
+          POSTGRES_HOST=${{ secrets. POSTGRES_HOST}}
+          POSTGRES_DB=${{ secrets.POSTGRES_DB }}
           
-          echo "ASSETS_URL=${{ secrets.ASSETS_URL }}" >> .env
-          echo "TON_INDEXER_URL=${{ secrets.TON_INDEXER_URL }}" >> .env
-          echo "TON_INDEXER_API_KEY=${{ secrets.TON_INDEXER_API_KEY }}" >> .env
-          echo "TON_INDEXER_RPS=${{ secrets.TON_INDEXER_RPS }}" >> .env
+          ASSETS_URL=${{ secrets.ASSETS_URL }}
+          TON_INDEXER_URL=${{ secrets.TON_INDEXER_URL }}
+          TON_INDEXER_API_KEY=${{ secrets.TON_INDEXER_API_KEY }}
+          TON_INDEXER_RPS=${{ secrets.TON_INDEXER_RPS }}
 
-          echo "WALLET_ID=${{ secrets.WALLET_ID }}" >> .env
-          echo "SEED=${{ secrets.SEED }}" >> .env
-          echo "ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}" >> .env
+          WALLET_ID=${{ secrets.WALLET_ID }}
+          SEED=${{ secrets.SEED }}
+          ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}
           
-          echo "FIX_FEE=${{ secrets.FIX_FEE }}" >> .env
-          echo "JETTON_TRANSFER_AMOUNT=${{ secrets.JETTON_TRANSFER_AMOUNT }}" >> .env
-          echo "POINT_WALLET=${{ secrets.POINT_WALLET }}" >> .env
+          FIX_FEE=${{ secrets.FIX_FEE }}
+          JETTON_TRANSFER_AMOUNT=${{ secrets.JETTON_TRANSFER_AMOUNT }}
+          POINT_WALLET=${{ secrets.POINT_WALLET }}
 
-          echo "BONUS_REWARD_FOR_PREMIUM=${{ vars.BONUS_REWARD_FOR_PREMIUM }}" >> .env
-          echo "BONUS_REWARD_FOR_SIMPLE=${{ vars.BONUS_REWARD_FOR_SIMPLE }}" >> .env
+          BONUS_REWARD_FOR_PREMIUM=${{ vars.BONUS_REWARD_FOR_PREMIUM }}
+          BONUS_REWARD_FOR_SIMPLE=${{ vars.BONUS_REWARD_FOR_SIMPLE }}
           
-          echo "LOGO_HASH=${{ vars.LOGO_HASH }}" >> .env
-          echo "SET_RATING_AMOUNT=${{ vars.SET_RATING_AMOUNT }}" >> .env
+          LOGO_HASH=${{ vars.LOGO_HASH }}
+          SET_RATING_AMOUNT=${{ vars.SET_RATING_AMOUNT }}
 
-          echo "POINT_APP_URL=${{ vars.POINT_APP_URL }}" >> .env
-          echo "POINT_CHANNEL_URL=${{ vars.POINT_CHANNEL_URL }}" >> .env
-          echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" >> .env
-          echo "JWT_ALGORITHM=${{ secrets.JWT_ALGORITHM }}" >> .env
-          echo "PUBLIC_KEY=${{ secrets.PUBLIC_KEY }}" >> .env
+          POINT_APP_NMA=${{ vars.POINT_APP_URL }}
+          POINT_BOT_NAME=${{ vars.POINT_BOT_NAME }}
+          POINT_CHANNEL_NAME=${{ vars.POINT_CHANNEL_URL }}
+          BOT_TOKEN=${{ secrets.BOT_TOKEN }}
+          JWT_ALGORITHM=${{ secrets.JWT_ALGORITHM }}
+          PUBLIC_KEY=${{ secrets.PUBLIC_KEY }}
           
-          echo "ADMIN_AUTH_KEY=${{ secrets.ADMIN_AUTH_KEY }}" >> .env
+          ADMIN_AUTH_KEY=${{ secrets.ADMIN_AUTH_KEY }}
           
-          echo "APP_ENV=dev" >> .env
+          APP_ENV=dev
+
+          EOF
 
       - name: Docker compose
         env:

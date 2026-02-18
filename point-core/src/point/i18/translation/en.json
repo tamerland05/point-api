@@ -1,24 +1,37 @@
 {
-    "payment": {
-        "stars": {
-            "establishment_rating": {
-                "description": "Good ratings in the Point app make your favorite venues more popular",
-                "title": "Rating"
-            }
-        }
-    },
-    "tip": {
-        "on_success": {
-            "employee": "You have received a tip of <b>{amount} {symbol}</b> from the user <b>{sender_name}</b>"
-        }
-    },
-    "common": {
-        "keyboards": {
-            "app": "Go to Point",
-            "channel": "Join channel"
-        },
-        "replies": {
-            "start": "<b>Welcome to Point!</b>\n\nWe are the premier Telegram application for food & beverage businesses and their customers!\n\n<b>Discover the best venues for yourself and your loved ones!</b>"
-        }
+  "payment": {
+    "stars": {
+      "establishment_rating": {
+        "description": "Good ratings in the Point app make your favorite venues more popular",
+        "title": "Rating"
+      }
     }
+  },
+  "tip": {
+    "on_success": {
+      "employee": "You have received a tip of <b>{amount} {symbol}</b> from the user <b>{sender_name}</b>"
+    }
+  },
+  "share": {
+    "menu_item": {
+      "replies": {
+        "oops": "Oops! Just fell head over heels for {item} at {establishment}. You’ve gotta see this!",
+        "dont_control": "Can’t stop myself… I need {item} from {establishment} right now.\nAnyone wanna join?",
+        "bet_on": "I bet you’ll love {item} from {establishment}.\nWanna take that bet?",
+        "love_or": "Is this love, or just a snack attack? Either way, I’m diving into {item} from {establishment} right now"
+      },
+      "keyboards": {
+        "show": "Show"
+      }
+    }
+  },
+  "common": {
+    "keyboards": {
+      "app": "Go to Point",
+      "channel": "Join channel"
+    },
+    "replies": {
+      "start": "<b>Welcome to Point!</b>\n\nWe are the premier Telegram application for food & beverage businesses and their customers!\n\n<b>Discover the best venues for yourself and your loved ones!</b>"
+    }
+  }
 }

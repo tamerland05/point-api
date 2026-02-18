@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS "establishment_types" (
 CREATE INDEX IF NOT EXISTS "idx_establishme_enabled_e074dc" ON "establishment_types" ("enabled");
 CREATE TABLE IF NOT EXISTS "establishments" (
     "id" UUID NOT NULL PRIMARY KEY,
+    "external_id" BIGINT UNIQUE,
     "location" geography(Point, 4326) NOT NULL,
     "address" VARCHAR(128) NOT NULL,
     "service_wallet" TEXT,
@@ -49,7 +50,7 @@ CREATE TABLE IF NOT EXISTS "establishments" (
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "establishment_type_id" UUID NOT NULL REFERENCES "establishment_types" ("id") ON DELETE RESTRICT
 );
-CREATE INDEX IF NOT EXISTS establishments_location_idx ON establishments USING GIST(location);
+
 CREATE INDEX IF NOT EXISTS "idx_establishme_enabled_90ab06" ON "establishments" ("enabled");
 CREATE INDEX IF NOT EXISTS idx_user_name_trgm ON establishments USING gin (LOWER(name) gin_trgm_ops);
 CREATE TABLE IF NOT EXISTS "employees" (
@@ -79,7 +80,7 @@ CREATE TABLE IF NOT EXISTS "menu_items" (
     "id" UUID NOT NULL PRIMARY KEY,
     "category" VARCHAR(32) NOT NULL,
     "title" VARCHAR(128) NOT NULL,
-    "description" VARCHAR(128) NOT NULL,
+    "description" VARCHAR(512) NOT NULL,
     "photo_hash" TEXT,
     "amount" DECIMAL(64,18) NOT NULL,
     "currency" VARCHAR(8) NOT NULL,
