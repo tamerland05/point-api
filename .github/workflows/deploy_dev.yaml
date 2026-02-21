@@ -118,6 +118,7 @@ jobs:
 
           BONUS_REWARD_FOR_PREMIUM=${{ vars.BONUS_REWARD_FOR_PREMIUM }}
           BONUS_REWARD_FOR_SIMPLE=${{ vars.BONUS_REWARD_FOR_SIMPLE }}
+          BONUS_REWARD_FOR_RATING=${{ vars.BONUS_REWARD_FOR_RATING }}
           
           LOGO_HASH=${{ vars.LOGO_HASH }}
           SET_RATING_AMOUNT=${{ vars.SET_RATING_AMOUNT }}

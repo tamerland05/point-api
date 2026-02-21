@@ -49,7 +49,7 @@ async def get_establishment(
         background_tasks: BackgroundTasks,
         user: AuthUser = Depends(get_user),
 ) -> EstablishmentOut:
-    establishment = await EstablishmentController.get("menu", id=establishment_id)
+    establishment = await EstablishmentController.get_establishment(establishment_id)
     establishment.user_rating = await EstablishmentRatingController.get_user_rating(
         establishment_id=establishment_id,
         user_id=user.id

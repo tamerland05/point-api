@@ -6,5 +6,5 @@ from point_shared.view import PointBase
 
 class ReferralOut(PointBase):
     name: str = Field(max_length=32)
-    bonus_balance: int = 0
+    referrals_bonus_balance: int = 0
     photo_url: Image

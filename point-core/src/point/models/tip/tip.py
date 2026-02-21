@@ -23,7 +23,7 @@ class Tip(Model):
     fee_transaction = fields.JSONField()
     tip_transaction = fields.JSONField()
     expired_at = fields.DatetimeField()
-    status = fields.CharEnumField(TipStatus, default=TipStatus.created, db_index=True)
+    status = fields.CharEnumField(TipStatus, default=TipStatus.created, db_index=True)  # TODO: make more faster schema
 
     amount = fields.BigIntField()
     tips_left_amount = fields.DecimalField(max_digits=64, decimal_places=32)

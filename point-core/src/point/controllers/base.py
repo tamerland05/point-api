@@ -27,10 +27,6 @@ class BaseController(Generic[Model]):
         return res
 
     @classmethod
-    def get_all(cls, *prefetch, **filters) -> QuerySet[Model]:
-        return cls.model.filter(**filters).prefetch_related(*prefetch)
-
-    @classmethod
     def filter(cls, *prefetch, **filters) -> QuerySet[Model]:
         return cls.model.filter(**filters).prefetch_related(*prefetch)
 

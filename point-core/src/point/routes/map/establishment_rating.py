@@ -28,8 +28,9 @@ async def set_establishment_rating(
         **establishment_rating_in.model_dump(mode="json"),
     )
     payment = await PaymentController.model.create(
-        meta=establishment_in.model_dump(mode="json"),
+        user_id=user.id,
         tag=PaymentTagType.stars_establishment_rating,
+        meta=establishment_in.model_dump(mode="json"),
     )
 
     domain = "payment." + PaymentTagType.stars_establishment_rating

@@ -10,7 +10,7 @@ class User(Model):
 
     class Meta:
         table = "users"
-        indexes = [("bonus_balance", "id")]
+        indexes = [("other_bonus_balance", "id")]
 
     id = fields.BigIntField(primary_key=True)
     first_name = fields.TextField(null=True)
@@ -20,10 +20,12 @@ class User(Model):
     photo_url = fields.TextField(null=True)
 
     wallet = TonAddressField(null=True)
-    bonus_balance = fields.BigIntField(default=0)
+    meta = fields.JSONField(default={})
+
+    other_bonus_balance = fields.BigIntField(default=0)
+    referrals_bonus_balance = fields.BigIntField(default=0)
     tips_left = fields.DecimalField(default=0, max_digits=64, decimal_places=32)
     rank = fields.BigIntField(default=0)
-    meta = fields.JSONField(default={})
 
     employee_id: UUID | None
     employee = fields.ForeignKeyField(
@@ -41,3 +43,7 @@ class User(Model):
     @property
     def name(self) -> str:
         return (self.first_name or "") + " " + (self.last_name or "")
+
+    @property
+    def bonus_balance(self) -> int:
+        return self.other_bonus_balance + self.referrals_bonus_balance

@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import sys
 from contextlib import asynccontextmanager
 from decimal import getcontext
 
@@ -15,11 +16,17 @@ from point.controllers.pooling import start_pooling, stop_pooling
 from point.errors import APIException
 from point.routes import router
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s,%(msecs)03d %(levelname)s [%(filename)s:%(lineno)d] %(message)s",
-    datefmt="%Y-%m-%d:%H:%M:%S",
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.INFO)
+formatter = logging.Formatter(
+    "%(asctime)s,%(msecs)03d %(levelname)s [%(filename)s:%(lineno)d] %(message)s",
+    "%Y-%m-%d:%H:%M:%S",
 )
+handler.setFormatter(formatter)
+logger.handlers = [handler]
 
 APP_BASE = "/api/v1/point"
 

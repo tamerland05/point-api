@@ -1,9 +1,12 @@
 from decimal import Decimal
 from uuid import UUID
 
+from tortoise.expressions import RawSQL
+from tortoise.query_utils import Prefetch
+
 from point.controllers.base import BaseController
 from point.errors import ErrorCode
-from point.models import Establishment
+from point.models import Establishment, MenuItem
 from point.services import WalletService
 from point.view import EstablishmentCreateIn
 
@@ -14,7 +17,14 @@ class EstablishmentController(BaseController[Establishment]):
 
     @classmethod
     async def get_establishment(cls, establishment_id: UUID) -> model:
-        return await cls.get("menu", id=establishment_id, enabled=True)
+        return await cls.get(
+            Prefetch(
+                "menu",
+                queryset=MenuItem.filter(enabled=True)
+            ),
+            id=establishment_id,
+            enabled=True,
+        )
 
     @classmethod
     async def admin_create(cls, establishment_create_in: EstablishmentCreateIn) -> Establishment:
@@ -52,23 +62,19 @@ class EstablishmentController(BaseController[Establishment]):
             limit: int | None = None,
             name_contains: str | None = None,
     ) -> list[model]:
-        where_clause = "WHERE enabled = TRUE"
+        query = Establishment.filter(enabled=True)
 
-        if name_contains is not None or name_contains == "":
-            where_clause += f" AND LOWER(name) LIKE '%{name_contains.lower()}%'"
+        if name_contains:
+            query = query.filter(name__icontains=name_contains)
 
-        query = f"""
-            SELECT {ESTABLISHMENT_PREVIEW_FIELDS}, ST_Distance(location, ST_MakePoint({lon}, {lat})::geography) AS dist
-            FROM establishments
-            {where_clause}
-            ORDER BY dist
-        """
+        query = query.annotate(
+            distance=RawSQL("location <-> ST_MakePoint(%s, %s)::geography" % (lon, lat))
+        ).order_by("distance")
 
-        if limit is not None:
-            query += f" LIMIT {limit}"
+        if limit:
+            query = query.limit(limit)
 
-        establishments = await Establishment.raw(query)
-        return establishments
+        return await query
 
 
 ESTABLISHMENT_PREVIEW_FIELDS = ", ".join(

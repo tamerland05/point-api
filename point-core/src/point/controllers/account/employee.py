@@ -15,7 +15,7 @@ class EmployeeController(BaseController[Employee]):
 
     @classmethod
     def validate_meta(cls, employee: model | None) -> None:
-        if employee is None:
+        if not hasattr(employee, "meta"):
             return
 
         if employee.meta["show_job"]:

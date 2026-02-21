@@ -23,6 +23,14 @@ class TipController(BaseController[Tip]):
     model = Tip
     error_code: ErrorCode = ErrorCode.TIP_NOT_FOUND
 
+    bonus_ranges = [
+        (1, 4, 2_000),
+        (5, 9, 10_000),
+        (10, 19, 25_000),
+        (20, 99, 70_000),
+        (100, float("inf"), 250_000),
+    ]
+
     @classmethod
     async def create_tip(cls, checkout_in: CheckoutTipIn, sender_id: int) -> model:
         sender, asset, ton, recipient = await asyncio.gather(
@@ -134,10 +142,10 @@ class TipController(BaseController[Tip]):
 
         async with in_transaction():
             await tip.fetch_related("sender")
-            tip.sender.bonus_balance += cls.calculate_bonus(tip.tips_left_amount)
+            tip.sender.other_bonus_balance += cls.calculate_bonus(tip.tips_left_amount)
             tip.sender.tips_left += tip.tips_left_amount
             await tip.save(update_fields=["status", "updated_at"])
-            await tip.sender.save(update_fields=["bonus_balance", "tips_left", "updated_at"])
+            await tip.sender.save(update_fields=["other_bonus_balance", "tips_left", "updated_at"])
 
         if tip.employee_id is None:
             return
@@ -171,15 +179,8 @@ class TipController(BaseController[Tip]):
             lang=employee.language_code,
         )
 
-    @staticmethod
-    def calculate_bonus(tip_amount: Decimal) -> int:
+    @classmethod
+    def calculate_bonus(cls, tip_amount: Decimal) -> int:
         amount = tip_amount.to_integral_value(rounding=ROUND_HALF_UP)
-        ranges = [
-            (1, 4, 2_000),
-            (5, 9, 10_000),
-            (10, 19, 25_000),
-            (20, 99, 70_000),
-            (100, float("inf"), 250_000),
-        ]
 
-        return next((bonus for start, end, bonus in ranges if start <= amount < end), 0)
+        return next((bonus for start, end, bonus in cls.bonus_ranges if start <= amount < end), 0)

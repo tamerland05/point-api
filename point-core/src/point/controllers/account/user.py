@@ -5,7 +5,7 @@ from tortoise.transactions import in_transaction
 from point.config import settings
 from point.controllers.base import BaseController
 from point.errors import ErrorCode
-from point.models import User, Referral
+from point.models import User, Referral, Employee
 from point.view import AuthUserIn
 
 
@@ -38,10 +38,6 @@ class UserController(BaseController[User]):
         return await cls.get(employee_id=employee_id, enabled=True)
 
     @classmethod
-    async def find_by_employee_ids(cls, employee_ids: list[UUID]) -> list:
-        return await cls.filter(employee_id__in=employee_ids).values_list("employee_id", "id")
-
-    @classmethod
     def validate_meta(cls, user: model) -> None:
         if "show_tips_left" not in user.meta or not user.meta["show_tips_left"]:
             user.tips_left = None
@@ -52,12 +48,12 @@ class UserController(BaseController[User]):
             referrer = await cls.get_or_none(id=referrer_id, enabled=True)
             if referrer is None:
                 return
-            await Referral.create(user_id=user_id, referral_id=user_id, referrer_id=referrer_id)
-            referrer.bonus_balance += (
+            await Referral.create(referral_id=user_id, referrer_id=referrer_id)
+            referrer.referrals_bonus_balance += (
                 settings.bonus_reward_for_premium if is_premium
                 else settings.bonus_reward_for_simple
             )
-            await referrer.save(update_fields=["bonus_balance", "updated_at"])
+            await referrer.save(update_fields=["referrals_bonus_balance", "updated_at"])
 
     @classmethod
     async def find_referrals(
@@ -67,15 +63,7 @@ class UserController(BaseController[User]):
             size: int,
     ) -> list[model]:
         offset = (page - 1) * size
-
-        referral_references = await (
-            Referral.filter(referrer_id=referrer_id)
-            .prefetch_related("referral")
-            .offset(offset)
-            .limit(size)
-            .order_by("-referral__bonus_balance")
-        )
-        return [referral_reference.referral for referral_reference in referral_references]
+        return await User.raw(SELECT_REFERRALS_SQL % (referrer_id, size, offset))
 
     @classmethod
     async def count_referrals(cls, referrer_id: int) -> int:
@@ -83,11 +71,17 @@ class UserController(BaseController[User]):
 
     @classmethod
     async def get_top_users(cls) -> list[model]:
-        return await (
-            cls.filter("employee", "employee__job_place", enabled=True)
-            .order_by("-bonus_balance")
-            .limit(100)
-        )
+        users: list[cls.model] = await cls.model.raw(GET_TOP_USERS_SQL)
+        employees = await Employee.filter(id__in=[u.employee_id for u in users if u.employee_id]).prefetch_related("job_place")
+        employees = {e.id: e for e in employees}
+
+        for user in users:
+            if user.employee_id in employees:
+                user.employee = employees[user.employee_id]
+            else:
+                user.employee = None
+
+        return users
 
     @classmethod
     async def update_user_ranks(cls):
@@ -96,7 +90,22 @@ class UserController(BaseController[User]):
 
 UPDATE_RANKS_SQL = """
     UPDATE users u SET rank = ranked.rank
-    FROM (SELECT id, ROW_NUMBER() OVER (ORDER BY bonus_balance DESC, id) AS rank
-            FROM users) AS ranked
+    FROM (SELECT id, ROW_NUMBER() OVER (ORDER BY (other_bonus_balance + referrals_bonus_balance) DESC, id) AS rank FROM users) AS ranked
     WHERE u.id = ranked.id 
+"""
+
+SELECT_REFERRALS_SQL = """
+    SELECT u.*
+    FROM referrals r JOIN users u ON u.id = r.referral_id
+    WHERE r.referrer_id = %s
+    ORDER BY (u.other_bonus_balance + u.referrals_bonus_balance) DESC
+    LIMIT %s OFFSET %s
+"""
+
+GET_TOP_USERS_SQL = """
+    SELECT u.*
+    FROM users u
+    WHERE u.enabled
+    ORDER BY (u.other_bonus_balance + u.referrals_bonus_balance) DESC, u.id
+    LIMIT 100
 """

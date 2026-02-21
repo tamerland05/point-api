@@ -3,12 +3,14 @@ from collections import defaultdict
 from uuid import UUID
 
 from pydantic import ValidationError
+from tortoise.expressions import F
 from tortoise.transactions import in_transaction
 
+from point.config import settings
 from point.controllers.base import BaseController
 from point_shared.entity_types import PaymentTagType
 from point.errors import ErrorCode
-from point.models import EstablishmentRating, Payment, Establishment
+from point.models import EstablishmentRating, Payment, Establishment, User
 from point.view import EstablishmentRatingDbCreateIn
 
 
@@ -19,6 +21,8 @@ class EstablishmentRatingController(BaseController[EstablishmentRating]):
     @classmethod
     async def allow_ratings(cls) -> None:
         rating_payments = await Payment.filter(done=True, tag=PaymentTagType.stars_establishment_rating)
+        if len(rating_payments) == 0:
+            return
 
         establishment_ratings = []
         establishments = defaultdict(lambda: [0, 0])
@@ -35,6 +39,11 @@ class EstablishmentRatingController(BaseController[EstablishmentRating]):
         async with in_transaction():
             await cls.model.bulk_create(establishment_ratings)
             await cls.update_establishments(establishments_rates=establishments)
+            await User.filter(
+                id__in=set(payment.user_id for payment in rating_payments),
+            ).update(
+                other_bonus_balance=F("other_bonus_balance") + settings.bonus_reward_for_rating
+            )
             await Payment.filter(id__in=[rp.id for rp in rating_payments]).delete()
 
     @classmethod

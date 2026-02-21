@@ -12,6 +12,7 @@ class Employee(Model):
 
     class Meta:
         table = "employees"
+        indexes = [("job_place_id", "enabled")]
 
     user: list[User]
     job_place = fields.ForeignKeyField("models.Establishment", on_delete=OnDelete.RESTRICT)
@@ -24,7 +25,7 @@ class Employee(Model):
     purpose = fields.JSONField(null=True)
     meta = fields.JSONField()
 
-    enabled = fields.BooleanField(default=True, db_index=True)
+    enabled = fields.BooleanField(default=True)
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
 

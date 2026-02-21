@@ -10,12 +10,13 @@ class MenuItem(Model):
 
     class Meta:
         table = "menu_items"
-        unique_together = ("title", "establishment_id")
+        unique_together = ("title", "description", "establishment_id")
 
     establishment = fields.ForeignKeyField(
         "models.Establishment",
         on_delete=OnDelete.RESTRICT,
         related_name="menu",
+        db_index=True,
     )
 
     id = fields.UUIDField(primary_key=True, default=uuid4)

@@ -42,6 +42,7 @@ class Settings(BaseSettings, extra="allow"):
 
     bonus_reward_for_premium: int
     bonus_reward_for_simple: int
+    bonus_reward_for_rating: int
 
     logo_hash: PointHash
     set_rating_amount: int

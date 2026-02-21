@@ -19,16 +19,15 @@ CREATE TABLE IF NOT EXISTS "assets" (
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-CREATE INDEX IF NOT EXISTS "idx_assets_enabled_28a156" ON "assets" ("enabled");
 CREATE TABLE IF NOT EXISTS "establishment_types" (
     "id" UUID NOT NULL PRIMARY KEY,
     "name" VARCHAR(128) NOT NULL UNIQUE,
     "icon_hash" TEXT NOT NULL,
+    "color_code" TEXT,
     "enabled" BOOL NOT NULL DEFAULT True,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-CREATE INDEX IF NOT EXISTS "idx_establishme_enabled_e074dc" ON "establishment_types" ("enabled");
 CREATE TABLE IF NOT EXISTS "establishments" (
     "id" UUID NOT NULL PRIMARY KEY,
     "external_id" BIGINT UNIQUE,
@@ -50,9 +49,8 @@ CREATE TABLE IF NOT EXISTS "establishments" (
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "establishment_type_id" UUID NOT NULL REFERENCES "establishment_types" ("id") ON DELETE RESTRICT
 );
-
-CREATE INDEX IF NOT EXISTS "idx_establishme_enabled_90ab06" ON "establishments" ("enabled");
-CREATE INDEX IF NOT EXISTS idx_user_name_trgm ON establishments USING gin (LOWER(name) gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_user_name_trgm ON establishments USING GIN (LOWER(name) gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS "idx_establishments_location_gist" ON "establishments" USING GIST ("location") WHERE enabled;
 CREATE TABLE IF NOT EXISTS "employees" (
     "id" UUID NOT NULL PRIMARY KEY,
     "profession" VARCHAR(32) NOT NULL,
@@ -66,7 +64,7 @@ CREATE TABLE IF NOT EXISTS "employees" (
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "job_place_id" UUID NOT NULL REFERENCES "establishments" ("id") ON DELETE RESTRICT
 );
-CREATE INDEX IF NOT EXISTS "idx_employees_enabled_ac4be2" ON "employees" ("enabled");
+CREATE INDEX IF NOT EXISTS "idx_employees_job_pla_f9c8a1" ON "employees" ("job_place_id") WHERE enabled = true;
 CREATE TABLE IF NOT EXISTS "invitations" (
     "user_id" BIGINT NOT NULL,
     "profession" VARCHAR(32) NOT NULL,
@@ -88,18 +86,9 @@ CREATE TABLE IF NOT EXISTS "menu_items" (
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "establishment_id" UUID NOT NULL REFERENCES "establishments" ("id") ON DELETE RESTRICT,
-    CONSTRAINT "uid_menu_items_title_9a00bf" UNIQUE ("title", "establishment_id")
+    CONSTRAINT "uid_menu_items_title_2174d9" UNIQUE ("title", "description", "establishment_id")
 );
-CREATE INDEX IF NOT EXISTS "idx_menu_items_enabled_2c09a4" ON "menu_items" ("enabled");
-CREATE TABLE IF NOT EXISTS "payments" (
-    "id" UUID NOT NULL PRIMARY KEY,
-    "tag" VARCHAR(32) NOT NULL,
-    "done" BOOL NOT NULL DEFAULT False,
-    "meta" JSONB NOT NULL,
-    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-CREATE INDEX IF NOT EXISTS "idx_payments_tag_72ef00" ON "payments" ("done", "tag");
+CREATE INDEX IF NOT EXISTS "idx_menu_items_est_enabled_true" ON "menu_items" ("establishment_id") WHERE enabled;
 CREATE TABLE IF NOT EXISTS "purpose_icons" (
     "id" UUID NOT NULL PRIMARY KEY,
     "preview_hash" TEXT NOT NULL,
@@ -108,7 +97,6 @@ CREATE TABLE IF NOT EXISTS "purpose_icons" (
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-CREATE INDEX IF NOT EXISTS "idx_purpose_ico_enabled_f0ab0d" ON "purpose_icons" ("enabled");
 CREATE TABLE IF NOT EXISTS "tasks" (
     "id" UUID NOT NULL PRIMARY KEY,
     "title" VARCHAR(128) NOT NULL,
@@ -121,9 +109,7 @@ CREATE TABLE IF NOT EXISTS "tasks" (
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-CREATE INDEX IF NOT EXISTS "idx_tasks_enabled_9d6ba4" ON "tasks" ("enabled");
-COMMENT ON COLUMN "tasks"."integration_type" IS 'link: link
-channel: channel';
+CREATE INDEX IF NOT EXISTS "idx_tasks_enabled_true_profit" ON "tasks" ("id") WHERE enabled;
 CREATE TABLE IF NOT EXISTS "users" (
     "id" BIGSERIAL NOT NULL PRIMARY KEY,
     "first_name" TEXT,
@@ -132,7 +118,8 @@ CREATE TABLE IF NOT EXISTS "users" (
     "language_code" TEXT,
     "photo_url" TEXT,
     "wallet" TEXT,
-    "bonus_balance" BIGINT NOT NULL DEFAULT 0,
+    "other_bonus_balance" BIGINT NOT NULL DEFAULT 0,
+    "referrals_bonus_balance" BIGINT NOT NULL DEFAULT 0,
     "tips_left" DECIMAL(64,32) NOT NULL DEFAULT 0,
     "rank" BIGINT NOT NULL DEFAULT 0,
     "meta" JSONB NOT NULL,
@@ -141,8 +128,9 @@ CREATE TABLE IF NOT EXISTS "users" (
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "employee_id" UUID REFERENCES "employees" ("id") ON DELETE SET NULL
 );
-CREATE INDEX IF NOT EXISTS "idx_users_enabled_e41084" ON "users" ("enabled");
-CREATE INDEX IF NOT EXISTS "idx_users_bonus_balance_id" ON "users" (bonus_balance DESC, id ASC);
+CREATE INDEX IF NOT EXISTS "idx_users_enabled_i41084" ON "users" ("id") WHERE enabled;
+CREATE INDEX IF NOT EXISTS "idx_users_other_b_6b3f97" 
+    ON "users" ((other_bonus_balance + referrals_bonus_balance) DESC, "id" ASC);
 CREATE TABLE IF NOT EXISTS "completed_tasks" (
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "executor_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE,
@@ -162,6 +150,16 @@ CREATE TABLE IF NOT EXISTS "referrals" (
     "referrer_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE,
     PRIMARY KEY ("referrer_id", "referral_id")
 );
+CREATE TABLE IF NOT EXISTS "payments" (
+    "id" UUID NOT NULL PRIMARY KEY,
+    "tag" VARCHAR(32) NOT NULL,
+    "done" BOOL NOT NULL DEFAULT False,
+    "meta" JSONB NOT NULL,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "user_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS "idx_payments_done_05a88d" ON "payments" ("done", "tag");
 CREATE TABLE IF NOT EXISTS "tips" (
     "id" UUID NOT NULL PRIMARY KEY,
     "fee_transaction" JSONB NOT NULL,
@@ -179,9 +177,6 @@ CREATE TABLE IF NOT EXISTS "tips" (
     CHECK (employee_id is null AND establishment_id is not null OR employee_id is not null AND establishment_id is null)
 );
 CREATE INDEX IF NOT EXISTS "idx_tips_status_b521b6" ON "tips" ("status");
-COMMENT ON COLUMN "tips"."status" IS 'created: created
-accepted: accepted
-failed: failed';
 CREATE TABLE IF NOT EXISTS "user_visits" (
     "visits" INT NOT NULL,
     "establishment_id" UUID NOT NULL REFERENCES "establishments" ("id") ON DELETE CASCADE,
@@ -202,66 +197,69 @@ async def downgrade(_: BaseDBAsyncClient) -> str:
 
 
 MODELS_STATE = (
-    "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"
-    "VyhLKjUUSO0HbkCK15BO7n/wFBcBju"
+    "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"
+    "yPbgiZFA5o4sJ54Uj7PJ4+XX/wEYOLKi"
 )
