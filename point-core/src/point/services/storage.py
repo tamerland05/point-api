@@ -35,7 +35,7 @@ class StorageService:
                 key = hashlib.md5(data).hexdigest()
 
                 content_type, _ = mimetypes.guess_type("file" + extension)
-                content_type = content_type or "application/octet-stream"
+                content_type = content_type or "image/jpeg"
 
                 response = await client.put_object(
                     Bucket=self.bucket,
