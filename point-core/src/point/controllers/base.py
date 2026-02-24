@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar, Any, Coroutine
+from typing import Generic, TypeVar, Awaitable
 
 from tortoise.models import Model as TortoiseModel
 from tortoise.queryset import QuerySet, QuerySetSingle
@@ -31,7 +31,7 @@ class BaseController(Generic[Model]):
         return cls.model.filter(**filters).prefetch_related(*prefetch)
 
     @classmethod
-    def create(cls, model_create_in: PointBase) -> Coroutine[Any, Any, Model]:
+    def create(cls, model_create_in: PointBase) -> Awaitable[Model]:
         return cls.model.create(**model_create_in.model_dump(mode="json"))
 
     @classmethod
@@ -48,5 +48,5 @@ class BaseController(Generic[Model]):
         return entity
 
     @classmethod
-    async def delete(cls, **filters) -> None:
-        await cls.model.filter(**filters).delete()
+    def delete(cls, **filters):
+        return cls.model.filter(**filters).delete()

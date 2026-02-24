@@ -28,6 +28,8 @@ class UserPublicOut(PointBase):
     name: str
     username: str | None = Field(default=None)
     bonus_balance: int = 0
+    tasks_bonus_balance: int = 0
+    tips_bonus_balance: int = 0
     referrals_bonus_balance: int = 0
     rank: int = Field(ge=0)
     tips_left: Decimal | None = Field(ge=0, default=None)

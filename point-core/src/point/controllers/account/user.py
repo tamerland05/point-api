@@ -88,24 +88,26 @@ class UserController(BaseController[User]):
         await cls.model.raw(UPDATE_RANKS_SQL)
 
 
-UPDATE_RANKS_SQL = """
+BONUS_BALANCE_SUM = "(u.tasks_bonus_balance + u.tips_bonus_balance + u.referrals_bonus_balance)"
+
+UPDATE_RANKS_SQL = f"""
     UPDATE users u SET rank = ranked.rank
-    FROM (SELECT id, ROW_NUMBER() OVER (ORDER BY (other_bonus_balance + referrals_bonus_balance) DESC, id) AS rank FROM users) AS ranked
+    FROM (SELECT id, ROW_NUMBER() OVER (ORDER BY {BONUS_BALANCE_SUM} DESC, id) AS rank FROM users) AS ranked
     WHERE u.id = ranked.id 
 """
 
-SELECT_REFERRALS_SQL = """
+SELECT_REFERRALS_SQL = f"""
     SELECT u.*
     FROM referrals r JOIN users u ON u.id = r.referral_id
     WHERE r.referrer_id = %s
-    ORDER BY (u.other_bonus_balance + u.referrals_bonus_balance) DESC
+    ORDER BY {BONUS_BALANCE_SUM} DESC
     LIMIT %s OFFSET %s
 """
 
-GET_TOP_USERS_SQL = """
+GET_TOP_USERS_SQL = f"""
     SELECT u.*
     FROM users u
     WHERE u.enabled
-    ORDER BY (u.other_bonus_balance + u.referrals_bonus_balance) DESC, u.id
+    ORDER BY {BONUS_BALANCE_SUM} DESC, u.id
     LIMIT 100
 """

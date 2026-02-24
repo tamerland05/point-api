@@ -118,7 +118,8 @@ CREATE TABLE IF NOT EXISTS "users" (
     "language_code" TEXT,
     "photo_url" TEXT,
     "wallet" TEXT,
-    "other_bonus_balance" BIGINT NOT NULL DEFAULT 0,
+    "tasks_bonus_balance" BIGINT NOT NULL DEFAULT 0,
+    "tips_bonus_balance" BIGINT NOT NULL DEFAULT 0,
     "referrals_bonus_balance" BIGINT NOT NULL DEFAULT 0,
     "tips_left" DECIMAL(64,32) NOT NULL DEFAULT 0,
     "rank" BIGINT NOT NULL DEFAULT 0,
@@ -130,7 +131,7 @@ CREATE TABLE IF NOT EXISTS "users" (
 );
 CREATE INDEX IF NOT EXISTS "idx_users_enabled_i41084" ON "users" ("id") WHERE enabled;
 CREATE INDEX IF NOT EXISTS "idx_users_other_b_6b3f97" 
-    ON "users" ((other_bonus_balance + referrals_bonus_balance) DESC, "id" ASC);
+    ON "users" ((tasks_bonus_balance + tips_bonus_balance + referrals_bonus_balance) DESC, "id" ASC);
 CREATE TABLE IF NOT EXISTS "completed_tasks" (
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "executor_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE,

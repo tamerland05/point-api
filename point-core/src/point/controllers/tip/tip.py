@@ -24,11 +24,12 @@ class TipController(BaseController[Tip]):
     error_code: ErrorCode = ErrorCode.TIP_NOT_FOUND
 
     bonus_ranges = [
-        (1, 4, 2_000),
-        (5, 9, 10_000),
-        (10, 19, 25_000),
-        (20, 99, 70_000),
-        (100, float("inf"), 250_000),
+        (1, 4, 100),
+        (5, 9, 500),
+        (10, 19, 1_500),
+        (20, 49, 3_000),
+        (50, 99, 7_500),
+        (100, float("inf"), 15_000),
     ]
 
     @classmethod
@@ -142,10 +143,10 @@ class TipController(BaseController[Tip]):
 
         async with in_transaction():
             await tip.fetch_related("sender")
-            tip.sender.other_bonus_balance += cls.calculate_bonus(tip.tips_left_amount)
+            tip.sender.tips_bonus_balance += cls.calculate_bonus(tip.tips_left_amount)
             tip.sender.tips_left += tip.tips_left_amount
             await tip.save(update_fields=["status", "updated_at"])
-            await tip.sender.save(update_fields=["other_bonus_balance", "tips_left", "updated_at"])
+            await tip.sender.save(update_fields=["tips_bonus_balance", "tips_left", "updated_at"])
 
         if tip.employee_id is None:
             return

@@ -10,7 +10,6 @@ class User(Model):
 
     class Meta:
         table = "users"
-        indexes = [("other_bonus_balance", "id")]
 
     id = fields.BigIntField(primary_key=True)
     first_name = fields.TextField(null=True)
@@ -22,7 +21,8 @@ class User(Model):
     wallet = TonAddressField(null=True)
     meta = fields.JSONField(default={})
 
-    other_bonus_balance = fields.BigIntField(default=0)
+    tasks_bonus_balance = fields.BigIntField(default=0)
+    tips_bonus_balance = fields.BigIntField(default=0)
     referrals_bonus_balance = fields.BigIntField(default=0)
     tips_left = fields.DecimalField(default=0, max_digits=64, decimal_places=32)
     rank = fields.BigIntField(default=0)
@@ -46,4 +46,4 @@ class User(Model):
 
     @property
     def bonus_balance(self) -> int:
-        return self.other_bonus_balance + self.referrals_bonus_balance
+        return self.tasks_bonus_balance + self.tips_bonus_balance + self.referrals_bonus_balance
