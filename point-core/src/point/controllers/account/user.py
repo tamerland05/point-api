@@ -88,7 +88,7 @@ class UserController(BaseController[User]):
         await cls.model.raw(UPDATE_RANKS_SQL)
 
 
-BONUS_BALANCE_SUM = "(u.tasks_bonus_balance + u.tips_bonus_balance + u.referrals_bonus_balance)"
+BONUS_BALANCE_SUM = "(tasks_bonus_balance + tips_bonus_balance + referrals_bonus_balance)"
 
 UPDATE_RANKS_SQL = f"""
     UPDATE users u SET rank = ranked.rank
