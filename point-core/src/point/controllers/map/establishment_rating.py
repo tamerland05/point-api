@@ -36,19 +36,21 @@ class EstablishmentRatingController(BaseController[EstablishmentRating]):
             establishments[rating.establishment_id][0] += 1
             establishments[rating.establishment_id][1] += rating.mark
 
-        async with in_transaction():
+        async with (in_transaction()):
             await cls.model.bulk_create(establishment_ratings)
             await cls.update_establishments(establishments_rates=establishments)
             await User.filter(
                 id__in=set(payment.user_id for payment in rating_payments),
-            ).update(
+            ).select_for_update(no_key=True).update(
                 tasks_bonus_balance=F("tasks_bonus_balance") + settings.bonus_reward_for_rating
             )
             await Payment.filter(id__in=[rp.id for rp in rating_payments]).delete()
 
     @classmethod
     async def update_establishments(cls, establishments_rates: dict) -> None:
-        establishments = await Establishment.filter(id__in=establishments_rates.keys())
+        establishments = await Establishment.filter(
+            id__in=establishments_rates.keys()
+        ).select_for_update(no_key=True)
 
         update_tasks = []
         for e in establishments:

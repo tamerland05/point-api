@@ -8,7 +8,7 @@ from point.auth import get_user
 from point.config import settings
 from point.controllers import MenuItemController, UserController
 from point.i18 import translate
-from point.services import bs
+from point.services import msb
 from point.view import MenuItemOut, Button, AuthUser
 
 router = APIRouter()
@@ -43,7 +43,7 @@ async def share_menu_item(item_id: UUID, user: AuthUser = Depends(get_user)):
         establishment=item.establishment.name,
     )
 
-    message_id = await bs.prepare_inline_message(
+    message_id = await msb.prepare_inline_message(
         user_id=user.id,
         text=text,
         photo=item.photo,

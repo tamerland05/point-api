@@ -5,4 +5,4 @@ from point.config import settings
 
 router = APIRouter()
 
-router.include_router(webhook_router, prefix="/" + settings.bot_token + "/webhook", include_in_schema=False)
+router.include_router(webhook_router, prefix="/" + settings.main_bot_token + "/webhook", include_in_schema=False)

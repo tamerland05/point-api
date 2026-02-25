@@ -2,7 +2,7 @@ from fastapi import Request, APIRouter
 from aiogram.types import Update
 
 from point.controllers import PaymentController
-from point.services import bs
+from point.services import msb
 
 router = APIRouter()
 
@@ -15,6 +15,6 @@ async def telegram_webhook(request: Request):
     if update.message and update.message.successful_payment:
         await PaymentController.process_payment(payload=update.message.successful_payment.invoice_payload)
     else:
-        await bs.feed_update(update)
+        await msb.feed_update(update)
 
     return {"ok": True}

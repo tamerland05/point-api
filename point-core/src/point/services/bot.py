@@ -4,7 +4,7 @@ import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
-from aiogram.enums import ParseMode
+from aiogram.enums import ParseMode, ChatMemberStatus
 from aiogram.filters import CommandStart
 from aiogram.types import (
     WebAppInfo,
@@ -28,19 +28,12 @@ dp = Dispatcher()
 
 
 class BotService:
-    def __init__(self):
+    def __init__(self, bot_token: str):
         self.bot = Bot(
-            token=settings.bot_token,
+            token=bot_token,
             default=DefaultBotProperties(parse_mode=ParseMode.HTML),
         )
         self._global_limiter = AsyncLimiter(max_rate=30, time_period=1)
-        self._secret_key = hmac.new(b'WebAppData', settings.bot_token.encode('utf-8'), hashlib.sha256).digest()
-
-        self.point_app_url = str(settings.point_app_url)
-        self.point_channel_url = "t.me/" + settings.point_channel_name
-
-    async def create_invoice_link(self, request: InvoiceRequest) -> str:
-        return await self.bot.create_invoice_link(**request.model_dump(mode="json"))
 
     async def request(self, func, **kwargs):
         async with self._global_limiter:
@@ -48,6 +41,19 @@ class BotService:
                 return await func(**kwargs)
             except Exception as e:
                 logging.exception(f"Error while send request with kwargs {kwargs}: {e}")
+
+
+class MainBotService(BotService):
+    def __init__(self):
+        super().__init__(settings.main_bot_token)
+
+        self._secret_key = hmac.new(b'WebAppData', settings.main_bot_token.encode('utf-8'), hashlib.sha256).digest()
+
+        self.point_app_url = str(settings.point_app_url)
+        self.point_channel_url = "t.me/" + settings.point_channel_name
+
+    async def create_invoice_link(self, request: InvoiceRequest) -> str:
+        return await self.bot.create_invoice_link(**request.model_dump(mode="json"))
 
     async def send_message_with_intro(self, text: str, user_id: int, lang: str) -> None:
         builder = InlineKeyboardBuilder()
@@ -130,13 +136,36 @@ class BotService:
         return hashlib.sha256(text.encode()).hexdigest()
 
 
-bs = BotService()
+class CheckerBotService(BotService):
+    def __init__(self):
+        super().__init__(settings.checker_bot_token)
+
+    async def is_user_member_of_chat(self, user_id: int, object_id: str) -> bool:
+        try:
+            member = await self.request(
+                func=self.bot.get_chat_member,
+                chat_id=object_id,
+                user_id=user_id
+            )
+
+            return member.status in {
+                ChatMemberStatus.MEMBER,
+                ChatMemberStatus.ADMINISTRATOR,
+                ChatMemberStatus.CREATOR,
+            }
+        except Exception as e:
+            logging.exception(f"Cannot check membership for user {user_id} in {object_id}: {e}")
+            return False
+
+
+msb = MainBotService()
+cbs = CheckerBotService()
 
 
 @dp.message(CommandStart())
 async def handle_start(message: Message) -> None:
     lang = message.from_user.language_code
-    await bs.send_message_with_intro(
+    await msb.send_message_with_intro(
         text=translate(tag_or_text="start", domain="common.replies", lang=lang),
         user_id=message.from_user.id,
         lang=lang

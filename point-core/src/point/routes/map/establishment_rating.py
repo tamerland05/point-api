@@ -8,7 +8,7 @@ from point.controllers import EstablishmentController, UserController, PaymentCo
 from point_shared.entity_types import PaymentTagType
 from point.i18 import translate
 from point.models.utils import hash_to_link
-from point.services import bs
+from point.services import msb
 from point.view import AuthUser, EstablishmentRatingDbCreateIn, EstablishmentRatingCreateIn, StarsInvoiceRequest
 
 router = APIRouter()
@@ -34,7 +34,7 @@ async def set_establishment_rating(
     )
 
     domain = "payment." + PaymentTagType.stars_establishment_rating
-    return await bs.create_invoice_link(
+    return await msb.create_invoice_link(
         request=StarsInvoiceRequest(
             payload=str(payment.id),
             title=translate("title", domain=domain),

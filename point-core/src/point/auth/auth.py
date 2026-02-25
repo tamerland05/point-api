@@ -8,7 +8,7 @@ from jose import jwt
 
 from point.config import settings
 from point.errors import APIException, ErrorCode
-from point.services import bs
+from point.services import msb
 from point.view import AuthIn, AuthUserIn
 from point.view import AuthUser
 
@@ -58,7 +58,7 @@ def get_user(token_data=Depends(JWTBearer())) -> AuthUser:
 
 def validate_telegram_init_data(init_data: AuthIn) -> AuthUserIn | None:
     init_data_dict = dict(parse_qsl(init_data.init_data_raw, keep_blank_values=True))
-    if "user" not in init_data_dict or not bs.validate_data(data_dict=init_data_dict):
+    if "user" not in init_data_dict or not msb.validate_data(data_dict=init_data_dict):
         return None
 
     return AuthUserIn.model_validate_json(init_data_dict["user"])
