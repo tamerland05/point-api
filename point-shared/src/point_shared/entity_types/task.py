@@ -2,5 +2,6 @@ from enum import StrEnum
 
 
 class TaskIntegrationType(StrEnum):
-    link = "link"
-    channel = "channel"
+    tg_membership = "tg_membership"
+    other = "other"
+

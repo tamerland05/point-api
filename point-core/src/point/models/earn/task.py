@@ -15,7 +15,8 @@ class Task(Model):
     icon_hash = fields.CharField(max_length=128)
 
     link = fields.CharField(max_length=1024)
-    integration_type = fields.CharEnumField(enum_type=TaskIntegrationType)
+    integration_type = fields.CharEnumField(enum_type=TaskIntegrationType, default=None)
+    config = fields.JSONField(null=True, default=None)
 
     enabled = fields.BooleanField(default=True, db_index=True)
     created_at = fields.DatetimeField(auto_now_add=True)

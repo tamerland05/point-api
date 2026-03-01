@@ -1,6 +1,6 @@
 from point.controllers.base import BaseController
 from point.errors import ErrorCode
-from point.models import Task, CompletedTask
+from point.models import Task, ExecutedTask
 
 
 class TaskController(BaseController[Task]):
@@ -10,8 +10,8 @@ class TaskController(BaseController[Task]):
     @classmethod
     async def get_for_user(cls, user_id: int) -> list[Task]:
         tasks = await cls.model.filter(enabled=True)
-        completed_tasks = await CompletedTask.filter(executor_id=user_id, task__enabled=True)
-        completed_tasks_ids = set(ct.task_id for ct in completed_tasks)
+        completed_tasks = await ExecutedTask.filter(executor_id=user_id, origin__enabled=True, completed=True)
+        completed_tasks_ids = set(ct.origin_id for ct in completed_tasks)
 
         for task in tasks:
             task.done = task.id in completed_tasks_ids

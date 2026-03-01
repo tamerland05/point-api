@@ -15,3 +15,6 @@ class TaskOut(PointBase):
     profit: int = Field(gt=0)
     done: bool = Field(default=False)
 
+
+class ExecutedTaskIn(PointBase):
+    id: UUID

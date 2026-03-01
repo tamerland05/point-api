@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import sys
+from concurrent.futures import ProcessPoolExecutor
 from contextlib import asynccontextmanager
 from decimal import getcontext
 
@@ -12,7 +13,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from tortoise.contrib.fastapi import register_tortoise
 
 from point.config import settings
-from point.controllers.pooling import start_pooling, stop_pooling
+from point.controllers.pooling import stop_pooling, run_pooling_process
 from point.errors import APIException
 from point.routes import router
 
@@ -31,10 +32,15 @@ logger.handlers = [handler]
 APP_BASE = "/api/v1/point"
 
 
+pooling_executor = ProcessPoolExecutor(max_workers=1)
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     getcontext().prec = 64
-    asyncio.ensure_future(start_pooling())
+    loop = asyncio.get_running_loop()
+
+    loop.run_in_executor(pooling_executor, run_pooling_process)
 
     yield
 

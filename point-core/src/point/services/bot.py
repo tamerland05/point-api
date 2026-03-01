@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import logging
+from uuid import uuid4
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
@@ -35,13 +36,6 @@ class BotService:
         )
         self._global_limiter = AsyncLimiter(max_rate=30, time_period=1)
 
-    async def request(self, func, **kwargs):
-        async with self._global_limiter:
-            try:
-                return await func(**kwargs)
-            except Exception as e:
-                logging.exception(f"Error while send request with kwargs {kwargs}: {e}")
-
 
 class MainBotService(BotService):
     def __init__(self):
@@ -51,6 +45,13 @@ class MainBotService(BotService):
 
         self.point_app_url = str(settings.point_app_url)
         self.point_channel_url = "t.me/" + settings.point_channel_name
+
+    async def request(self, func, **kwargs):
+        async with self._global_limiter:
+            try:
+                return await func(**kwargs)
+            except Exception as e:
+                logging.exception(f"Error while send request with kwargs {kwargs}: {e}")
 
     async def create_invoice_link(self, request: InvoiceRequest) -> str:
         return await self.bot.create_invoice_link(**request.model_dump(mode="json"))
@@ -85,9 +86,10 @@ class MainBotService(BotService):
         else:
             reply_markup = None
 
+        query_id = str(uuid4())
         if photo:
             prepared_message = InlineQueryResultPhoto(
-                id=self.make_result_id(text + photo),
+                id=query_id,
                 photo_url=photo,
                 thumbnail_url=photo,
                 caption=text,
@@ -95,7 +97,7 @@ class MainBotService(BotService):
             )
         else:
             prepared_message = InlineQueryResultArticle(
-                id=self.make_result_id(text),
+                id=query_id,
                 title="Share",
                 input_message_content=InputTextMessageContent(message_text=text),
                 reply_markup=reply_markup,
@@ -131,22 +133,21 @@ class MainBotService(BotService):
         calculated_hash = hmac.new(self._secret_key, data, hashlib.sha256).hexdigest()
         return hmac.compare_digest(calculated_hash, data_hash)
 
-    @staticmethod
-    def make_result_id(text: str) -> str:
-        return hashlib.sha256(text.encode()).hexdigest()
-
 
 class CheckerBotService(BotService):
     def __init__(self):
         super().__init__(settings.checker_bot_token)
 
-    async def is_user_member_of_chat(self, user_id: int, object_id: str) -> bool:
+    async def is_user_member_of_chat(self, user_id: int, object_id: int | str) -> bool:
         try:
-            member = await self.request(
-                func=self.bot.get_chat_member,
-                chat_id=object_id,
-                user_id=user_id
-            )
+            async with self._global_limiter:
+                member = await self.bot.get_chat_member(
+                    chat_id=object_id,
+                    user_id=user_id
+                )
+
+            if member is None:
+                return False
 
             return member.status in {
                 ChatMemberStatus.MEMBER,

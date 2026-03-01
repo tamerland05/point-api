@@ -104,7 +104,8 @@ CREATE TABLE IF NOT EXISTS "tasks" (
     "profit" BIGINT NOT NULL,
     "icon_hash" VARCHAR(128) NOT NULL,
     "link" VARCHAR(1024) NOT NULL,
-    "integration_type" VARCHAR(7) NOT NULL,
+    "integration_type" VARCHAR(16) NOT NULL, 
+    "config" JSONB,
     "enabled" BOOL NOT NULL DEFAULT True,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -132,12 +133,15 @@ CREATE TABLE IF NOT EXISTS "users" (
 CREATE INDEX IF NOT EXISTS "idx_users_enabled_i41084" ON "users" ("id") WHERE enabled;
 CREATE INDEX IF NOT EXISTS "idx_users_other_b_6b3f97" 
     ON "users" ((tasks_bonus_balance + tips_bonus_balance + referrals_bonus_balance) DESC, "id" ASC);
-CREATE TABLE IF NOT EXISTS "completed_tasks" (
+CREATE TABLE IF NOT EXISTS "executed_tasks" (
+    "completed" BOOL NOT NULL DEFAULT FALSE,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "executor_id" BIGINT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE,
-    "task_id" UUID NOT NULL REFERENCES "tasks" ("id") ON DELETE CASCADE,
-    PRIMARY KEY ("task_id", "executor_id")
+    "origin_id" UUID NOT NULL REFERENCES "tasks" ("id") ON DELETE CASCADE,
+    PRIMARY KEY ("origin_id", "executor_id")
 );
+CREATE INDEX IF NOT EXISTS "idx_users_completed_t41084" ON "executed_tasks" ("origin_id") WHERE completed;         
 CREATE TABLE IF NOT EXISTS "establishment_ratings" (
     "mark" SMALLINT NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
