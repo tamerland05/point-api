@@ -126,7 +126,8 @@ jobs:
           POINT_APP_URL=${{ vars.POINT_APP_URL }}
           POINT_BOT_NAME=${{ vars.POINT_BOT_NAME }}
           POINT_CHANNEL_NAME=${{ vars.POINT_CHANNEL_URL }}
-          BOT_TOKEN=${{ secrets.BOT_TOKEN }}
+          MAIN_BOT_TOKEN=${{ secrets.MAIN_BOT_TOKEN }}
+          CHECKER_BOT_TOKEN=${{ secrets.CHECKER_BOT_TOKEN }}
           JWT_ALGORITHM=${{ secrets.JWT_ALGORITHM }}
           PUBLIC_KEY=${{ secrets.PUBLIC_KEY }}
           
