@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 from uuid import UUID
 
 from pydantic import Field, AnyUrl
@@ -14,6 +15,7 @@ class TaskCreateIn(PointBase):
     icon_hash: PointHash
     link: AnyUrl = Field(max_length=1024)
     integration_type: TaskIntegrationType
+    config: Any = Field(default=None)
 
 
 class TaskUpdateIn(PointBase):
@@ -24,6 +26,7 @@ class TaskUpdateIn(PointBase):
     link: AnyUrl | None = Field(max_length=1024, default=None)
     integration_type: TaskIntegrationType | None = Field(default=None)
     enabled: bool | None = Field(default=None)
+    config: Any = Field(default=None)
 
 
 class TaskAdminOut(PointBase):
@@ -34,6 +37,7 @@ class TaskAdminOut(PointBase):
     icon_hash: PointHash
     link: AnyUrl = Field(max_length=1024)
     integration_type: TaskIntegrationType
+    config: Any = Field(None)
     enabled: bool
     created_at: datetime | None = Field(default=None)
     updated_at: datetime | None = Field(default=None)
